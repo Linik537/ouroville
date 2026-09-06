@@ -54,6 +54,7 @@ function Home() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />
+        <HeroHeadlights />
         <div className="relative mx-auto max-w-5xl px-4 py-28 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
           <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
