@@ -103,6 +103,7 @@ function Home() {
         </div>
       </section>
 
+      <div className="relative z-30 bg-background">
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Últimas novidades</h2>
@@ -167,6 +168,7 @@ function Home() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

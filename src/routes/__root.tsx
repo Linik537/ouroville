@@ -130,7 +130,9 @@ function RootComponent() {
           {/* Required: nested routes render here. */}
           <Outlet />
         </main>
-        <Footer />
+        <div className="relative z-30">
+          <Footer />
+        </div>
       </div>
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
