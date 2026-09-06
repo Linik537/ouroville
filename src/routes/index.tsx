@@ -11,7 +11,7 @@ import { fetchCarros } from "@/lib/supabase";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ouroville Motors — Seminovos e novos em Uberlândia MG" },
+      { title: "Ouroville Motors" },
       {
         name: "description",
         content:
