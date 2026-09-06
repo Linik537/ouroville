@@ -40,14 +40,6 @@ export function HeroHeadlights() {
     return () => clearTimeout(t);
   }, [flash]);
 
-  // Mirror object-cover math so the lights track the image on any viewport.
-  const layout = (() => {
-    const el = ref.current;
-    if (!el) return null;
-    return null;
-  })();
-  void layout;
-
   return (
     <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <CoverBox>
