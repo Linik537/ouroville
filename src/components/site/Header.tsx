@@ -40,7 +40,7 @@ export function Header() {
           href={whatsappLink(`Olá! Vim pelo site da ${SITE.name}.`)}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-110 md:ml-4"
+          className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-white/90 md:ml-4"
         >
           <Phone className="h-4 w-4" aria-hidden />
           <span className="hidden sm:inline">{SITE.phoneDisplay}</span>
