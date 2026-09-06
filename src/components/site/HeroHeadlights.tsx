@@ -16,7 +16,7 @@ const LIGHTS = [
 /**
  * Overlay that matches the hero image's object-cover rendering box and
  * flashes white over each headlight twice whenever the user crosses a
- * scroll threshold (down past 10px, or back up past 400px).
+ * scroll threshold (down past 10px, or back up past 300px).
  */
 export function HeroHeadlights() {
   const ref = useRef<HTMLDivElement>(null);
