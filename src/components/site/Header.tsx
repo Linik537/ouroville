@@ -5,9 +5,9 @@ import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
 const nav = [
-  { to: "/estoque", label: "Estoque" },
-  { to: "/sobre", label: "Sobre" },
-  { to: "/financie", label: "Financie" },
+  { to: "/estoque", label: "ESTOQUE" },
+  { to: "/sobre", label: "SOBRE" },
+  { to: "/financie", label: "FINANCIE" },
 ] as const;
 
 export function Header() {
