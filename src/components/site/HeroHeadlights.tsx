@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const IMG_W = 1920;
 const IMG_H = 1088;
 const DOWN_TRIGGER_PX = 10;
-const UP_TRIGGER_PX = 400;
+const UP_TRIGGER_PX = 300;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
