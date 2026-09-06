@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
-import logo from "@/assets/ouroville-logo-new.jpg.asset.json";
+import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
 const nav = [
@@ -16,7 +16,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
-          <img src={logo.url} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
+          <img src={logo} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
           <span className="hidden items-baseline gap-2 sm:flex">
             <span className="font-brand-primary text-xl text-primary">Ouroville</span>
             <span className="font-brand-secondary text-base text-foreground">Motors</span>
