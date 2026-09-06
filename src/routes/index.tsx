@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Award, Search, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
+import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
@@ -144,6 +145,24 @@ function Home() {
               <figcaption className="mt-4 text-sm font-semibold text-primary">{d.nome}</figcaption>
             </figure>
           ))}
+        </div>
+      </section>
+
+      <section className="border-t border-border/60 bg-card">
+        <div className="mx-auto max-w-7xl px-4 py-16">
+          <h2 className="text-center text-2xl font-bold text-foreground sm:text-3xl">Onde estamos</h2>
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            {SITE.address} · {SITE.hours}
+          </p>
+          <div className="mt-8 overflow-hidden rounded-xl border border-border/70">
+            <iframe
+              title={`Mapa de localização da ${SITE.name}`}
+              src={SITE.mapEmbed}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="h-96 w-full border-0"
+            />
+          </div>
         </div>
       </section>
     </div>
