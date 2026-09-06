@@ -71,6 +71,10 @@ export function Header() {
           ))}
         </nav>
       )}
+
+      <div className="bg-white py-1.5 text-center text-xs font-semibold tracking-wide text-zinc-800">
+        {SITE.hours} — {SITE.address}
+      </div>
     </header>
   );
 }
