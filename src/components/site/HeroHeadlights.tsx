@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const IMG_W = 1920;
 const IMG_H = 1088;
 const DOWN_TRIGGER_PX = 10;
-const UP_OFFSET_PX = 10;
+const UP_TRIGGER_PX = 160;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
@@ -13,17 +13,10 @@ const LIGHTS = [
   { left: 0.874, top: 0.558, width: 0.045, height: 0.02 },
 ];
 
-function getHeaderHeight() {
-  const header = document.querySelector("header");
-  if (!header) return 104;
-  const rect = header.getBoundingClientRect();
-  return Math.round(rect.height);
-}
-
 /**
  * Overlay that matches the hero image's object-cover rendering box and
  * flashes white over each headlight twice whenever the user crosses a
- * scroll threshold (down past 10px, or back up to 10px from the header bottom).
+ * scroll threshold (down past 10px, or back up past 160px).
  */
 export function HeroHeadlights() {
   const ref = useRef<HTMLDivElement>(null);
@@ -35,11 +28,9 @@ export function HeroHeadlights() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      const headerHeight = getHeaderHeight();
-      const upTrigger = Math.max(DOWN_TRIGGER_PX, headerHeight - UP_OFFSET_PX);
 
       const nowBelow = y > DOWN_TRIGGER_PX;
-      const nowAbove = y < upTrigger;
+      const nowAbove = y < UP_TRIGGER_PX;
 
       if (nowBelow && !belowRef.current && y > lastScrollRef.current) {
         setFlash((f) => f + 1);
@@ -53,16 +44,8 @@ export function HeroHeadlights() {
       lastScrollRef.current = y;
     };
 
-    const onResize = () => {
-      lastScrollRef.current = window.scrollY;
-    };
-
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-    };
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
