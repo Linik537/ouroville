@@ -44,18 +44,26 @@ function Home() {
   return (
     <div>
       <section className="relative overflow-hidden border-b border-border/60">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_55%)]" />
-        <div className="relative mx-auto max-w-5xl px-4 py-24 text-center">
+        <img
+          src={heroCar}
+          alt="Carro premium em showroom escuro com iluminação dourada"
+          width={1920}
+          height={1088}
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />
+        <div className="relative mx-auto max-w-5xl px-4 py-28 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
-          <h1 className="mt-5 text-4xl font-extrabold uppercase leading-tight tracking-tight text-foreground sm:text-6xl">
-            O seu próximo carro está <span className="text-primary">aqui em Uberlândia</span>
+          <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
+            Encontre o seu próximo carro, <span className="text-primary">no padrão de ouro</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground">
-            Estoque selecionado, procedência checada e financiamento sem complicação. {SITE.hours}.
+            Estoque selecionado, procedência checada e financiamento sem complicação.
           </p>
 
           <form
-            className="mx-auto mt-10 flex max-w-2xl overflow-hidden rounded-full border border-primary/50 bg-card"
+            className="mx-auto mt-10 flex max-w-2xl overflow-hidden rounded-full border border-primary/50 bg-card/90"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({ to: "/estoque", search: { q: termo || undefined } });
@@ -64,7 +72,7 @@ function Home() {
             <input
               value={termo}
               onChange={(e) => setTermo(e.target.value)}
-              placeholder="Digite marca, modelo ou ano (ex: crorola 2022)"
+              placeholder="Digite marca, modelo ou ano"
               aria-label="Buscar veículo"
               className="flex-1 bg-transparent px-6 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
