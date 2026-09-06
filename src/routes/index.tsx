@@ -59,7 +59,7 @@ function Home() {
           <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
             Encontre o seu próximo carro, <span className="text-primary">no padrão de ouro</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground">
+          <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
             Estoque selecionado, procedência checada e financiamento sem complicação.
           </p>
 
