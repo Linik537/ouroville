@@ -74,9 +74,10 @@ export function Header() {
         )}
       </header>
 
-      <div className="sticky top-16 z-20 bg-primary px-4 py-2.5 text-center font-sans text-sm font-medium text-primary-foreground sm:text-base">
+      <div className="fixed inset-x-0 top-16 z-20 bg-primary px-4 py-2.5 text-center font-sans text-sm font-medium text-primary-foreground sm:text-base">
         Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
       </div>
+      <div className="h-11" aria-hidden />
     </>
   );
 }
