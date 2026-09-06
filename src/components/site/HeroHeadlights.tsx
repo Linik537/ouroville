@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const IMG_W = 1920;
 const IMG_H = 1088;
 const DOWN_TRIGGER_PX = 10;
-const UP_TRIGGER_PX = 400;
+const UP_TRIGGER_PX = 300;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
@@ -16,7 +16,7 @@ const LIGHTS = [
 /**
  * Overlay that matches the hero image's object-cover rendering box and
  * flashes white over each headlight twice whenever the user crosses a
- * scroll threshold (down past 10px, or back up past 400px).
+ * scroll threshold (down past 10px, or back up past 300px).
  */
 export function HeroHeadlights() {
   const ref = useRef<HTMLDivElement>(null);
