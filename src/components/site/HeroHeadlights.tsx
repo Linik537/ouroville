@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 const IMG_W = 1920;
 const IMG_H = 1088;
-const SCROLL_TRIGGER_PX = 140;
+const SCROLL_TRIGGER_PX = 50;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
