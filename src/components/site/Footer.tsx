@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Calendar, Phone } from "lucide-react";
 import { SITE, whatsappLink } from "@/lib/site";
 
 export function Footer() {
@@ -8,8 +8,14 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <h2 className="text-lg font-semibold text-primary">{SITE.name}</h2>
-          <p className="mt-3 text-sm text-muted-foreground">{SITE.address}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{SITE.hours}</p>
+          <p className="mt-3 inline-flex items-start gap-2 text-sm text-muted-foreground">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{SITE.address}</span>
+          </p>
+          <p className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4 shrink-0 text-primary" />
+            <span>{SITE.hours}</span>
+          </p>
         </div>
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">Contato</h3>
@@ -17,9 +23,10 @@ export function Footer() {
             href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 block text-sm text-muted-foreground hover:text-primary"
+            className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
           >
-            {SITE.phoneDisplay}
+            <Phone className="h-4 w-4 shrink-0 text-primary" />
+            <span>{SITE.phoneDisplay}</span>
           </a>
           <p className="mt-1 text-sm text-muted-foreground">Atendimento também por WhatsApp</p>
         </div>
