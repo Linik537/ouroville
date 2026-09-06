@@ -17,7 +17,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
           <img src={logo} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
-          <span className="hidden items-baseline gap-2 sm:flex">
+          <span className="hidden items-baseline gap-1 sm:flex">
             <span className="font-brand-primary text-xl text-primary">Ouroville</span>
             <span className="font-brand-secondary text-xl text-foreground">Motors</span>
           </span>
