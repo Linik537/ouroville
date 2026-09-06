@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Calendar, Phone } from "lucide-react";
 import { SITE, whatsappLink } from "@/lib/site";
 
 export function Footer() {
