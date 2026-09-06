@@ -4,6 +4,7 @@ import { Award, Search, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
 import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
+import { HeroHeadlights } from "@/components/site/HeroHeadlights";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
@@ -54,12 +55,13 @@ function Home() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />
+        <HeroHeadlights />
         <div className="relative mx-auto max-w-5xl px-4 py-28 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
           <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
             Encontre o seu próximo carro, <span className="text-primary">no padrão de ouro</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground">
+          <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
             Estoque selecionado, procedência checada e financiamento sem complicação.
           </p>
 

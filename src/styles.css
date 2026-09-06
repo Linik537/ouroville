@@ -146,3 +146,39 @@
     color: var(--color-foreground);
   }
 }
+
+/* Hero headlight flash: two quick white blinks, like a car locking/unlocking */
+@keyframes hero-headlight-flash {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0;
+  }
+  36% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.hero-headlight {
+  opacity: 0;
+  background: #fff;
+  box-shadow:
+    0 0 12px 4px rgba(255, 255, 255, 0.95),
+    0 0 40px 16px rgba(255, 255, 255, 0.55),
+    0 0 90px 36px rgba(255, 255, 255, 0.28);
+  animation: hero-headlight-flash 0.8s ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-headlight {
+    animation: none;
+  }
+}
