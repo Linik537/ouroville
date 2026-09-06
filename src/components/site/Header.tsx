@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
-import logo from "@/assets/logo.jpg.asset.json";
+import logo from "@/assets/ouroville-logo-new.jpg.asset.json";
 import { SITE, whatsappLink } from "@/lib/site";
 
 const nav = [
@@ -17,9 +17,9 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
           <img src={logo.url} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
-          <span className="hidden font-display text-xl font-bold uppercase tracking-[0.18em] sm:block">
-            <span className="text-primary">Ouroville</span>{" "}
-            <span className="text-foreground">Motors</span>
+          <span className="hidden items-baseline gap-2 sm:flex">
+            <span className="font-brand-primary text-xl text-primary">Ouroville</span>
+            <span className="font-brand-secondary text-base text-foreground">Motors</span>
           </span>
         </Link>
 
@@ -28,7 +28,7 @@ export function Header() {
             <Link
               key={n.to}
               to={n.to}
-              className="rounded-md px-3 py-2 text-sm font-medium text-foreground/80 transition hover:text-primary"
+              className="rounded-md px-3 py-2 text-base font-semibold text-foreground/80 transition hover:text-primary"
               activeProps={{ className: "text-primary" }}
             >
               {n.label}
@@ -72,8 +72,8 @@ export function Header() {
         </nav>
       )}
 
-      <div className="bg-white py-1.5 text-center text-xs font-semibold tracking-wide text-zinc-800">
-        {SITE.hours} — {SITE.address}
+      <div className="bg-primary px-4 py-2.5 text-center font-sans text-sm font-medium text-primary-foreground sm:text-base">
+        Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
       </div>
     </header>
   );
