@@ -156,7 +156,10 @@ function Painel() {
   async function alternarStatus(c: Carro) {
     const status = c.status === "vendido" ? "disponivel" : "vendido";
     const { error } = await supabase.from("carros").update({ status }).eq("id", c.id);
-    if (error) return toast.error("Não foi possível atualizar.");
+    if (error) {
+      toast.error("Não foi possível atualizar.");
+      return;
+    }
     qc.invalidateQueries({ queryKey: ["admin", "carros"] });
     qc.invalidateQueries({ queryKey: ["carros"] });
   }
@@ -164,7 +167,10 @@ function Painel() {
   async function remover(c: Carro) {
     if (!confirm(`Remover ${c.marca} ${c.modelo}?`)) return;
     const { error } = await supabase.from("carros").delete().eq("id", c.id);
-    if (error) return toast.error("Não foi possível remover.");
+    if (error) {
+      toast.error("Não foi possível remover.");
+      return;
+    }
     qc.invalidateQueries({ queryKey: ["admin", "carros"] });
     qc.invalidateQueries({ queryKey: ["carros"] });
   }
