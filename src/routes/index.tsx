@@ -1,24 +1,143 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Award, Search, ShieldCheck, Users } from "lucide-react";
+import { useState } from "react";
+import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
+import { SITE } from "@/lib/site";
+import { fetchCarros } from "@/lib/supabase";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Ouroville Motors — Seminovos e novos em Uberlândia MG" },
+      {
+        name: "description",
+        content:
+          "Concessionária Ouroville Motors em Uberlândia (MG). Veículos revisados, procedência garantida e financiamento facilitado. Confira o estoque.",
+      },
+      { property: "og:title", content: "Ouroville Motors — Veículos em Uberlândia MG" },
+      {
+        property: "og:description",
+        content: "Estoque selecionado de carros seminovos e novos com garantia e financiamento em Uberlândia.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const depoimentos = [
+  { nome: "Rafael M.", texto: "Atendimento impecável, carro entregue revisado e no prazo combinado." },
+  { nome: "Juliana S.", texto: "Consegui financiamento aprovado no mesmo dia. Equipe muito transparente." },
+  { nome: "Carlos E.", texto: "Melhor negociação da cidade. Já é o segundo carro que compro com eles." },
+];
+
+function Home() {
+  const navigate = useNavigate();
+  const [termo, setTermo] = useState("");
+  const { data, isLoading } = useQuery({
+    queryKey: ["carros", "home"],
+    queryFn: () => fetchCarros({ limit: 6 }),
+  });
+
+  const marcas = Array.from(new Set((data ?? []).map((c) => c.marca))).slice(0, 12);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div>
+      <section className="relative overflow-hidden border-b border-border/60">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,color-mix(in_oklab,var(--primary)_22%,transparent),transparent_55%)]" />
+        <div className="relative mx-auto max-w-5xl px-4 py-24 text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
+          <h1 className="mt-5 text-4xl font-extrabold uppercase leading-tight tracking-tight text-foreground sm:text-6xl">
+            O seu próximo carro está <span className="text-primary">aqui em Uberlândia</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground">
+            Estoque selecionado, procedência checada e financiamento sem complicação. {SITE.hours}.
+          </p>
+
+          <form
+            className="mx-auto mt-10 flex max-w-2xl overflow-hidden rounded-full border border-primary/50 bg-card"
+            onSubmit={(e) => {
+              e.preventDefault();
+              navigate({ to: "/estoque", search: { q: termo || undefined } });
+            }}
+          >
+            <input
+              value={termo}
+              onChange={(e) => setTermo(e.target.value)}
+              placeholder="Digite marca, modelo ou ano (ex: crorola 2022)"
+              aria-label="Buscar veículo"
+              className="flex-1 bg-transparent px-6 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
+            >
+              <Search className="h-4 w-4" /> Buscar
+            </button>
+          </form>
+          {marcas.length > 0 && (
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {marcas.map((m) => (
+                <Link
+                  key={m}
+                  to="/estoque"
+                  search={{ marca: m }}
+                  className="rounded-full border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
+                >
+                  {m}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <div className="flex items-end justify-between">
+          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Últimas novidades</h2>
+          <Link to="/estoque" className="text-sm font-semibold text-primary hover:underline">
+            Ver todo estoque
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, i) => <CarCardSkeleton key={i} />)
+            : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
+        </div>
+        {!isLoading && (data ?? []).length === 0 && (
+          <p className="mt-8 text-center text-sm text-muted-foreground">
+            Estoque sendo atualizado. Fale com a gente pelo WhatsApp para conhecer os veículos disponíveis.
+          </p>
+        )}
+      </section>
+
+      <section className="border-y border-border/60 bg-card">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:grid-cols-3">
+          {[
+            { icon: Award, titulo: "+10 anos de mercado", texto: "Tradição e credibilidade em Uberlândia e região." },
+            { icon: Users, titulo: "+2.000 clientes", texto: "Famílias que já saíram dirigindo o carro dos sonhos." },
+            { icon: ShieldCheck, titulo: "Parceiros de financiamento", texto: "Principais bancos, aprovação rápida." },
+          ].map((s) => (
+            <div key={s.titulo} className="text-center">
+              <s.icon className="mx-auto h-8 w-8 text-primary" aria-hidden />
+              <h3 className="mt-3 text-lg font-semibold text-foreground">{s.titulo}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{s.texto}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <h2 className="text-center text-2xl font-bold text-foreground sm:text-3xl">O que dizem nossos clientes</h2>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          {depoimentos.map((d) => (
+            <figure key={d.nome} className="rounded-xl border border-border/70 bg-card p-6">
+              <blockquote className="text-sm text-muted-foreground">“{d.texto}”</blockquote>
+              <figcaption className="mt-4 text-sm font-semibold text-primary">{d.nome}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
