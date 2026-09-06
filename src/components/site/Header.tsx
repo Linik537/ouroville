@@ -17,9 +17,9 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
           <img src={logo.url} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
-          <span className="hidden font-semibold tracking-wide sm:block">
-            <span className="text-primary">ouroville</span>{" "}
-            <span className="text-muted-foreground">motors</span>
+          <span className="hidden font-display text-xl font-bold uppercase tracking-[0.18em] sm:block">
+            <span className="text-primary">Ouroville</span>{" "}
+            <span className="text-foreground">Motors</span>
           </span>
         </Link>
 
