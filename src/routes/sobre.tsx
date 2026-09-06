@@ -28,7 +28,10 @@ function Sobre() {
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
-    if (!consent) return toast.error("É necessário aceitar o uso dos dados.");
+    if (!consent) {
+      toast.error("É necessário aceitar o uso dos dados.");
+      return;
+    }
     setEnviando(true);
     const { error } = await supabase.from("leads").insert({
       nome: String(fd.get("nome") ?? ""),
@@ -37,7 +40,10 @@ function Sobre() {
       consentimento: true,
     });
     setEnviando(false);
-    if (error) return toast.error("Não foi possível enviar. Tente pelo WhatsApp.");
+    if (error) {
+      toast.error("Não foi possível enviar. Tente pelo WhatsApp.");
+      return;
+    }
     toast.success("Mensagem enviada! Entraremos em contato em breve.");
     form.reset();
     setConsent(false);

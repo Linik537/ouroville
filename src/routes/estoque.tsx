@@ -6,12 +6,12 @@ import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { fetchCarros } from "@/lib/supabase";
 
 type EstoqueSearch = {
-  q?: string;
-  marca?: string;
-  cambio?: string;
-  combustivel?: string;
-  anoMin?: number;
-  precoMax?: number;
+  q?: string | undefined;
+  marca?: string | undefined;
+  cambio?: string | undefined;
+  combustivel?: string | undefined;
+  anoMin?: number | undefined;
+  precoMax?: number | undefined;
 };
 
 export const Route = createFileRoute("/estoque")({

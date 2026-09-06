@@ -62,13 +62,13 @@ export const PLACEHOLDER_CAR =
   );
 
 export async function fetchCarros(filters?: {
-  termo?: string;
-  marca?: string;
-  cambio?: string;
-  combustivel?: string;
-  anoMin?: number;
-  precoMax?: number;
-  limit?: number;
+  termo?: string | undefined;
+  marca?: string | undefined;
+  cambio?: string | undefined;
+  combustivel?: string | undefined;
+  anoMin?: number | undefined;
+  precoMax?: number | undefined;
+  limit?: number | undefined;
 }) {
   let q = supabase.from("carros").select("*").eq("status", "disponivel");
   if (filters?.marca) q = q.eq("marca", filters.marca);
