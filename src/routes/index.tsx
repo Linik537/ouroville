@@ -77,23 +77,23 @@ function Home() {
               onChange={(e) => setTermo(e.target.value)}
               placeholder="Digite marca, modelo ou ano"
               aria-label="Buscar veículo"
-              className="flex-1 bg-transparent px-6 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              className="flex-1 bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:brightness-110"
+              className="inline-flex items-center gap-2 bg-primary px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
             >
-              <Search className="h-4 w-4" /> Buscar
+              <Search className="h-5 w-5" /> Buscar
             </button>
           </form>
           {marcas.length > 0 && (
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               {marcas.map((m) => (
                 <Link
                   key={m}
                   to="/estoque"
                   search={{ marca: m }}
-                  className="rounded-full border border-border px-4 py-1.5 text-xs font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
+                  className="rounded-full border border-border px-5 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
                 >
                   {m}
                 </Link>
