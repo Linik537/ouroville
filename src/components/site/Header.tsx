@@ -28,7 +28,7 @@ export function Header() {
             <Link
               key={n.to}
               to={n.to}
-              className="rounded-md px-3 py-2 text-base font-semibold text-foreground/80 transition hover:text-primary"
+              className="rounded-md px-3 py-2 text-lg font-display font-semibold uppercase tracking-widest text-white transition hover:text-primary"
               activeProps={{ className: "text-primary" }}
             >
               {n.label}
@@ -64,7 +64,7 @@ export function Header() {
               key={n.to}
               to={n.to}
               onClick={() => setOpen(false)}
-              className="block rounded-md px-2 py-3 text-sm font-medium text-foreground/90"
+              className="block rounded-md px-2 py-3 text-base font-display font-medium uppercase tracking-wide text-white"
             >
               {n.label}
             </Link>
