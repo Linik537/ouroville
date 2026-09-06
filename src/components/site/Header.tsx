@@ -19,7 +19,7 @@ export function Header() {
           <img src={logo} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
           <span className="hidden items-baseline gap-2 sm:flex">
             <span className="font-brand-primary text-xl text-primary">Ouroville</span>
-            <span className="font-brand-secondary text-base text-foreground">Motors</span>
+            <span className="font-brand-secondary text-xl text-foreground">Motors</span>
           </span>
         </Link>
 
@@ -40,7 +40,7 @@ export function Header() {
           href={whatsappLink(`Olá! Vim pelo site da ${SITE.name}.`)}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:brightness-110 md:ml-4"
+          className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-white/90 md:ml-4"
         >
           <Phone className="h-4 w-4" aria-hidden />
           <span className="hidden sm:inline">{SITE.phoneDisplay}</span>
