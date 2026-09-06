@@ -1,13 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Gauge } from "lucide-react";
 import { brl, km } from "@/lib/site";
-import { carTitle, carUrl, PLACEHOLDER_CAR, type Carro } from "@/lib/supabase";
+import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
   return (
     <Link
-      to={carUrl(carro)}
+      to="/carros/$marca/$modelo/$ano/$id"
+      params={{
+        marca: slugify(carro.marca),
+        modelo: slugify(carro.modelo),
+        ano: String(carro.ano),
+        id: String(carro.id),
+      }}
       className="group flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card transition hover:border-primary/60"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-muted">
