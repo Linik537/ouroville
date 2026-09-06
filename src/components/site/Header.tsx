@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, Phone, X } from "lucide-react";
 import { useState } from "react";
-import logo from "@/assets/ouroville-logo-new.jpg.asset.json";
+import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
 const nav = [
