@@ -7,10 +7,10 @@ const UP_TRIGGER_PX = 400;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
-  { left: 0.403, top: 0.531, width: 0.156, height: 0.02, rotate: 0 },
-  { left: 0.403, top: 0.563, width: 0.156, height: 0.02, rotate: 0 },
-  { left: 0.869, top: 0.531, width: 0.045, height: 0.02, rotate: 3 },
-  { left: 0.869, top: 0.563, width: 0.045, height: 0.02, rotate: 3 },
+  { left: 0.403, top: 0.525, width: 0.156, height: 0.02, rotate: 5 },
+  { left: 0.403, top: 0.557, width: 0.156, height: 0.02, rotate: 5 },
+  { left: 0.869, top: 0.531, width: 0.045, height: 0.02, rotate: -7 },
+  { left: 0.869, top: 0.563, width: 0.045, height: 0.02, rotate: -7 },
 ];
 
 /**
