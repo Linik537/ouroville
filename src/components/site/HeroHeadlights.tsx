@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 const IMG_W = 1920;
 const IMG_H = 1088;
-const SCROLL_TRIGGER_PX = 50;
+const DOWN_TRIGGER_PX = 10;
+const UP_OFFSET_PX = 10;
 
 // Headlight bar positions as fractions of the source image (two LED bars per side).
 const LIGHTS = [
@@ -12,26 +13,56 @@ const LIGHTS = [
   { left: 0.874, top: 0.558, width: 0.045, height: 0.02 },
 ];
 
+function getHeaderHeight() {
+  const header = document.querySelector("header");
+  if (!header) return 104;
+  const rect = header.getBoundingClientRect();
+  return Math.round(rect.height);
+}
+
 /**
  * Overlay that matches the hero image's object-cover rendering box and
  * flashes white over each headlight twice whenever the user crosses a
- * scroll threshold (down past it, or back up past it).
+ * scroll threshold (down past 10px, or back up to 10px from the header bottom).
  */
 export function HeroHeadlights() {
   const ref = useRef<HTMLDivElement>(null);
   const [flash, setFlash] = useState(0);
-  const crossedRef = useRef(false);
+  const belowRef = useRef(false);
+  const aboveRef = useRef(true);
+  const lastScrollRef = useRef(0);
 
   useEffect(() => {
     const onScroll = () => {
-      const past = window.scrollY > SCROLL_TRIGGER_PX;
-      if (past !== crossedRef.current) {
-        crossedRef.current = past;
+      const y = window.scrollY;
+      const headerHeight = getHeaderHeight();
+      const upTrigger = Math.max(DOWN_TRIGGER_PX, headerHeight - UP_OFFSET_PX);
+
+      const nowBelow = y > DOWN_TRIGGER_PX;
+      const nowAbove = y < upTrigger;
+
+      if (nowBelow && !belowRef.current && y > lastScrollRef.current) {
         setFlash((f) => f + 1);
       }
+      if (nowAbove && !aboveRef.current && y < lastScrollRef.current) {
+        setFlash((f) => f + 1);
+      }
+
+      belowRef.current = nowBelow;
+      aboveRef.current = nowAbove;
+      lastScrollRef.current = y;
     };
+
+    const onResize = () => {
+      lastScrollRef.current = window.scrollY;
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   useEffect(() => {
