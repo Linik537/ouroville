@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, MessageCircle, Phone, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
@@ -12,16 +12,30 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [barHeight, setBarHeight] = useState(56);
+  const [offset, setOffset] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const showHours = !pathname.startsWith("/carros/");
 
   useEffect(() => {
-    const updateHeader = () => setScrolled(window.scrollY >= 20);
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
-    return () => window.removeEventListener("scroll", updateHeader);
-  }, []);
+    const measure = () => {
+      if (barRef.current) setBarHeight(barRef.current.offsetHeight);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [pathname]);
+
+  useEffect(() => {
+    const update = () => {
+      const y = window.scrollY;
+      setOffset(Math.min(Math.max(y - 20, 0), barHeight));
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [barHeight]);
 
   return (
     <div className="sticky top-0 z-50">
