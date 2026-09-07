@@ -57,9 +57,10 @@ function Detalhe() {
   }
 
   const fotos = carro.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
+  const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
   const ficha: [string, string][] = [
     ["Ano", `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`],
-    ["Quilometragem", km(carro.quilometragem)],
+    ["Quilometragem", km(quilometragem)],
     ["Câmbio", carro.cambio ?? "-"],
     ["Combustível", carro.combustivel ?? "-"],
     ["Cor", carro.cor ?? "-"],

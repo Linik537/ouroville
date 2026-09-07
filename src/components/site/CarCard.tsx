@@ -5,6 +5,7 @@ import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
+  const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
   return (
     <Link
       to="/carros/$marca/$modelo/$ano/$id"
@@ -36,7 +37,7 @@ export function CarCard({ carro }: { carro: Carro }) {
         <p className="line-clamp-1 text-sm text-muted-foreground">{carro.versao ?? carro.cor ?? ""}</p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-primary" />{carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}</span>
-          <span className="inline-flex items-center gap-1.5"><Gauge className="h-4 w-4 text-primary" />{km(carro.quilometragem)}</span>
+          <span className="inline-flex items-center gap-1.5"><Gauge className="h-4 w-4 text-primary" />{km(quilometragem)}</span>
         </div>
         <div className="mt-1 flex items-center justify-between gap-3">
           <span className="rounded-full bg-gold px-4 py-1.5 font-inter text-base font-medium tracking-wide text-primary-foreground">
