@@ -5,13 +5,23 @@ import { SITE, whatsappLink } from "@/lib/site";
 export const Route = createFileRoute("/financie")({
   head: () => ({
     meta: [
-      { title: "Financiamento de veículos — Ouroville Motors" },
+      { title: `Financiamento de Veículos em Uberlândia — ${SITE.name}` },
       {
         name: "description",
-        content: "Financie seu carro na Ouroville Motors em Uberlândia: aprovação rápida, parceiros bancários e parcelas que cabem no bolso.",
+        content: "Financie seu carro na Ouroville Motors em Uberlândia: aprovação rápida, taxas competitivas, entrada facilitada e simulação pelo WhatsApp.",
       },
-      { property: "og:title", content: "Financiamento de veículos — Ouroville Motors" },
-      { property: "og:description", content: "Simule seu financiamento pelo WhatsApp com a equipe Ouroville Motors." },
+      { name: "keywords", content: "financiamento de carros uberlandia, simular financiamento automotivo, aprovação de credito carro, financiar seminovo uberlandia" },
+      { property: "og:title", content: `Financiamento de Veículos — ${SITE.name}` },
+      { property: "og:description", content: "Simule seu financiamento pelo WhatsApp com a equipe Ouroville Motors em Uberlândia." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE.url}/financie` },
+      { property: "og:image", content: SITE.ogImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: `Financiamento de Carros — ${SITE.name}` },
+      { name: "twitter:description", content: "Financiamento facilitado para carros novos e seminovos em Uberlândia." },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE.url}/financie` },
     ],
   }),
   component: Financie,
@@ -25,8 +35,25 @@ const passos = [
 ];
 
 function Financie() {
+  const financialSchema = {
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    "name": "Financiamento de Veículos Ouroville Motors",
+    "description": "Financiamento veicular facilitado com os principais bancos em Uberlândia MG.",
+    "provider": {
+      "@type": "AutoDealer",
+      "name": SITE.name,
+      "telephone": `+${SITE.phoneDigits}`,
+    },
+    "feesAndCommissionsSpecification": "Simulação gratuita e personalizada via WhatsApp.",
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(financialSchema) }}
+      />
       <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Financiamento sem complicação</h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
         Trabalhamos com os principais bancos do país para encontrar a melhor condição para o seu perfil.

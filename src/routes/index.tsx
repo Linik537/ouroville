@@ -6,27 +6,49 @@ import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HeroHeadlights } from "@/components/site/HeroHeadlights";
 import { HoursBar } from "@/components/site/HoursBar";
-import { SITE } from "@/lib/site";
+import { SITE, getAutoDealerSchema } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Ouroville Motors" },
+      { title: `${SITE.name} — Concessionária de Carros Seminovos e Novos em Uberlândia MG` },
       {
         name: "description",
         content:
-          "Concessionária Ouroville Motors em Uberlândia (MG). Veículos revisados, procedência garantida e financiamento facilitado. Confira o estoque.",
+          "Concessionária Ouroville Motors em Uberlândia (MG). Veículos revisados, procedência garantida e financiamento facilitado. Confira o estoque completo.",
       },
-      { property: "og:title", content: "Ouroville Motors — Veículos em Uberlândia MG" },
+      { name: "keywords", content: "carros uberlandia, seminovos uberlandia, concessionaria uberlandia, comprar carro uberlandia, ouroville motors" },
+      { property: "og:title", content: `${SITE.name} — Veículos Seminovos e Novos em Uberlândia MG` },
       {
         property: "og:description",
-        content: "Estoque selecionado de carros seminovos e novos com garantia e financiamento em Uberlândia.",
+        content: "Estoque selecionado de carros seminovos e novos com garantia de procedência e financiamento em Uberlândia.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE.url}/` },
+      { property: "og:image", content: SITE.ogImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: `${SITE.name} — Veículos em Uberlândia` },
+      { name: "twitter:description", content: SITE.description },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE.url}/` },
     ],
   }),
   component: Home,
 });
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": SITE.name,
+  "url": SITE.url,
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": `${SITE.url}/estoque?termo={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
 
 const depoimentos = [
   { nome: "Rafael M.", texto: "Atendimento impecável, carro entregue revisado e no prazo combinado." },
@@ -46,6 +68,14 @@ function Home() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getAutoDealerSchema()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
       <HoursBar />
       <section className="relative overflow-hidden border-b border-border/60">
         <img

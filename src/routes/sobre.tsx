@@ -2,19 +2,29 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Clock, MapPin, Phone } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { SITE, whatsappLink } from "@/lib/site";
+import { SITE, getAutoDealerSchema, whatsappLink } from "@/lib/site";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre a Ouroville Motors — Uberlândia MG" },
+      { title: `Sobre a ${SITE.name} — Concessionária em Uberlândia MG` },
       {
         name: "description",
-        content: "Conheça a história da Ouroville Motors, nossa localização na Avenida João Pinheiro em Uberlândia, horários e formas de contato.",
+        content: `Conheça a história da Ouroville Motors, nossa localização na ${SITE.address}, horários de atendimento e formas de contato direto.`,
       },
-      { property: "og:title", content: "Sobre a Ouroville Motors" },
+      { name: "keywords", content: "sobre ouroville motors, concessionaria avenida joao pinheiro, contato ouroville motors, endereco ouroville motors uberlandia" },
+      { property: "og:title", content: `Sobre a ${SITE.name} — Uberlândia MG` },
       { property: "og:description", content: "História, valores, endereço e contato da Ouroville Motors em Uberlândia MG." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE.url}/sobre` },
+      { property: "og:image", content: SITE.ogImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: `Sobre a ${SITE.name}` },
+      { name: "twitter:description", content: SITE.description },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE.url}/sobre` },
     ],
   }),
   component: Sobre,
@@ -54,6 +64,10 @@ function Sobre() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getAutoDealerSchema()) }}
+      />
       <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Sobre a {SITE.name}</h1>
       <p className="mt-4 max-w-3xl text-muted-foreground">
         Nascemos em Uberlândia com um propósito simples: tornar a compra de um carro uma experiência

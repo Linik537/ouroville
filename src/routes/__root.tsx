@@ -16,6 +16,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { WhatsAppFloater, WhatsAppProvider } from "@/components/site/WhatsAppFloater";
+import { SITE } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
@@ -80,13 +81,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ouroville Motors" },
+      { title: "Ouroville Motors — Carros Seminovos e Novos em Uberlândia MG" },
       {
         name: "description",
-        content: "Veículos novos e seminovos com procedência na Ouroville Motors, Uberlândia MG.",
+        content: SITE.description,
       },
+      { name: "theme-color", content: "#000000" },
+      { name: "robots", content: "index, follow" },
+      { name: "geo.region", content: "BR-MG" },
+      { name: "geo.placename", content: "Uberlândia" },
+      { name: "geo.position", content: `${SITE.geo.latitude};${SITE.geo.longitude}` },
+      { name: "ICBM", content: `${SITE.geo.latitude}, ${SITE.geo.longitude}` },
+      { property: "og:site_name", content: SITE.name },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "pt_BR" },
+      { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ourovillemotors" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -97,6 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },
+      { rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
     ],
   }),
   shellComponent: RootShell,

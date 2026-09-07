@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
-import { HoursBar } from "@/components/site/HoursBar";
+import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
 type EstoqueSearch = {
@@ -34,13 +34,23 @@ export const Route = createFileRoute("/estoque")({
   }),
   head: () => ({
     meta: [
-      { title: "Estoque de veículos — Ouroville Motors Uberlândia" },
+      { title: "Estoque de Veículos Seminovos e Novos — Ouroville Motors Uberlândia" },
       {
         name: "description",
-        content: "Veja todos os carros disponíveis na Ouroville Motors: filtre por marca, ano, preço, câmbio e combustível.",
+        content: "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço, câmbio e combustível.",
       },
-      { property: "og:title", content: "Estoque de veículos — Ouroville Motors" },
-      { property: "og:description", content: "Carros seminovos e novos disponíveis em Uberlândia MG." },
+      { name: "keywords", content: "estoque de carros uberlandia, carros a venda uberlandia, seminovos uberlandia, filtro de carros" },
+      { property: "og:title", content: "Estoque de Veículos — Ouroville Motors Uberlândia" },
+      { property: "og:description", content: "Catálogo completo de carros seminovos e novos com garantia de procedência em Uberlândia." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE.url}/estoque` },
+      { property: "og:image", content: SITE.ogImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Estoque de Carros — Ouroville Motors" },
+      { name: "twitter:description", content: "Explore nosso estoque de veículos revisados em Uberlândia." },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE.url}/estoque` },
     ],
   }),
   component: Estoque,

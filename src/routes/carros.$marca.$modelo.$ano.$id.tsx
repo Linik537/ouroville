@@ -9,7 +9,7 @@ import {
   Palette,
 } from "lucide-react";
 import { useState, type ComponentType } from "react";
-import { brl, formatCarName, km, whatsappLink } from "@/lib/site";
+import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
 import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
 
@@ -22,14 +22,25 @@ async function fetchCarro(id: number) {
 export const Route = createFileRoute("/carros/$marca/$modelo/$ano/$id")({
   head: ({ params }) => {
     const nome = `${params.marca} ${params.modelo} ${params.ano}`.replace(/-/g, " ").toUpperCase();
-    const title = `${nome} à venda — Ouroville Motors`;
-    const description = `${nome} disponível na Ouroville Motors em Uberlândia MG. Veja fotos, ficha técnica, preço e fale com um consultor pelo WhatsApp.`;
+    const title = `${nome} à venda em Uberlândia MG — ${SITE.name}`;
+    const description = `${nome} disponível na Ouroville Motors em Uberlândia (MG). Confira fotos, ficha técnica, preço e entre em contato via WhatsApp.`;
+    const canonicalUrl = `${SITE.url}/carros/${params.marca}/${params.modelo}/${params.ano}/${params.id}`;
+
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "keywords", content: `${nome.toLowerCase()}, comprar ${params.modelo.replace(/-/g, " ")}, ${params.marca.replace(/-/g, " ")} uberlandia, seminovos uberlandia` },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: canonicalUrl },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [
+        { rel: "canonical", href: canonicalUrl },
       ],
     };
   },
@@ -88,8 +99,89 @@ function Detalhe() {
     { label: "Versão", value: carro.versao ?? "-", Icon: Cog },
   ];
 
+  const carSchema = {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    "name": nomeCarro,
+    "brand": {
+      "@type": "Brand",
+      "name": nomeMarca,
+    },
+    "model": nomeModelo,
+    "vehicleModelDate": String(carro.ano),
+    "fuelType": carro.combustivel || undefined,
+    "vehicleTransmission": carro.cambio || undefined,
+    "color": carro.cor || undefined,
+    "mileageFromOdometer":
+      quilometragem != null
+        ? {
+            "@type": "QuantitativeValue",
+            "value": quilometragem,
+            "unitCode": "KMT",
+          }
+        : undefined,
+    "image": fotos,
+    "description":
+      carro.descricao ||
+      `${nomeCarro} disponível na Ouroville Motors em Uberlândia MG.`,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "BRL",
+      "price": carro.preco ?? 0,
+      "availability":
+        carro.status === "disponivel"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      "itemCondition": "https://schema.org/UsedCondition",
+      "seller": {
+        "@type": "AutoDealer",
+        "name": SITE.name,
+        "telephone": `+${SITE.phoneDigits}`,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": SITE.streetAddress,
+          "addressLocality": SITE.city,
+          "addressRegion": SITE.state,
+          "addressCountry": SITE.country,
+        },
+      },
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Início",
+        "item": `${SITE.url}/`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Estoque",
+        "item": `${SITE.url}/estoque`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": nomeCarro,
+      },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(carSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <nav className="text-xs text-muted-foreground">
         <Link to="/estoque" className="transition hover:text-primary">Estoque</Link> / {nomeCarro}
       </nav>
