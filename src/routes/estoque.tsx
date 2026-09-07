@@ -217,6 +217,11 @@ function sortCarros<T extends { id: number; marca: string; modelo: string; ano: 
   }
 }
 
+function modelYear(c: { ano: number | null; ano_modelo: number | null }) {
+  // Ano do modelo (o segundo número de "2022/2023"); fallback ao ano de fabricação
+  return c.ano_modelo ?? c.ano;
+}
+
 function compareNullable(a: number | null | undefined, b: number | null | undefined, dir: "asc" | "desc") {
   const aNull = a == null;
   const bNull = b == null;
