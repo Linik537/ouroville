@@ -71,7 +71,7 @@ function Detalhe() {
       <nav className="text-xs text-muted-foreground">
         <Link to="/estoque" className="hover:text-primary">Estoque</Link> / {carTitle(carro)}
       </nav>
-      <h1 className="font-oswald mt-3 text-[28px] font-semibold leading-tight tracking-wide">
+      <h1 className="font-oswald mt-3 text-[22px] font-semibold leading-tight tracking-wide">
         <span className="text-white">{formatCarName(carro.marca)}</span>{" "}
         <span className="text-gold">{formatCarName(carro.modelo)}</span>{" "}
         <span className="text-white">{carro.ano}</span>
@@ -130,7 +130,7 @@ function Detalhe() {
       <section className="mt-12 text-center">
         <Link
           to="/estoque"
-          className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:brightness-110"
+          className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
         >
           Ver o estoque completo
         </Link>

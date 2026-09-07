@@ -21,6 +21,7 @@
 @theme inline {
   --font-display: "Barlow Condensed", "Archivo", sans-serif;
   --font-sans: "Archivo", system-ui, sans-serif;
+  --font-inter: "Inter", sans-serif;
   --font-oswald: "Oswald", "Archivo", sans-serif;
   --font-brand-primary: "Russo One", "Archivo", sans-serif;
   --font-brand-secondary: "Audiowide", "Archivo", sans-serif;

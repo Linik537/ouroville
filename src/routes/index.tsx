@@ -122,7 +122,7 @@ function Home() {
           <div className="mt-10 text-center">
             <Link
               to="/estoque"
-              className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:brightness-110"
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
             >
               Ver o estoque completo
             </Link>

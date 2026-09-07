@@ -30,7 +30,7 @@ export function CarCard({ carro }: { carro: Carro }) {
         )}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-oswald text-[28px] font-semibold leading-tight tracking-wide">
+        <h3 className="font-oswald text-[22px] font-semibold leading-tight tracking-wide">
           <span className="text-white">{formatCarName(carro.marca)}</span>{" "}<span className="text-gold">{formatCarName(carro.modelo)}</span>
         </h3>
         <p className="line-clamp-1 text-sm text-muted-foreground">{carro.versao ?? carro.cor ?? ""}</p>
@@ -39,7 +39,7 @@ export function CarCard({ carro }: { carro: Carro }) {
           <span className="inline-flex items-center gap-1.5"><Gauge className="h-4 w-4 text-primary" />{km(carro.quilometragem)}</span>
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <span className="rounded-full bg-gold px-5 py-2 font-display text-lg font-bold tracking-wide text-primary-foreground">
+          <span className="rounded-full bg-gold px-5 py-2 font-inter text-lg font-normal tracking-wide text-primary-foreground">
             {brl(carro.preco)}
           </span>
           <span className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition group-hover:border-primary group-hover:text-primary">
