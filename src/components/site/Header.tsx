@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
-import { Menu, Phone, X } from "lucide-react";
-import { useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Menu, MessageCircle, Phone, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
@@ -12,9 +12,32 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const showHours = !pathname.startsWith("/carros/");
+
+  useEffect(() => {
+    const updateHeader = () => setScrolled(window.scrollY >= 20);
+    updateHeader();
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeader);
+  }, []);
+
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/95 backdrop-blur">
+    <div className="sticky top-0 z-50">
+      {showHours && (
+        <div
+          className={`overflow-hidden bg-primary text-center font-sans font-medium text-primary-foreground transition-[max-height,opacity] duration-300 ${
+            scrolled ? "max-h-0 opacity-0" : "max-h-14 opacity-100"
+          }`}
+        >
+          <p className="px-4 py-2.5 text-sm sm:text-base">
+            Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
+          </p>
+        </div>
+      )}
+
+      <header className="border-b border-border/60 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
           <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
             <img src={logo} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
@@ -38,12 +61,21 @@ export function Header() {
           </nav>
 
           <a
+            href={`tel:${SITE.phoneDigits.slice(2)}`}
+            aria-label={`Ligar para ${SITE.phoneDisplay}`}
+            title={`Ligar para ${SITE.phoneDisplay}`}
+            className="hidden h-10 w-10 shrink-0 items-center justify-center text-white transition hover:text-primary md:inline-flex"
+          >
+            <Phone className="h-5 w-5" aria-hidden />
+          </a>
+
+          <a
             href={whatsappLink(`Olá! Vim pelo site da ${SITE.name}.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-semibold text-black transition hover:bg-white/90 md:ml-4"
+            className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-3 py-2 text-sm font-semibold text-black transition hover:bg-white/90 md:ml-0"
           >
-            <Phone className="h-4 w-4 text-black" aria-hidden />
+            <MessageCircle className="h-4 w-4 text-black" aria-hidden />
             <span className="hidden sm:inline">{SITE.phoneDisplay}</span>
             <span className="sm:hidden">WhatsApp</span>
           </a>
@@ -73,11 +105,6 @@ export function Header() {
           </nav>
         )}
       </header>
-
-      <div className="fixed inset-x-0 top-16 z-20 bg-primary px-4 py-2.5 text-center font-sans text-sm font-medium text-primary-foreground sm:text-base">
-        Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
-      </div>
-      <div className="h-11" aria-hidden />
-    </>
+    </div>
   );
 }
