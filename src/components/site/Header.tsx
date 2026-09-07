@@ -41,9 +41,12 @@ export function Header() {
     <div className="sticky top-0 z-50">
       {showHours && (
         <div
-          className={`overflow-hidden bg-primary text-center font-sans font-medium text-primary-foreground transition-[max-height,opacity] duration-300 ${
-            scrolled ? "max-h-0 opacity-0" : "max-h-14 opacity-100"
-          }`}
+          ref={barRef}
+          className="overflow-hidden bg-primary text-center font-sans font-medium text-primary-foreground"
+          style={{
+            height: Math.max(barHeight - offset, 0),
+            opacity: barHeight > 0 ? 1 - offset / barHeight : 1,
+          }}
         >
           <p className="px-4 py-2.5 text-sm sm:text-base">
             Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
