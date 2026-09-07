@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { brl } from "@/lib/site";
 import { supabase, type Carro, type Lead } from "@/lib/supabase";
+import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -79,8 +80,13 @@ function Painel() {
   const [aba, setAba] = useState<"estoque" | "leads">("estoque");
   const [form, setForm] = useState({ ...vazio });
   const [editId, setEditId] = useState<number | null>(null);
-  const [arquivos, setArquivos] = useState<FileList | null>(null);
+  const [arquivos, setArquivos] = useState<File[]>([]);
+  const [arquivoInputKey, setArquivoInputKey] = useState(0);
   const [salvando, setSalvando] = useState(false);
+  const [planilha, setPlanilha] = useState<File | null>(null);
+  const [urlPlanilha, setUrlPlanilha] = useState("");
+  const [importando, setImportando] = useState(false);
+  const [resultadoImportacao, setResultadoImportacao] = useState<{ total: number; erros: string[] } | null>(null);
 
   const carros = useQuery({
     queryKey: ["admin", "carros"],
@@ -101,10 +107,10 @@ function Painel() {
   });
 
   async function uploadFotos(): Promise<string[]> {
-    if (!arquivos?.length) return [];
+    if (!arquivos.length) return [];
     const urls: string[] = [];
-    for (const file of Array.from(arquivos)) {
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/\s+/g, "-")}`;
+    for (const file of arquivos) {
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/[^a-zA-Z0-9._-]+/g, "-")}`;
       const { error } = await supabase.storage.from("carros").upload(path, file);
       if (error) throw error;
       urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
@@ -143,7 +149,8 @@ function Painel() {
       toast.success("Carro salvo!");
       setForm({ ...vazio });
       setEditId(null);
-      setArquivos(null);
+      setArquivos([]);
+      setArquivoInputKey((key) => key + 1);
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
     } catch {
@@ -175,6 +182,59 @@ function Painel() {
     qc.invalidateQueries({ queryKey: ["carros"] });
   }
 
+  async function removerFoto(c: Carro, foto: string) {
+    const fotos = (c.fotos ?? []).filter((item) => item !== foto);
+    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
+    if (error) {
+      toast.error("Não foi possível remover a imagem.");
+      return;
+    }
+    const marker = "/storage/v1/object/public/carros/";
+    const path = foto.includes(marker) ? decodeURIComponent(foto.split(marker)[1]) : null;
+    if (path) await supabase.storage.from("carros").remove([path]);
+    toast.success("Imagem removida.");
+    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
+    qc.invalidateQueries({ queryKey: ["carros"] });
+  }
+
+  async function importarPlanilha() {
+    setImportando(true);
+    setResultadoImportacao(null);
+    try {
+      const resultado = await analisarFontePlanilha(planilha ?? undefined, urlPlanilha);
+      if (!resultado.carros.length) {
+        setResultadoImportacao({ total: 0, erros: resultado.erros.length ? resultado.erros : ["Nenhum carro válido foi encontrado."] });
+        return;
+      }
+      const registros = resultado.carros.map((carro: ImportacaoCarro) => ({
+        ...carro,
+        versao: carro.versao ?? null,
+        ano_modelo: carro.ano_modelo ?? null,
+        preco: carro.preco ?? null,
+        quilometragem: carro.quilometragem ?? null,
+        combustivel: carro.combustivel ?? null,
+        cambio: carro.cambio ?? null,
+        cor: carro.cor ?? null,
+        descricao: carro.descricao ?? null,
+        destaque: carro.destaque ?? null,
+        fotos: [],
+        status: "disponivel",
+      }));
+      const { error } = await supabase.from("carros").insert(registros);
+      if (error) throw error;
+      setResultadoImportacao({ total: registros.length, erros: resultado.erros });
+      setPlanilha(null);
+      setUrlPlanilha("");
+      qc.invalidateQueries({ queryKey: ["admin", "carros"] });
+      qc.invalidateQueries({ queryKey: ["carros"] });
+      toast.success(`${registros.length} carro(s) importado(s). Agora adicione as imagens pela edição.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível importar a planilha.");
+    } finally {
+      setImportando(false);
+    }
+  }
+
   function editar(c: Carro) {
     setEditId(c.id);
     setForm({
@@ -183,6 +243,8 @@ function Painel() {
       quilometragem: c.quilometragem ? String(c.quilometragem) : "", combustivel: c.combustivel ?? "Flex",
       cambio: c.cambio ?? "Automático", cor: c.cor ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
     });
+    setArquivos([]);
+    setArquivoInputKey((key) => key + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -218,6 +280,49 @@ function Painel() {
 
       {aba === "estoque" ? (
         <>
+          <section className="mt-6 rounded-xl border border-primary/40 bg-card p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Importar estoque</h2>
+                <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                  Envie Excel/CSV ou use um Google Sheets público. O cabeçalho pode começar em qualquer linha e as linhas vazias serão ignoradas.
+                </p>
+              </div>
+              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">Marca, Modelo e Ano obrigatórios</span>
+            </div>
+            <form
+              className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end"
+              onSubmit={(e) => { e.preventDefault(); void importarPlanilha(); }}
+            >
+              <label className="block text-xs text-muted-foreground">
+                Arquivo Excel ou CSV
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                  onChange={(e) => setPlanilha(e.target.files?.[0] ?? null)}
+                  className={inputCls}
+                />
+              </label>
+              <label className="block text-xs text-muted-foreground">
+                Link público do Google Sheets
+                <input value={urlPlanilha} onChange={(e) => setUrlPlanilha(e.target.value)} placeholder="https://docs.google.com/spreadsheets/d/..." className={inputCls} />
+              </label>
+              <button disabled={importando || (!planilha && !urlPlanilha.trim())} className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+                {importando ? "Importando..." : "Importar dados"}
+              </button>
+            </form>
+            {resultadoImportacao && (
+              <div className="mt-4 rounded-md border border-border bg-background p-3 text-sm">
+                <p className="text-foreground">{resultadoImportacao.total} carro(s) importado(s).</p>
+                {resultadoImportacao.erros.length > 0 && (
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-destructive">
+                    {resultadoImportacao.erros.slice(0, 8).map((erro) => <li key={erro}>{erro}</li>)}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+
           <form onSubmit={salvar} className="mt-6 rounded-xl border border-border/70 bg-card p-6">
             <h2 className="text-lg font-semibold text-foreground">{editId ? "Editar carro" : "Novo carro"}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -243,10 +348,26 @@ function Painel() {
                 </select>
               </label>
               <label className="block text-xs text-muted-foreground">
-                Fotos
-                <input type="file" multiple accept="image/*" onChange={(e) => setArquivos(e.target.files)} className={inputCls} />
+                Adicionar fotos
+                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => setArquivos(Array.from(e.target.files ?? []))} className={inputCls} />
               </label>
             </div>
+            {arquivos.length > 0 && <p className="mt-2 text-xs text-muted-foreground">{arquivos.length} imagem(ns) selecionada(s) para enviar.</p>}
+            {editId && (
+              <div className="mt-4">
+                <p className="text-xs text-muted-foreground">Fotos atuais</p>
+                <div className="mt-2 flex flex-wrap gap-3">
+                  {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto) => (
+                    <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
+                      <img src={foto} alt="" className="h-full w-full object-cover" />
+                      <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="absolute right-1 top-1 rounded bg-destructive px-2 py-1 text-xs text-destructive-foreground">
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <label className="mt-4 block text-xs text-muted-foreground">
               Descrição
               <textarea rows={3} value={form.descricao} onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))} className={inputCls} />
@@ -256,7 +377,7 @@ function Painel() {
                 {salvando ? "Salvando..." : editId ? "Salvar alterações" : "Adicionar carro"}
               </button>
               {editId && (
-                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
+                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
                   Cancelar
                 </button>
               )}
