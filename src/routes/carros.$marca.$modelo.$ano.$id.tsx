@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MessageCircle } from "lucide-react";
-import { useState } from "react";
+import {
+  CalendarDays,
+  Cog,
+  Fuel,
+  Gauge,
+  MessageCircle,
+  Palette,
+} from "lucide-react";
+import { useState, type ComponentType } from "react";
 import { brl, formatCarName, km, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
 
@@ -27,6 +34,12 @@ export const Route = createFileRoute("/carros/$marca/$modelo/$ano/$id")({
   },
   component: Detalhe,
 });
+
+type FichaItem = {
+  label: string;
+  value: string;
+  Icon: ComponentType<{ className?: string }>;
+};
 
 function Detalhe() {
   const { id } = Route.useParams();
@@ -58,28 +71,25 @@ function Detalhe() {
 
   const fotos = carro.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
   const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
-  const ficha: [string, string][] = [
-    ["Ano", `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`],
-    ["Quilometragem", km(quilometragem)],
-    ["Câmbio", carro.cambio ?? "-"],
-    ["Combustível", carro.combustivel ?? "-"],
-    ["Cor", carro.cor ?? "-"],
-    ["Versão", carro.versao ?? "-"],
+  const nomeMarca = formatCarName(carro.marca);
+  const nomeModelo = formatCarName(carro.modelo);
+  const nomeCarro = `${nomeMarca} ${nomeModelo} ${carro.ano}`;
+  const ficha: FichaItem[] = [
+    { label: "Ano", value: `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`, Icon: CalendarDays },
+    { label: "Quilometragem", value: km(quilometragem), Icon: Gauge },
+    { label: "Câmbio", value: carro.cambio ?? "-", Icon: Cog },
+    { label: "Combustível", value: carro.combustivel ?? "-", Icon: Fuel },
+    { label: "Cor", value: carro.cor ?? "-", Icon: Palette },
+    { label: "Versão", value: carro.versao ?? "-", Icon: Cog },
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
       <nav className="text-xs text-muted-foreground">
-        <Link to="/estoque" className="hover:text-primary">Estoque</Link> / {carTitle(carro)}
+        <Link to="/estoque" className="transition hover:text-primary">Estoque</Link> / {nomeCarro}
       </nav>
-      <h1 className="font-oswald mt-3 text-[22px] font-semibold leading-tight tracking-wide">
-        <span className="text-white">{formatCarName(carro.marca)}</span>{" "}
-        <span className="text-gold">{formatCarName(carro.modelo)}</span>{" "}
-        <span className="text-white">{carro.ano}</span>
-      </h1>
-      <p className="text-sm text-muted-foreground">{carro.versao}</p>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
         <div>
           <img
             src={fotos[ativa] ?? fotos[0]}
@@ -90,8 +100,12 @@ function Detalhe() {
           {fotos.length > 1 && (
             <div className="mt-3 flex gap-3 overflow-x-auto">
               {fotos.map((f, i) => (
-                <button key={f + i} onClick={() => setAtiva(i)} aria-label={`Ver foto ${i + 1}`}
-                  className={`h-20 w-28 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}>
+                <button
+                  key={f + i}
+                  onClick={() => setAtiva(i)}
+                  aria-label={`Ver foto ${i + 1}`}
+                  className={`h-20 w-28 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
+                >
                   <img src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" className="h-full w-full object-cover" />
                 </button>
               ))}
@@ -100,42 +114,53 @@ function Detalhe() {
           {carro.descricao && (
             <section className="mt-8">
               <h2 className="text-lg font-semibold text-foreground">Descrição</h2>
-              <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{carro.descricao}</p>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{carro.descricao}</p>
             </section>
           )}
         </div>
 
-        <aside className="h-fit rounded-xl border border-border/70 bg-card p-6">
-          <p className="text-sm text-muted-foreground">Preço</p>
-          <p className="text-3xl font-extrabold text-gold">{brl(carro.preco)}</p>
+        <aside>
+          <h1 className="font-oswald text-[30px] font-semibold leading-tight tracking-wide sm:text-[32px]">
+            <span className="text-white">{nomeMarca}</span>{" "}
+            <span className="text-gold">{nomeModelo}</span>{" "}
+            <span className="text-white">{carro.ano}</span>
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{carro.versao}</p>
+          <p className="mt-5 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-medium tracking-wide text-black sm:text-2xl">
+            {brl(carro.preco)}
+          </p>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
+            {ficha.map(({ label, value, Icon }) => (
+              <div key={label} className="min-w-0 rounded-lg border border-border/70 bg-card px-3 py-3">
+                <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <span className="truncate">{label}</span>
+                </div>
+                <p className="mt-1 truncate text-sm font-semibold text-foreground">{value}</p>
+              </div>
+            ))}
+          </div>
+
           <a
             href={whatsappLink(`Olá! Tenho interesse no ${carTitle(carro)} anunciado no site da Ouroville Motors.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-black shadow-lg transition hover:brightness-110"
           >
             <MessageCircle className="h-4 w-4" /> Tenho interesse
           </a>
-          <h2 className="mt-8 text-sm font-semibold uppercase tracking-wider text-foreground">Ficha técnica</h2>
-          <dl className="mt-3 divide-y divide-border/60 text-sm">
-            {ficha.map(([k, v]) => (
-              <div key={k} className="flex justify-between py-2">
-                <dt className="text-muted-foreground">{k}</dt>
-                <dd className="font-medium text-foreground">{v}</dd>
-              </div>
-            ))}
-          </dl>
         </aside>
       </div>
 
-      <section className="mt-12 text-center">
+      <div className="mt-12 text-center">
         <Link
           to="/estoque"
           className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
         >
           Ver o estoque completo
         </Link>
-      </section>
+      </div>
     </div>
   );
 }
