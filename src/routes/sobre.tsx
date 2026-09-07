@@ -118,7 +118,7 @@ function Sobre() {
             <button
               type="submit"
               disabled={enviando}
-              className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              className="w-full rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
             >
               {enviando ? "Enviando..." : "Enviar mensagem"}
             </button>
