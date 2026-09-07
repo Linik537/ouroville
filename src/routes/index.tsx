@@ -5,6 +5,7 @@ import { useState } from "react";
 import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HeroHeadlights } from "@/components/site/HeroHeadlights";
+import { HoursBar } from "@/components/site/HoursBar";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
