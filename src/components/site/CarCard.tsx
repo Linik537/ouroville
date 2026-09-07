@@ -24,22 +24,22 @@ export function CarCard({ carro }: { carro: Carro }) {
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
         {carro.destaque && (
-          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
+          <span className="absolute left-3 top-3 rounded-full bg-gold px-3 py-1 text-xs font-semibold text-primary-foreground">
             {carro.destaque}
           </span>
         )}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="text-base font-semibold text-foreground">
-          {carro.marca} {carro.modelo}
+        <h3 className="font-display text-2xl font-semibold uppercase tracking-wide">
+          <span className="text-white">{carro.marca}</span> <span className="text-gold">{carro.modelo}</span>
         </h3>
         <p className="line-clamp-1 text-sm text-muted-foreground">{carro.versao ?? carro.cor ?? ""}</p>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" />{carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}</span>
-          <span className="inline-flex items-center gap-1"><Gauge className="h-3.5 w-3.5" />{km(carro.quilometragem)}</span>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-primary" />{carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}</span>
+          <span className="inline-flex items-center gap-1.5"><Gauge className="h-4 w-4 text-primary" />{km(carro.quilometragem)}</span>
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <span className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+          <span className="rounded-full bg-gold px-5 py-2 font-display text-lg font-bold tracking-wide text-primary-foreground">
             {brl(carro.preco)}
           </span>
           <span className="text-sm font-medium text-primary group-hover:underline">Ver mais</span>

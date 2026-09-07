@@ -1,6 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Menu, MessageCircle, Phone, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
 
@@ -12,54 +12,15 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const [barHeight, setBarHeight] = useState(56);
-  const [offset, setOffset] = useState(0);
-  const barRef = useRef<HTMLDivElement>(null);
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const showHours = !pathname.startsWith("/carros/");
-
-  useEffect(() => {
-    const measure = () => {
-      if (barRef.current) setBarHeight(barRef.current.offsetHeight);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [pathname]);
-
-  useEffect(() => {
-    const update = () => {
-      const y = window.scrollY;
-      setOffset(Math.min(Math.max(y - 20, 0), barHeight));
-    };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, [barHeight]);
 
   return (
     <div className="sticky top-0 z-50">
-      {showHours && (
-        <div
-          ref={barRef}
-          className="overflow-hidden bg-primary text-center font-sans font-medium text-primary-foreground"
-          style={{
-            height: Math.max(barHeight - offset, 0),
-            opacity: barHeight > 0 ? 1 - offset / barHeight : 1,
-          }}
-        >
-          <p className="px-4 py-2.5 text-sm sm:text-base">
-            Horário de Funcionamento: Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
-          </p>
-        </div>
-      )}
-
       <header className="border-b border-border/60 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
           <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} — página inicial`}>
             <img src={logo} alt={`Logo ${SITE.name}`} className="h-11 w-11 rounded-md object-cover" />
             <span className="hidden items-baseline gap-1 sm:flex">
-              <span className="font-brand-primary text-xl text-primary">Ouroville</span>
+              <span className="font-brand-primary text-xl text-gold">Ouroville</span>
               <span className="font-brand-secondary text-xl text-foreground">Motors</span>
             </span>
           </Link>

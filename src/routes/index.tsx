@@ -5,6 +5,7 @@ import { useState } from "react";
 import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HeroHeadlights } from "@/components/site/HeroHeadlights";
+import { HoursBar } from "@/components/site/HoursBar";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
@@ -45,6 +46,7 @@ function Home() {
 
   return (
     <div>
+      <HoursBar />
       <section className="relative overflow-hidden border-b border-border/60">
         <img
           src={heroCar}
@@ -59,7 +61,7 @@ function Home() {
         <div className="relative mx-auto max-w-5xl px-4 py-28 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
           <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
-            Encontre o seu próximo carro, <span className="text-primary">no padrão de ouro</span>
+            Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
             Estoque selecionado, procedência checada e financiamento sem complicação.
@@ -81,7 +83,7 @@ function Home() {
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-primary px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
+              className="inline-flex items-center gap-2 bg-gold px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
             >
               <Search className="h-5 w-5" /> Buscar
             </button>
@@ -120,7 +122,7 @@ function Home() {
           <div className="mt-10 text-center">
             <Link
               to="/estoque"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:brightness-110"
+              className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:brightness-110"
             >
               Ver o estoque completo
             </Link>

@@ -52,7 +52,7 @@ function Financie() {
           href={whatsappLink("Olá! Gostaria de simular um financiamento na Ouroville Motors.")}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
         >
           <MessageCircle className="h-4 w-4" /> Simular pelo WhatsApp
         </a>

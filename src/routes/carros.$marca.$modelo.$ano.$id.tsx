@@ -49,7 +49,7 @@ function Detalhe() {
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold text-foreground">Veículo indisponível</h1>
         <p className="mt-2 text-sm text-muted-foreground">Este carro já foi vendido ou não está mais no estoque.</p>
-        <Link to="/estoque" className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground">
+        <Link to="/estoque" className="mt-6 inline-block rounded-full bg-gold px-6 py-3 text-sm font-semibold text-white">
           Ver estoque
         </Link>
       </div>
@@ -102,12 +102,12 @@ function Detalhe() {
 
         <aside className="h-fit rounded-xl border border-border/70 bg-card p-6">
           <p className="text-sm text-muted-foreground">Preço</p>
-          <p className="text-3xl font-extrabold text-primary">{brl(carro.preco)}</p>
+          <p className="text-3xl font-extrabold text-gold">{brl(carro.preco)}</p>
           <a
             href={whatsappLink(`Olá! Tenho interesse no ${carTitle(carro)} anunciado no site da Ouroville Motors.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
           >
             <MessageCircle className="h-4 w-4" /> Tenho interesse
           </a>
@@ -126,7 +126,7 @@ function Detalhe() {
       <section className="mt-12 text-center">
         <Link
           to="/estoque"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:brightness-110"
+          className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-white shadow-lg transition hover:brightness-110"
         >
           Ver o estoque completo
         </Link>

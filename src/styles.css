@@ -136,6 +136,26 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+@utility text-gold {
+  background-image: linear-gradient(
+    115deg,
+    oklch(0.62 0.12 68),
+    oklch(0.88 0.14 90) 45%,
+    oklch(0.7 0.13 76)
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-gold {
+  background-image: linear-gradient(
+    115deg,
+    oklch(0.62 0.12 68),
+    oklch(0.88 0.14 90) 45%,
+    oklch(0.7 0.13 76)
+  );
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
