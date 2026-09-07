@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
+import { HoursBar } from "@/components/site/HoursBar";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
