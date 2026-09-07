@@ -197,9 +197,9 @@ function sortCarros<T extends { id: number; marca: string; modelo: string; ano: 
   switch (ordem) {
     // "Recente" = ano do modelo (segundo número de "2022/2023"); em empate, ano de fabricação
     case "recentes":
-      return list.sort((a, b) => compareNullable(modelYear(b), modelYear(a), "asc"));
+      return list.sort((a, b) => compareAno(b, a));
     case "antigos":
-      return list.sort((a, b) => compareNullable(modelYear(a), modelYear(b), "asc"));
+      return list.sort((a, b) => compareAno(a, b));
     case "preco_asc":
       return list.sort((a, b) => compareNullable(a.preco, b.preco, "asc"));
     case "preco_desc":
@@ -217,9 +217,9 @@ function sortCarros<T extends { id: number; marca: string; modelo: string; ano: 
   }
 }
 
-function modelYear(c: { ano: number | null; ano_modelo: number | null }) {
-  // Ano do modelo (o segundo número de "2022/2023"); fallback ao ano de fabricação
-  return c.ano_modelo ?? c.ano;
+function compareAno(a: { ano: number | null; ano_modelo: number | null }, b: { ano: number | null; ano_modelo: number | null }) {
+  // 1º critério: ano do modelo (segundo número de "2022/2023"); 2º: ano de fabricação
+  return compareNullable(a.ano_modelo, b.ano_modelo, "asc") || compareNullable(a.ano, b.ano, "asc");
 }
 
 function compareNullable(a: number | null | undefined, b: number | null | undefined, dir: "asc" | "desc") {
