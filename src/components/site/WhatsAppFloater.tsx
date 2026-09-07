@@ -1,10 +1,47 @@
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
-import { SITE, whatsappLink } from "@/lib/site";
+import { whatsappLink } from "@/lib/site";
+
+const DEFAULT_MESSAGE = "Olá! Qual carro a Ouroville recomenda em 2026?";
+
+type WhatsAppContextType = {
+  message: string | null;
+  setMessage: (msg: string | null) => void;
+};
+
+const WhatsAppContext = createContext<WhatsAppContextType>({
+  message: null,
+  setMessage: () => {},
+});
+
+export function WhatsAppProvider({ children }: { children: ReactNode }) {
+  const [message, setMessage] = useState<string | null>(null);
+
+  return (
+    <WhatsAppContext.Provider value={{ message, setMessage }}>
+      {children}
+    </WhatsAppContext.Provider>
+  );
+}
+
+export function useWhatsAppMessage(message: string | null | undefined) {
+  const { setMessage } = useContext(WhatsAppContext);
+
+  useEffect(() => {
+    if (message) {
+      setMessage(message);
+      return () => setMessage(null);
+    }
+  }, [message, setMessage]);
+}
 
 export function WhatsAppFloater() {
+  const { message } = useContext(WhatsAppContext);
+  const activeMessage = message || DEFAULT_MESSAGE;
+
   return (
     <a
-      href={whatsappLink("Olá! Qual carro a Ouroville recomenda em 2026?")}
+      href={whatsappLink(activeMessage)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Fale conosco pelo WhatsApp"
@@ -16,3 +53,4 @@ export function WhatsAppFloater() {
     </a>
   );
 }
+

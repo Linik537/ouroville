@@ -15,7 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
-import { WhatsAppFloater } from "@/components/site/WhatsAppFloater";
+import { WhatsAppFloater, WhatsAppProvider } from "@/components/site/WhatsAppFloater";
 
 function NotFoundComponent() {
   return (
@@ -124,19 +124,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SmoothScroll />
-      <div className="flex min-h-screen flex-col bg-background">
-        <Header />
-        <main className="flex-1">
-          {/* Required: nested routes render here. */}
-          <Outlet />
-        </main>
-        <div className="relative z-30">
-          <Footer />
+      <WhatsAppProvider>
+        <SmoothScroll />
+        <div className="flex min-h-screen flex-col bg-background">
+          <Header />
+          <main className="flex-1">
+            {/* Required: nested routes render here. */}
+            <Outlet />
+          </main>
+          <div className="relative z-30">
+            <Footer />
+          </div>
         </div>
-      </div>
-      <WhatsAppFloater />
-      <Toaster position="top-center" richColors />
+        <WhatsAppFloater />
+        <Toaster position="top-center" richColors />
+      </WhatsAppProvider>
     </QueryClientProvider>
   );
 }

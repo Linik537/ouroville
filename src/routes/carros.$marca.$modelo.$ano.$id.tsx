@@ -11,6 +11,7 @@ import {
 import { useState, type ComponentType } from "react";
 import { brl, formatCarName, km, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
+import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
 
 async function fetchCarro(id: number) {
   const { data, error } = await supabase.from("carros").select("*").eq("id", id).maybeSingle();
@@ -49,6 +50,15 @@ function Detalhe() {
   });
   const [ativa, setAtiva] = useState(0);
 
+  const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
+  const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
+  const nomeMarca = carro ? formatCarName(carro.marca) : "";
+  const nomeModelo = carro ? formatCarName(carro.modelo) : "";
+  const nomeCarro = carro ? `${nomeMarca} ${nomeModelo} ${carro.ano}` : "";
+
+  const mensagemWhatsApp = carro ? `Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.` : null;
+  useWhatsAppMessage(mensagemWhatsApp);
+
   if (isLoading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-12">
@@ -69,11 +79,6 @@ function Detalhe() {
     );
   }
 
-  const fotos = carro.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
-  const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
-  const nomeMarca = formatCarName(carro.marca);
-  const nomeModelo = formatCarName(carro.modelo);
-  const nomeCarro = `${nomeMarca} ${nomeModelo} ${carro.ano}`;
   const ficha: FichaItem[] = [
     { label: "Ano", value: `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`, Icon: CalendarDays },
     { label: "Quilometragem", value: km(quilometragem), Icon: Gauge },
@@ -143,7 +148,7 @@ function Detalhe() {
           </div>
 
           <a
-            href={whatsappLink(`Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.`)}
+            href={whatsappLink(mensagemWhatsApp ?? "")}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
