@@ -9,10 +9,10 @@ export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Painel administrativo — Ouroville Motors" },
+      { title: "Painel administrativo : Ouroville Motors" },
       { name: "description", content: "Área restrita de gestão de estoque e leads da Ouroville Motors." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Painel administrativo — Ouroville Motors" },
+      { property: "og:title", content: "Painel administrativo : Ouroville Motors" },
       { property: "og:description", content: "Área restrita." },
     ],
   }),

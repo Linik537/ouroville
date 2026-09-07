@@ -22,7 +22,7 @@ async function fetchCarro(id: number) {
 export const Route = createFileRoute("/carros/$marca/$modelo/$ano/$id")({
   head: ({ params }) => {
     const nome = `${params.marca} ${params.modelo} ${params.ano}`.replace(/-/g, " ").toUpperCase();
-    const title = `${nome} à venda em Uberlândia MG — ${SITE.name}`;
+    const title = `${nome} à venda em Uberlândia MG - ${SITE.name}`;
     const description = `${nome} disponível na Ouroville Motors em Uberlândia (MG). Confira fotos, ficha técnica, preço e entre em contato via WhatsApp.`;
     const canonicalUrl = `${SITE.url}/carros/${params.marca}/${params.modelo}/${params.ano}/${params.id}`;
 
@@ -190,7 +190,7 @@ function Detalhe() {
         <div>
           <img
             src={fotos[ativa] ?? fotos[0]}
-            alt={`${carTitle(carro)} — foto ${ativa + 1}`}
+            alt={`${carTitle(carro)} - foto ${ativa + 1}`}
             loading="lazy"
             className="aspect-4/3 w-full rounded-xl border border-border/70 object-cover"
           />

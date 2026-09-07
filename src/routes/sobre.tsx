@@ -8,13 +8,13 @@ import { supabase } from "@/lib/supabase";
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: `Sobre a ${SITE.name} — Concessionária em Uberlândia MG` },
+      { title: `Sobre a ${SITE.name} : Concessionária em Uberlândia MG` },
       {
         name: "description",
         content: `Conheça a história da Ouroville Motors, nossa localização na ${SITE.address}, horários de atendimento e formas de contato direto.`,
       },
       { name: "keywords", content: "sobre ouroville motors, concessionaria avenida joao pinheiro, contato ouroville motors, endereco ouroville motors uberlandia" },
-      { property: "og:title", content: `Sobre a ${SITE.name} — Uberlândia MG` },
+      { property: "og:title", content: `Sobre a ${SITE.name} : Uberlândia MG` },
       { property: "og:description", content: "História, valores, endereço e contato da Ouroville Motors em Uberlândia MG." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/sobre` },

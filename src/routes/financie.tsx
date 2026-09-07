@@ -5,19 +5,19 @@ import { SITE, whatsappLink } from "@/lib/site";
 export const Route = createFileRoute("/financie")({
   head: () => ({
     meta: [
-      { title: `Financiamento de Veículos em Uberlândia — ${SITE.name}` },
+      { title: `Financiamento de Veículos em Uberlândia : ${SITE.name}` },
       {
         name: "description",
         content: "Financie seu carro na Ouroville Motors em Uberlândia: aprovação rápida, taxas competitivas, entrada facilitada e simulação pelo WhatsApp.",
       },
       { name: "keywords", content: "financiamento de carros uberlandia, simular financiamento automotivo, aprovação de credito carro, financiar seminovo uberlandia" },
-      { property: "og:title", content: `Financiamento de Veículos — ${SITE.name}` },
+      { property: "og:title", content: `Financiamento de Veículos : ${SITE.name}` },
       { property: "og:description", content: "Simule seu financiamento pelo WhatsApp com a equipe Ouroville Motors em Uberlândia." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/financie` },
       { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: `Financiamento de Carros — ${SITE.name}` },
+      { name: "twitter:title", content: `Financiamento de Carros : ${SITE.name}` },
       { name: "twitter:description", content: "Financiamento facilitado para carros novos e seminovos em Uberlândia." },
     ],
     links: [

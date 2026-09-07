@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ouroville Motors — Carros Seminovos e Novos em Uberlândia MG" },
+      { title: "Ouroville Motors : Carros Seminovos e Novos em Uberlândia MG" },
       {
         name: "description",
         content: SITE.description,

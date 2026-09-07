@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Projeto Supabase próprio do cliente (chave publicável — segura no frontend)
+// Projeto Supabase próprio do cliente (chave publicável - segura no frontend)
 const SUPABASE_URL = "https://xjokgcsozlqiqjfnzxle.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_c50RR1HGqK3NSgAC_x85bA_AWtnc9Lc";
 
@@ -70,18 +70,26 @@ export async function fetchCarros(filters?: {
   precoMax?: number | undefined;
   limit?: number | undefined;
 }) {
-  let q = supabase.from("carros").select("*").eq("status", "disponivel");
-  if (filters?.marca) q = q.eq("marca", filters.marca);
-  if (filters?.cambio) q = q.eq("cambio", filters.cambio);
-  if (filters?.combustivel) q = q.eq("combustivel", filters.combustivel);
-  if (filters?.anoMin) q = q.gte("ano", filters.anoMin);
-  if (filters?.precoMax) q = q.lte("preco", filters.precoMax);
-  if (filters?.limit) q = q.limit(filters.limit);
-  const { data, error } = await q.order("created_at", { ascending: false });
-  if (error) throw error;
-  let rows = (data ?? []) as Carro[];
-  if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
-  return rows;
+  try {
+    let q = supabase.from("carros").select("*").eq("status", "disponivel");
+    if (filters?.marca) q = q.eq("marca", filters.marca);
+    if (filters?.cambio) q = q.eq("cambio", filters.cambio);
+    if (filters?.combustivel) q = q.eq("combustivel", filters.combustivel);
+    if (filters?.anoMin && Number.isFinite(filters.anoMin)) q = q.gte("ano", filters.anoMin);
+    if (filters?.precoMax && Number.isFinite(filters.precoMax)) q = q.lte("preco", filters.precoMax);
+    if (filters?.limit && Number.isFinite(filters.limit)) q = q.limit(filters.limit);
+    const { data, error } = await q.order("created_at", { ascending: false });
+    if (error) {
+      console.error("Erro ao buscar carros do Supabase:", error);
+      return [];
+    }
+    let rows = (data ?? []) as Carro[];
+    if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
+    return rows;
+  } catch (err) {
+    console.error("Exceção ao buscar carros:", err);
+    return [];
+  }
 }
 
 // Busca tolerante a erros de digitação (client-side, complementa o índice trigram do Postgres)

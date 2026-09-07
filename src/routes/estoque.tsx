@@ -24,29 +24,37 @@ type Ordem =
   | "az";
 
 export const Route = createFileRoute("/estoque")({
-  validateSearch: (s: Record<string, unknown>): EstoqueSearch => ({
-    q: typeof s['q'] === "string" ? s['q'] : undefined,
-    marca: typeof s['marca'] === "string" ? s['marca'] : undefined,
-    cambio: typeof s['cambio'] === "string" ? s['cambio'] : undefined,
-    combustivel: typeof s['combustivel'] === "string" ? s['combustivel'] : undefined,
-    anoMin: s['anoMin'] ? Number(s['anoMin']) : undefined,
-    precoMax: s['precoMax'] ? Number(s['precoMax']) : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): EstoqueSearch => {
+    const q = typeof s['q'] === "string" ? s['q'] : undefined;
+    const marca = typeof s['marca'] === "string" ? s['marca'] : undefined;
+    const cambio = typeof s['cambio'] === "string" ? s['cambio'] : undefined;
+    const combustivel = typeof s['combustivel'] === "string" ? s['combustivel'] : undefined;
+    const anoMinRaw = s['anoMin'] ? Number(s['anoMin']) : undefined;
+    const precoMaxRaw = s['precoMax'] ? Number(s['precoMax']) : undefined;
+    return {
+      q,
+      marca,
+      cambio,
+      combustivel,
+      anoMin: anoMinRaw && Number.isFinite(anoMinRaw) && anoMinRaw > 0 ? anoMinRaw : undefined,
+      precoMax: precoMaxRaw && Number.isFinite(precoMaxRaw) && precoMaxRaw > 0 ? precoMaxRaw : undefined,
+    };
+  },
   head: () => ({
     meta: [
-      { title: "Estoque de Veículos Seminovos e Novos — Ouroville Motors Uberlândia" },
+      { title: "Estoque de Veículos Seminovos e Novos : Ouroville Motors Uberlândia" },
       {
         name: "description",
         content: "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço, câmbio e combustível.",
       },
       { name: "keywords", content: "estoque de carros uberlandia, carros a venda uberlandia, seminovos uberlandia, filtro de carros" },
-      { property: "og:title", content: "Estoque de Veículos — Ouroville Motors Uberlândia" },
+      { property: "og:title", content: "Estoque de Veículos : Ouroville Motors Uberlândia" },
       { property: "og:description", content: "Catálogo completo de carros seminovos e novos com garantia de procedência em Uberlândia." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/estoque` },
       { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Estoque de Carros — Ouroville Motors" },
+      { name: "twitter:title", content: "Estoque de Carros : Ouroville Motors" },
       { name: "twitter:description", content: "Explore nosso estoque de veículos revisados em Uberlândia." },
     ],
     links: [
