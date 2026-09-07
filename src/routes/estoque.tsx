@@ -196,9 +196,13 @@ function sortCarros<T extends { id: number; marca: string; modelo: string; ano: 
   const list = [...rows];
   switch (ordem) {
     case "recentes":
-      return list.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+      return list.sort(
+        (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || b.id - a.id,
+      );
     case "antigos":
-      return list.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+      return list.sort(
+        (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at) || a.id - b.id,
+      );
     case "preco_asc":
       return list.sort((a, b) => compareNullable(a.preco, b.preco, "asc"));
     case "preco_desc":
