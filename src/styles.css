@@ -21,6 +21,7 @@
 @theme inline {
   --font-display: "Barlow Condensed", "Archivo", sans-serif;
   --font-sans: "Archivo", system-ui, sans-serif;
+  --font-oswald: "Oswald", "Archivo", sans-serif;
   --font-brand-primary: "Russo One", "Archivo", sans-serif;
   --font-brand-secondary: "Audiowide", "Archivo", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
@@ -138,10 +139,9 @@
 
 @utility text-gold {
   background-image: linear-gradient(
-    115deg,
+    90deg,
     oklch(0.62 0.12 68),
-    oklch(0.88 0.14 90) 45%,
-    oklch(0.7 0.13 76)
+    oklch(0.88 0.14 90)
   );
   background-clip: text;
   color: transparent;
@@ -149,10 +149,9 @@
 
 @utility bg-gold {
   background-image: linear-gradient(
-    115deg,
+    90deg,
     oklch(0.62 0.12 68),
-    oklch(0.88 0.14 90) 45%,
-    oklch(0.7 0.13 76)
+    oklch(0.88 0.14 90)
   );
 }
 

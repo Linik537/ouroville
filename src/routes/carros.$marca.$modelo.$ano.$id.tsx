@@ -71,7 +71,11 @@ function Detalhe() {
       <nav className="text-xs text-muted-foreground">
         <Link to="/estoque" className="hover:text-primary">Estoque</Link> / {carTitle(carro)}
       </nav>
-      <h1 className="mt-3 text-3xl font-bold text-foreground">{carTitle(carro)}</h1>
+      <h1 className="font-oswald mt-3 text-[30px] font-semibold uppercase leading-tight tracking-wide text-white">
+        <span className="text-white">{carro.marca}</span>{" "}
+        <span className="text-gold">{carro.modelo}</span>{" "}
+        <span className="text-white">{carro.ano}</span>
+      </h1>
       <p className="text-sm text-muted-foreground">{carro.versao}</p>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
