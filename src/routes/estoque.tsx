@@ -189,20 +189,17 @@ function Estoque() {
   );
 }
 
-function sortCarros<T extends { id: number; marca: string; modelo: string; ano: number | null; preco: number | null; quilometragem: number | null; created_at: string }>(
+function sortCarros<T extends { id: number; marca: string; modelo: string; ano: number | null; ano_modelo: number | null; preco: number | null; quilometragem: number | null; created_at: string }>(
   rows: T[],
   ordem: Ordem,
 ): T[] {
   const list = [...rows];
   switch (ordem) {
+    // "Recente" = ano do modelo (segundo número de "2022/2023"); em empate, ano de fabricação
     case "recentes":
-      return list.sort(
-        (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || b.id - a.id,
-      );
+      return list.sort((a, b) => compareNullable(modelYear(b), modelYear(a), "asc"));
     case "antigos":
-      return list.sort(
-        (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at) || a.id - b.id,
-      );
+      return list.sort((a, b) => compareNullable(modelYear(a), modelYear(b), "asc"));
     case "preco_asc":
       return list.sort((a, b) => compareNullable(a.preco, b.preco, "asc"));
     case "preco_desc":
