@@ -68,7 +68,7 @@ function Home() {
           </p>
 
           <form
-            className="mx-auto mt-10 flex max-w-2xl overflow-hidden rounded-full border border-primary/50 bg-card/90"
+            className="mx-auto mt-10 flex max-w-2xl overflow-visible rounded-full border border-primary/50 bg-card/90"
             onSubmit={(e) => {
               e.preventDefault();
               navigate({ to: "/estoque", search: { q: termo || undefined } });
@@ -79,11 +79,11 @@ function Home() {
               onChange={(e) => setTermo(e.target.value)}
               placeholder="Digite marca, modelo ou ano"
               aria-label="Buscar veículo"
-              className="flex-1 bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
+              className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
             />
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-gold px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
+              className="gold-glow inline-flex items-center gap-2 rounded-r-full bg-gold px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
             >
               <Search className="h-5 w-5" /> Buscar
             </button>
@@ -122,7 +122,7 @@ function Home() {
           <div className="mt-10 text-center">
             <Link
               to="/estoque"
-              className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+              className="gold-glow inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
             >
               Ver o estoque completo
             </Link>

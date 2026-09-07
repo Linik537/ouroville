@@ -126,7 +126,7 @@ function Detalhe() {
             <span className="text-white">{carro.ano}</span>
           </h1>
           <p className="mt-1 text-base text-muted-foreground">{carro.versao}</p>
-          <p className="mt-5 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
+          <p className="gold-glow inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
             {brl(carro.preco)}
           </p>
 
@@ -146,7 +146,7 @@ function Detalhe() {
             href={whatsappLink(`Olá! Tenho interesse no ${carTitle(carro)} anunciado no site da Ouroville Motors.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+            className="gold-glow mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
           >
             <MessageCircle className="h-5 w-5" /> Tenho interesse
           </a>
@@ -156,7 +156,7 @@ function Detalhe() {
       <div className="mt-12 text-center">
         <Link
           to="/estoque"
-          className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+          className="gold-glow inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
         >
           Ver o estoque completo
         </Link>

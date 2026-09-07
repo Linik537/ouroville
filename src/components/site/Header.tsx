@@ -48,7 +48,7 @@ export function Header() {
           </a>
 
           <a
-            href={whatsappLink(`Olá! Vim pelo site da ${SITE.name}.`)}
+            href={whatsappLink("Olá! Qual carro a Ouroville recomenda em 2026?")}
             target="_blank"
             rel="noopener noreferrer"
             className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-base font-semibold text-black transition hover:bg-white/90 md:ml-0"
