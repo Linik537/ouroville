@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { fetchCarros } from "@/lib/supabase";
 
@@ -13,6 +13,14 @@ type EstoqueSearch = {
   anoMin?: number | undefined;
   precoMax?: number | undefined;
 };
+
+type Ordem =
+  | "recentes"
+  | "antigos"
+  | "preco_asc"
+  | "preco_desc"
+  | "km"
+  | "az";
 
 export const Route = createFileRoute("/estoque")({
   validateSearch: (s: Record<string, unknown>): EstoqueSearch => ({
@@ -41,6 +49,7 @@ function Estoque() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/estoque" });
   const [termo, setTermo] = useState(search.q ?? "");
+  const [ordem, setOrdem] = useState<Ordem>("recentes");
 
   const { data, isLoading } = useQuery({
     queryKey: ["carros", search],
@@ -58,11 +67,15 @@ function Estoque() {
   const { data: todos } = useQuery({ queryKey: ["carros", "all"], queryFn: () => fetchCarros({}) });
   const marcas = Array.from(new Set((todos ?? []).map((c) => c.marca))).sort();
 
+  const sorted = useMemo(() => sortCarros(data ?? [], ordem), [data, ordem]);
+
   const setFilter = (patch: Partial<EstoqueSearch>) =>
     navigate({ search: (prev) => ({ ...prev, ...patch }) });
 
   const selectCls =
     "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
+  const orderSelectCls =
+    "rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary w-full sm:w-auto sm:min-w-[190px]";
 
   return (
     <div className="relative z-30 bg-background">
@@ -137,15 +150,34 @@ function Estoque() {
           </aside>
 
           <div>
-            <p className="mb-4 text-sm text-muted-foreground">
-              <strong className="text-foreground">{data?.length ?? 0}</strong> veículos encontrados
-            </p>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">{sorted.length}</strong> veículos encontrados
+              </p>
+              <label className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center">
+                Ordenar por
+                <select
+                  className={orderSelectCls}
+                  value={ordem}
+                  onChange={(e) => setOrdem(e.target.value as Ordem)}
+                  aria-label="Ordenar veículos"
+                >
+                  <option value="recentes">Mais recentes</option>
+                  <option value="antigos">Menos recentes</option>
+                  <option value="preco_asc">Menor preço</option>
+                  <option value="preco_desc">Maior preço</option>
+                  <option value="km">Menor kilometragem</option>
+                  <option value="az">Ordem alfabética</option>
+                </select>
+              </label>
+            </div>
+
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {isLoading
                 ? Array.from({ length: 6 }).map((_, i) => <CarCardSkeleton key={i} />)
-                : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
+                : sorted.map((c) => <CarCard key={c.id} carro={c} />)}
             </div>
-            {!isLoading && (data ?? []).length === 0 && (
+            {!isLoading && sorted.length === 0 && (
               <p className="rounded-xl border border-border/70 bg-card p-8 text-center text-sm text-muted-foreground">
                 Nenhum veículo encontrado com esses filtros.
               </p>
@@ -155,4 +187,41 @@ function Estoque() {
       </div>
     </div>
   );
+}
+
+function sortCarros<T extends { id: number; marca: string; modelo: string; ano: number | null; preco: number | null; quilometragem: number | null; created_at: string }>(
+  rows: T[],
+  ordem: Ordem,
+): T[] {
+  const list = [...rows];
+  switch (ordem) {
+    case "recentes":
+      return list.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+    case "antigos":
+      return list.sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+    case "preco_asc":
+      return list.sort((a, b) => compareNullable(a.preco, b.preco, "asc"));
+    case "preco_desc":
+      return list.sort((a, b) => compareNullable(a.preco, b.preco, "desc"));
+    case "km":
+      return list.sort((a, b) => compareNullable(a.quilometragem, b.quilometragem, "asc"));
+    case "az":
+      return list.sort((a, b) => {
+        const nameA = `${a.marca} ${a.modelo} ${a.ano ?? ""}`.trim().toLowerCase();
+        const nameB = `${b.marca} ${b.modelo} ${b.ano ?? ""}`.trim().toLowerCase();
+        return nameA.localeCompare(nameB, "pt-BR");
+      });
+    default:
+      return list;
+  }
+}
+
+function compareNullable(a: number | null | undefined, b: number | null | undefined, dir: "asc" | "desc") {
+  const aNull = a == null;
+  const bNull = b == null;
+  if (aNull && bNull) return 0;
+  if (aNull) return 1;
+  if (bNull) return -1;
+  const diff = (a as number) - (b as number);
+  return dir === "asc" ? diff : -diff;
 }
