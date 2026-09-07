@@ -95,7 +95,7 @@ function Home() {
               Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
-              Estoque selecionado, procedência checada e financiamento sem complicação.
+              Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
             </p>
           </div>
 
