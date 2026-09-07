@@ -122,6 +122,15 @@ function Detalhe() {
           </dl>
         </aside>
       </div>
+
+      <section className="mt-12 text-center">
+        <Link
+          to="/estoque"
+          className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:brightness-110"
+        >
+          Ver o estoque completo
+        </Link>
+      </section>
     </div>
   );
 }
