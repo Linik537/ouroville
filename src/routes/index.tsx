@@ -89,49 +89,53 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />
         <HeroHeadlights />
         <div className="relative mx-auto max-w-5xl px-4 py-28 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
-          <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
-            Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro</span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
-            Estoque selecionado, procedência checada e financiamento sem complicação.
-          </p>
+          <div className="relative -top-3">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
+            <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
+              Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro</span>
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
+              Estoque selecionado, procedência checada e financiamento sem complicação.
+            </p>
+          </div>
 
-          <form
-            className="mx-auto mt-10 flex max-w-2xl overflow-visible rounded-full border border-primary/50 bg-card/90"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate({ to: "/estoque", search: { q: termo || undefined } });
-            }}
-          >
-            <input
-              value={termo}
-              onChange={(e) => setTermo(e.target.value)}
-              placeholder="Digite marca, modelo ou ano"
-              aria-label="Buscar veículo"
-              className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
-            />
-            <button
-              type="submit"
-              className="gold-glow inline-flex items-center gap-2 rounded-r-full bg-gold px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
+          <div className="relative top-3">
+            <form
+              className="mx-auto mt-10 flex max-w-2xl overflow-visible rounded-full border border-primary/50 bg-card/90"
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate({ to: "/estoque", search: { q: termo || undefined } });
+              }}
             >
-              <Search className="h-5 w-5" /> Buscar
-            </button>
-          </form>
-          {marcas.length > 0 && (
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              {marcas.map((m) => (
-                <Link
-                  key={m}
-                  to="/estoque"
-                  search={{ marca: m }}
-                  className="rounded-full border border-border px-5 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
-                >
-                  {m}
-                </Link>
-              ))}
-            </div>
-          )}
+              <input
+                value={termo}
+                onChange={(e) => setTermo(e.target.value)}
+                placeholder="Digite marca, modelo ou ano"
+                aria-label="Buscar veículo"
+                className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
+              />
+              <button
+                type="submit"
+                className="gold-glow inline-flex items-center gap-2 rounded-r-full bg-gold px-6 text-base font-semibold text-primary-foreground transition hover:brightness-110"
+              >
+                <Search className="h-5 w-5" /> Buscar
+              </button>
+            </form>
+            {marcas.length > 0 && (
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
+                {marcas.map((m) => (
+                  <Link
+                    key={m}
+                    to="/estoque"
+                    search={{ marca: m }}
+                    className="rounded-full border border-border px-5 py-2 text-sm font-medium text-muted-foreground transition hover:border-primary hover:text-primary"
+                  >
+                    {m}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
