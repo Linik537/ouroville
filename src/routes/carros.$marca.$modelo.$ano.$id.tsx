@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
 import { useState } from "react";
-import { brl, km, whatsappLink } from "@/lib/site";
+import { brl, formatCarName, km, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
 
 async function fetchCarro(id: number) {
@@ -71,9 +71,9 @@ function Detalhe() {
       <nav className="text-xs text-muted-foreground">
         <Link to="/estoque" className="hover:text-primary">Estoque</Link> / {carTitle(carro)}
       </nav>
-      <h1 className="font-oswald mt-3 text-[30px] font-semibold uppercase leading-tight tracking-wide text-white">
-        <span className="text-white">{carro.marca}</span>{" "}
-        <span className="text-gold">{carro.modelo}</span>{" "}
+      <h1 className="font-oswald mt-3 text-[28px] font-semibold leading-tight tracking-wide">
+        <span className="text-white">{formatCarName(carro.marca)}</span>{" "}
+        <span className="text-gold">{formatCarName(carro.modelo)}</span>{" "}
         <span className="text-white">{carro.ano}</span>
       </h1>
       <p className="text-sm text-muted-foreground">{carro.versao}</p>

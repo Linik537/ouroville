@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Gauge } from "lucide-react";
 import { brl, km } from "@/lib/site";
-import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
+import { carTitle, formatCarName, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
@@ -30,8 +30,8 @@ export function CarCard({ carro }: { carro: Carro }) {
         )}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="font-oswald text-[30px] font-semibold uppercase leading-tight tracking-wide">
-          <span className="text-white">{carro.marca}</span> <span className="text-gold">{carro.modelo}</span>
+        <h3 className="font-oswald text-[28px] font-semibold leading-tight tracking-wide">
+          <span className="text-white">{formatCarName(carro.marca)}</span>{" "}<span className="text-gold">{formatCarName(carro.modelo)}</span>
         </h3>
         <p className="line-clamp-1 text-sm text-muted-foreground">{carro.versao ?? carro.cor ?? ""}</p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
