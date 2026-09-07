@@ -138,8 +138,8 @@ function Home() {
       <section className="border-y border-border/60 bg-card">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:grid-cols-3">
           {[
-            { icon: Award, titulo: "+10 anos de mercado", texto: "Tradição e credibilidade em Uberlândia e região." },
-            { icon: Users, titulo: "+2.000 clientes", texto: "Famílias que já saíram dirigindo o carro dos sonhos." },
+            { icon: Award, titulo: "Estoque Selecionado", texto: "Carros escolhidos com cuidado para você." },
+            { icon: Users, titulo: "Atendimento personalizado", texto: "Acompanhamento próximo em cada etapa." },
             { icon: ShieldCheck, titulo: "Parceiros de financiamento", texto: "Principais bancos, aprovação rápida." },
           ].map((s) => (
             <div key={s.titulo} className="text-center">
