@@ -126,7 +126,7 @@ function Detalhe() {
             <span className="text-white">{carro.ano}</span>
           </h1>
           <p className="mt-1 text-base text-muted-foreground">{carro.versao}</p>
-          <p className="gold-glow inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
+          <p className="gold-glow mt-10 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
             {brl(carro.preco)}
           </p>
 
