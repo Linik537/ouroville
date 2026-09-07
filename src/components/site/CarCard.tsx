@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Gauge } from "lucide-react";
-import { brl, km } from "@/lib/site";
-import { carTitle, formatCarName, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
+import { brl, formatCarName, km } from "@/lib/site";
+import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
