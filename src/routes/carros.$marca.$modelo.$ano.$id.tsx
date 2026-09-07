@@ -113,8 +113,8 @@ function Detalhe() {
           )}
           {carro.descricao && (
             <section className="mt-8">
-              <h2 className="text-lg font-semibold text-foreground">Descrição</h2>
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{carro.descricao}</p>
+              <h2 className="text-xl font-semibold text-foreground">Descrição</h2>
+              <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-muted-foreground">{carro.descricao}</p>
             </section>
           )}
         </div>
@@ -125,8 +125,8 @@ function Detalhe() {
             <span className="text-gold">{nomeModelo}</span>{" "}
             <span className="text-white">{carro.ano}</span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{carro.versao}</p>
-          <p className="mt-5 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-medium tracking-wide text-black sm:text-2xl">
+          <p className="mt-1 text-base text-muted-foreground">{carro.versao}</p>
+          <p className="mt-5 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
             {brl(carro.preco)}
           </p>
 
@@ -146,9 +146,9 @@ function Detalhe() {
             href={whatsappLink(`Olá! Tenho interesse no ${carTitle(carro)} anunciado no site da Ouroville Motors.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-black shadow-lg transition hover:brightness-110"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
           >
-            <MessageCircle className="h-4 w-4" /> Tenho interesse
+            <MessageCircle className="h-5 w-5" /> Tenho interesse
           </a>
         </aside>
       </div>
