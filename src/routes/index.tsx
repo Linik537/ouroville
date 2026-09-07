@@ -116,6 +116,16 @@ function Home() {
             ? Array.from({ length: 3 }).map((_, i) => <CarCardSkeleton key={i} />)
             : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
         </div>
+        {!isLoading && (data ?? []).length > 0 && (
+          <div className="mt-10 text-center">
+            <Link
+              to="/estoque"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:brightness-110"
+            >
+              Ver o estoque completo
+            </Link>
+          </div>
+        )}
         {!isLoading && (data ?? []).length === 0 && (
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Estoque sendo atualizado. Fale com a gente pelo WhatsApp para conhecer os veículos disponíveis.
