@@ -246,7 +246,22 @@
 }
 
 .number-stepper {
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 0.7;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.number-chevron {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-right: 4px solid currentColor;
+  border-bottom: 4px solid currentColor;
+  border-radius: 1px;
+}
+
+.number-chevron-up {
+  transform: translateY(3px) rotate(225deg);
+}
+
+.number-chevron-down {
+  transform: translateY(-3px) rotate(45deg);
 }
