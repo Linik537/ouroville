@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HoursBar } from "@/components/site/HoursBar";
+import { NumberInput } from "@/components/site/NumberInput";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
@@ -153,13 +154,26 @@ function Estoque() {
             </label>
             <label className="block text-xs text-muted-foreground">
               Ano a partir de
-              <input type="number" className={selectCls} value={search.anoMin ?? ""} placeholder="2015"
-                onChange={(e) => setFilter({ anoMin: e.target.value ? Number(e.target.value) : undefined })} />
+              <NumberInput
+                className={selectCls}
+                value={search.anoMin ?? ""}
+                placeholder="2015"
+                upStart={2016}
+                downStart={2015}
+                onChange={(value) => setFilter({ anoMin: value ? Number(value) : undefined })}
+              />
             </label>
             <label className="block text-xs text-muted-foreground">
               Preço até (R$)
-              <input type="number" className={selectCls} value={search.precoMax ?? ""} placeholder="150000"
-                onChange={(e) => setFilter({ precoMax: e.target.value ? Number(e.target.value) : undefined })} />
+              <NumberInput
+                className={selectCls}
+                value={search.precoMax ?? ""}
+                placeholder="300000"
+                step={5000}
+                upStart={300000}
+                downStart={280000}
+                onChange={(value) => setFilter({ precoMax: value ? Number(value) : undefined })}
+              />
             </label>
             <button
               type="button"

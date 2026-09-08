@@ -234,3 +234,19 @@
     animation: none;
   }
 }
+
+.number-input::-webkit-inner-spin-button,
+.number-input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.number-input {
+  appearance: textfield;
+}
+
+.number-stepper {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 0.7;
+}

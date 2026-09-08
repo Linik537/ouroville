@@ -6,6 +6,7 @@ import { brl } from "@/lib/site";
 import { supabase, type Carro, type Lead } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
+import { NumberInput } from "@/components/site/NumberInput";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -347,12 +348,23 @@ function Painel() {
   const campo = (name: keyof typeof vazio, label: string, type = "text") => (
     <label className="block text-xs text-muted-foreground">
       {label}
-      <input
-        type={type}
-        value={form[name]}
-        onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-        className={inputCls}
-      />
+      {type === "number" ? (
+        <NumberInput
+          value={form[name]}
+          onChange={(value) => setForm((f) => ({ ...f, [name]: value }))}
+          className={inputCls}
+          upStart={name === "preco" ? 300000 : name === "ano" || name === "ano_modelo" ? 2016 : 1}
+          downStart={name === "preco" ? 280000 : name === "ano" || name === "ano_modelo" ? 2015 : 0}
+          step={name === "preco" ? 5000 : 1}
+        />
+      ) : (
+        <input
+          type={type}
+          value={form[name]}
+          onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
+          className={inputCls}
+        />
+      )}
     </label>
   );
 
