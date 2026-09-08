@@ -257,7 +257,7 @@ function Detalhe() {
       </nav>
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
-        <div>
+        <div className="lg:col-start-1 lg:row-start-1">
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-muted">
             {anterior !== null && (
               <img
@@ -323,15 +323,9 @@ function Detalhe() {
               )}
             </div>
           )}
-          {carro.descricao && (
-            <section className="mt-8">
-              <h2 className="text-xl font-semibold text-primary">Descrição</h2>
-              <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-white">{carro.descricao}</p>
-            </section>
-          )}
         </div>
 
-        <aside>
+        <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <h1 className="font-oswald text-[30px] font-semibold leading-tight tracking-wide sm:text-[32px]">
             <span className="text-white">{nomeMarca}</span>{" "}
             <span className="text-gold">{nomeModelo}</span>{" "}
@@ -364,6 +358,13 @@ function Detalhe() {
             <MessageCircle className="h-5 w-5" /> Tenho interesse
           </a>
         </aside>
+
+        {carro.descricao && (
+          <section className="lg:col-start-1 lg:row-start-2">
+            <h2 className="text-xl font-semibold text-primary">Descrição</h2>
+            <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-white">{carro.descricao}</p>
+          </section>
+        )}
       </div>
 
       <div className="mt-12 text-center">

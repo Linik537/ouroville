@@ -551,7 +551,13 @@ function Painel() {
             )}
             <label className="mt-4 block text-xs text-muted-foreground">
               Descrição
-              <textarea rows={3} value={form.descricao} onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))} className={inputCls} />
+              <textarea
+                rows={8}
+                data-lenis-prevent-wheel
+                value={form.descricao}
+                onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
+                className={`${inputCls} min-h-48 resize-y overflow-y-auto`}
+              />
             </label>
             <div className="mt-4 flex gap-3">
               <button disabled={salvando} className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
