@@ -62,6 +62,7 @@ function Detalhe() {
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
   const [imagemEntrando, setImagemEntrando] = useState(true);
+  const ativaRef = useRef(0);
   const pausaAte = useRef(0);
   const transicao = useRef<number | null>(null);
   const inicioMiniaturasRef = useRef(0);
@@ -69,29 +70,36 @@ function Detalhe() {
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
 
   useEffect(() => {
+    ativaRef.current = ativa;
+  }, [ativa]);
+
+  useEffect(() => {
     if (fotos.length < 2) return;
     const timer = window.setInterval(() => {
       if (Date.now() < pausaAte.current) return;
-      trocarFoto((ativa + 1) % fotos.length);
+      trocarFoto((ativaRef.current + 1) % fotos.length);
     }, 4000);
     return () => {
       window.clearInterval(timer);
       if (transicao.current) window.clearTimeout(transicao.current);
     };
-  }, [ativa, fotos.length]);
+  }, [fotos.length]);
 
   function trocarFoto(indice: number) {
-    if (indice === ativa) return;
+    if (indice === ativaRef.current) return;
     if (indice < inicioMiniaturasRef.current || indice >= inicioMiniaturasRef.current + janelaMiniaturas) {
       inicioMiniaturasRef.current = Math.min(
         Math.max(0, indice - 2),
         Math.max(0, fotos.length - janelaMiniaturas),
       );
     }
-    setAnterior(ativa);
+    setAnterior(ativaRef.current);
     setImagemEntrando(false);
+    ativaRef.current = indice;
     setAtiva(indice);
-    window.setTimeout(() => setImagemEntrando(true), 20);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setImagemEntrando(true));
+    });
     if (transicao.current) window.clearTimeout(transicao.current);
     transicao.current = window.setTimeout(() => setAnterior(null), 420);
   }
@@ -246,7 +254,7 @@ function Detalhe() {
                 alt=""
                 aria-hidden
                 className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
-                style={{ opacity: anterior === null ? 0 : 1 }}
+                style={{ opacity: imagemEntrando ? 0 : 1 }}
               />
             )}
             <img
