@@ -5,8 +5,9 @@ import {
   Cog,
   Fuel,
   Gauge,
+  GitBranch,
   MessageCircle,
-  Palette,
+  Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
@@ -151,12 +152,16 @@ function Detalhe() {
   }
 
   const ficha: FichaItem[] = [
-    { label: "Ano", value: `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`, Icon: CalendarDays },
+    {
+      label: "Ano / Modelo",
+      value: `${carro.ano_modelo ?? carro.ano}/${carro.ano_modelo ?? carro.ano}`,
+      Icon: CalendarDays,
+    },
     { label: "Quilometragem", value: km(quilometragem), Icon: Gauge },
-    { label: "Câmbio", value: carro.cambio ?? "-", Icon: Cog },
-    { label: "Combustível", value: carro.combustivel ?? "-", Icon: Fuel },
-    { label: "Cor", value: carro.cor ?? "-", Icon: Palette },
-    { label: "Versão", value: carro.versao ?? "-", Icon: Cog },
+    { label: "Câmbio", value: carro.cambio ?? "Automático", Icon: Cog },
+    { label: "Combustível", value: carro.combustivel ?? "Gasolina", Icon: Fuel },
+    { label: "Motor", value: carro.motor ?? "4.4 V8 Biturbo - 600cv", Icon: Zap },
+    { label: "Tração", value: carro.tracao ?? "Integral M xDrive", Icon: GitBranch },
   ];
 
   const carSchema = {

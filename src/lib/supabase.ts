@@ -22,6 +22,8 @@ export type Carro = {
   preco: number | null;
   quilometragem: number | null;
   combustivel: string | null;
+  motor: string | null;
+  tracao: string | null;
   cambio: string | null;
   cor: string | null;
   fotos: string[] | null;
