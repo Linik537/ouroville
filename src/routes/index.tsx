@@ -91,9 +91,6 @@ function Home() {
             <h1 className="mt-0 font-display text-5xl font-bold leading-[0.95] tracking-wide text-foreground sm:text-7xl">
               Encontre o seu próximo carro, <span className="text-gold">no padrão de <span className="capitalize">ouro</span></span>
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-foreground/90">
-              Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
-            </p>
             <p className="mx-auto mt-1 max-w-2xl text-base leading-relaxed text-foreground/80">
               Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
             </p>
@@ -140,7 +137,22 @@ function Home() {
       </section>
 
       <div className="relative z-30 bg-background">
-      <section className="mx-auto max-w-7xl px-4 py-16">
+      <section className="mx-auto max-w-7xl px-4 pb-3 pt-12 sm:pt-16">
+        <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card px-5 py-6 shadow-[0_18px_45px_rgba(0,0,0,0.22)] sm:px-8 sm:py-7">
+          <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gold/10 blur-3xl" aria-hidden />
+          <div className="relative flex items-center gap-4 sm:gap-5">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 sm:h-14 sm:w-14">
+              <ShieldCheck className="h-6 w-6 text-primary sm:h-7 sm:w-7" aria-hidden />
+            </span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Seu próximo carro, com tranquilidade</p>
+              <p className="mt-1 text-base font-medium leading-snug text-foreground sm:text-xl">Veículos revisados, laudo cautelar aprovado e financiamento em minutos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-16 pt-8">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Últimas novidades</h2>
           <Link to="/estoque" className="text-sm font-semibold text-primary hover:underline">
