@@ -44,12 +44,12 @@ export function NumberInput({
         onChange={(event) => onChange(event.target.value)}
         className={`number-input w-full pr-11 ${className}`}
       />
-      <div className="absolute right-1 top-1/2 flex w-8 -translate-y-1/2 flex-col items-center gap-1.5">
+      <div className="absolute right-1 top-1/2 flex w-8 -translate-y-1/2 flex-col items-center gap-3">
         <button
           type="button"
           aria-label="Aumentar valor"
           onClick={() => changeBy(1)}
-          className="number-stepper flex h-5 w-7 items-center justify-center rounded-sm text-primary transition hover:bg-primary/15"
+          className="number-stepper flex h-4 w-7 items-center justify-center rounded-sm transition hover:bg-primary/15"
         >
           <span aria-hidden className="number-chevron number-chevron-up" />
         </button>
@@ -57,7 +57,7 @@ export function NumberInput({
           type="button"
           aria-label="Diminuir valor"
           onClick={() => changeBy(-1)}
-          className="number-stepper flex h-5 w-7 items-center justify-center rounded-sm text-primary transition hover:bg-primary/15"
+          className="number-stepper flex h-4 w-7 items-center justify-center rounded-sm transition hover:bg-primary/15"
         >
           <span aria-hidden className="number-chevron number-chevron-down" />
         </button>

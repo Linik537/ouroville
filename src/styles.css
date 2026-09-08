@@ -251,17 +251,16 @@
 
 .number-chevron {
   display: block;
-  width: 13px;
-  height: 13px;
-  border-right: 4px solid currentColor;
-  border-bottom: 4px solid currentColor;
-  border-radius: 1px;
+  width: 10px;
+  height: 8px;
+  background-image: linear-gradient(135deg, oklch(0.62 0.12 68), oklch(0.88 0.14 90));
+  clip-path: polygon(0 0, 50% 70%, 100% 0, 100% 32%, 50% 100%, 0 32%);
 }
 
 .number-chevron-up {
-  transform: translateY(3px) rotate(225deg);
+  transform: rotate(180deg);
 }
 
 .number-chevron-down {
-  transform: translateY(-3px) rotate(45deg);
+  transform: none;
 }
