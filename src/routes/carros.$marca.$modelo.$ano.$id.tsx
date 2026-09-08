@@ -60,7 +60,10 @@ function Detalhe() {
     queryFn: () => fetchCarro(Number(id)),
   });
   const [ativa, setAtiva] = useState(0);
+  const [anterior, setAnterior] = useState<number | null>(null);
+  const [imagemVisivel, setImagemVisivel] = useState(true);
   const pausaAte = useRef(0);
+  const transicao = useRef<number | null>(null);
 
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
 
@@ -68,15 +71,39 @@ function Detalhe() {
     if (fotos.length < 2) return;
     const timer = window.setInterval(() => {
       if (Date.now() < pausaAte.current) return;
-      setAtiva((atual) => (atual + 1) % fotos.length);
+      trocarFoto((ativa + 1) % fotos.length);
     }, 4000);
-    return () => window.clearInterval(timer);
-  }, [fotos.length]);
+    return () => {
+      window.clearInterval(timer);
+      if (transicao.current) window.clearTimeout(transicao.current);
+    };
+  }, [ativa, fotos.length]);
+
+  function trocarFoto(indice: number) {
+    if (indice === ativa) return;
+    setAnterior(ativa);
+    setImagemVisivel(false);
+    setAtiva(indice);
+    requestAnimationFrame(() => setImagemVisivel(true));
+    if (transicao.current) window.clearTimeout(transicao.current);
+    transicao.current = window.setTimeout(() => setAnterior(null), 420);
+  }
 
   function selecionarFoto(indice: number) {
     pausaAte.current = Date.now() + 12000;
-    setAtiva(indice);
+    trocarFoto(indice);
   }
+
+  function moverGaleria(direcao: -1 | 1) {
+    selecionarFoto((ativa + direcao + fotos.length) % fotos.length);
+  }
+
+  const janelaMiniaturas = Math.min(5, fotos.length);
+  const inicioMiniaturas = Math.min(
+    Math.max(0, ativa - (janelaMiniaturas - 1)),
+    Math.max(0, fotos.length - janelaMiniaturas),
+  );
+  const miniaturas = fotos.slice(inicioMiniaturas, inicioMiniaturas + janelaMiniaturas);
   const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
   const nomeMarca = carro ? formatCarName(carro.marca) : "";
   const nomeModelo = carro ? formatCarName(carro.modelo) : "";
@@ -203,24 +230,64 @@ function Detalhe() {
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
         <div>
-          <img
-            src={fotos[ativa] ?? fotos[0]}
-            alt={`${carTitle(carro)} - foto ${ativa + 1}`}
-            loading="lazy"
-            className="aspect-4/3 w-full rounded-xl border border-border/70 object-cover"
-          />
+          <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-muted">
+            {anterior !== null && (
+              <img
+                src={fotos[anterior] ?? fotos[0]}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
+                style={{ opacity: 1 }}
+              />
+            )}
+            <img
+              src={fotos[ativa] ?? fotos[0]}
+              alt={`${carTitle(carro)} - foto ${ativa + 1}`}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
+              style={{ opacity: imagemVisivel ? 1 : 0 }}
+            />
+          </div>
           {fotos.length > 1 && (
-            <div className="mt-3 flex gap-3 overflow-x-auto">
-              {fotos.map((f, i) => (
+            <div className="mt-3 flex w-full items-center gap-2">
+              {fotos.length > 5 && (
+                <button
+                  type="button"
+                  onClick={() => moverGaleria(-1)}
+                  aria-label="Ver fotos anteriores"
+                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
+                  disabled={inicioMiniaturas === 0}
+                >
+                  &#8249;
+                </button>
+              )}
+              <div className="grid min-w-0 flex-1 grid-cols-5 gap-2">
+              {miniaturas.map((f, localIndex) => {
+                const i = inicioMiniaturas + localIndex;
+                return (
                 <button
                   key={f + i}
+                  type="button"
                   onClick={() => selecionarFoto(i)}
                   aria-label={`Ver foto ${i + 1}`}
-                  className={`h-20 w-28 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
+                  className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                 >
                   <img src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" className="h-full w-full object-cover" />
                 </button>
-              ))}
+                );
+              })}
+              </div>
+              {fotos.length > 5 && (
+                <button
+                  type="button"
+                  onClick={() => moverGaleria(1)}
+                  aria-label="Ver próximas fotos"
+                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
+                  disabled={inicioMiniaturas + janelaMiniaturas >= fotos.length}
+                >
+                  &#8250;
+                </button>
+              )}
             </div>
           )}
           {carro.descricao && (
