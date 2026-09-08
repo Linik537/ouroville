@@ -26,43 +26,23 @@ const inputCls =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
 
 function Admin() {
-  const [access, setAccess] = useState<"checking" | "signed_out" | "forbidden" | "allowed">("checking");
+  const [userId, setUserId] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    async function checkAccess(userId?: string) {
-      if (!userId) {
-        setAccess("signed_out");
-        setCarregando(false);
-        return;
-      }
-      // is_admin runs inside Supabase with the correct table privileges. Reading
-      // admins directly can be blocked by an older RLS/grant setup even for an admin.
-      const { data, error } = await supabase.rpc("is_admin", { _uid: userId });
-      if (error) {
-        console.error("Não foi possível verificar o acesso administrativo:", error);
-        setAccess("forbidden");
-      } else {
-        setAccess(data === true ? "allowed" : "forbidden");
-      }
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
       setCarregando(false);
-    }
-    supabase.auth.getUser().then(({ data }) => void checkAccess(data.user?.id));
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setCarregando(true);
-      void checkAccess(session?.user?.id);
+      setUserId(session?.user?.id ?? null);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (carregando || access === "checking") return <div className="p-16 text-center text-sm text-muted-foreground">Verificando acesso...</div>;
-  if (access === "signed_out") return <Login />;
-  if (access === "forbidden") return <AccessDenied />;
+  if (carregando) return <div className="p-16 text-center text-sm text-muted-foreground">Carregando...</div>;
+  if (!userId) return <Login />;
   return <Painel />;
-}
-
-function AccessDenied() {
-  return <div className="mx-auto max-w-lg px-4 py-24 text-center"><h1 className="text-2xl font-bold text-foreground">Acesso não autorizado</h1><p className="mt-3 text-sm text-muted-foreground">Esta conta não está cadastrada como administradora.</p><button onClick={() => void supabase.auth.signOut()} className="mt-6 rounded-full border border-border px-5 py-2 text-sm text-muted-foreground hover:text-primary">Sair</button></div>;
 }
 
 function Login() {
