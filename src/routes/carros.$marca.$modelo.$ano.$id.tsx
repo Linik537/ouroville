@@ -61,7 +61,6 @@ function Detalhe() {
   });
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
-  const [imagemEntrando, setImagemEntrando] = useState(true);
   const ativaRef = useRef(0);
   const pausaAte = useRef(0);
   const transicao = useRef<number | null>(null);
@@ -94,12 +93,8 @@ function Detalhe() {
       );
     }
     setAnterior(ativaRef.current);
-    setImagemEntrando(false);
     ativaRef.current = indice;
     setAtiva(indice);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setImagemEntrando(true));
-    });
     if (transicao.current) window.clearTimeout(transicao.current);
     transicao.current = window.setTimeout(() => setAnterior(null), 420);
   }
@@ -253,16 +248,15 @@ function Detalhe() {
                 src={fotos[anterior] ?? fotos[0]}
                 alt=""
                 aria-hidden
-                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
-                style={{ opacity: imagemEntrando ? 0 : 1 }}
+                className="absolute inset-0 h-full w-full object-cover"
               />
             )}
             <img
+              key={`${fotos[ativa]}-${ativa}`}
               src={fotos[ativa] ?? fotos[0]}
               alt={`${carTitle(carro)} - foto ${ativa + 1}`}
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
-              style={{ opacity: imagemEntrando ? 1 : 0 }}
+              loading={ativa === 0 ? "eager" : "lazy"}
+              className="car-gallery-fade absolute inset-0 h-full w-full object-cover"
             />
           </div>
           {fotos.length > 1 && (
