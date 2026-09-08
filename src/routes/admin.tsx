@@ -73,7 +73,7 @@ function Login() {
 }
 
 const vazio = {
-  marca: "", modelo: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
+  marca: "", modelo: "", versao: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
   combustivel: "Flex", cambio: "Automático", motor: "", tracao: "", descricao: "", destaque: "",
 };
 
@@ -165,6 +165,7 @@ function Painel() {
       const payload = {
         marca: form.marca,
         modelo: form.modelo,
+        versao: form.versao || null,
         ano: Number(form.ano),
         ano_modelo: form.ano_modelo ? Number(form.ano_modelo) : null,
         preco: form.preco ? Number(form.preco) : null,
@@ -302,7 +303,7 @@ function Painel() {
       }
       const registros = resultado.carros.map((carro: ImportacaoCarro) => ({
         ...carro,
-        versao: null,
+        versao: carro.versao ?? null,
         ano_modelo: carro.ano_modelo ?? null,
         preco: carro.preco ?? null,
         quilometragem: carro.quilometragem ?? null,
@@ -310,7 +311,7 @@ function Painel() {
         cambio: carro.cambio ?? null,
         motor: carro.motor ?? null,
         tracao: carro.tracao ?? null,
-        cor: null,
+        cor: carro.cor ?? null,
         descricao: carro.descricao ?? null,
         destaque: carro.destaque ?? null,
         fotos: [],
@@ -334,7 +335,7 @@ function Painel() {
   function editar(c: Carro) {
     setEditId(c.id);
     setForm({
-      marca: c.marca, modelo: c.modelo, ano: String(c.ano),
+      marca: c.marca, modelo: c.modelo, versao: c.versao ?? "", ano: String(c.ano),
       ano_modelo: c.ano_modelo ? String(c.ano_modelo) : "", preco: c.preco ? String(c.preco) : "",
       quilometragem: c.quilometragem ? String(c.quilometragem) : "", combustivel: c.combustivel ?? "Flex",
       cambio: c.cambio ?? "Automático", motor: c.motor ?? "", tracao: c.tracao ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
@@ -438,6 +439,7 @@ function Painel() {
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
+              {campo("versao", "Versão")}
               {campo("ano", "Ano", "number")}
               {campo("ano_modelo", "Ano / Modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}
