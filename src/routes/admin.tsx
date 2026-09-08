@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { brl } from "@/lib/site";
 import { supabase, type Carro, type Lead } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
+import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -82,11 +83,24 @@ function Painel() {
   const [editId, setEditId] = useState<number | null>(null);
   const [arquivos, setArquivos] = useState<File[]>([]);
   const [arquivoInputKey, setArquivoInputKey] = useState(0);
+  const [editorIndex, setEditorIndex] = useState(0);
+  const [crop, setCrop] = useState<CropSettings>({ ...DEFAULT_CROP });
+  const [editorPreviewUrl, setEditorPreviewUrl] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [planilha, setPlanilha] = useState<File | null>(null);
   const [urlPlanilha, setUrlPlanilha] = useState("");
   const [importando, setImportando] = useState(false);
   const [resultadoImportacao, setResultadoImportacao] = useState<{ total: number; erros: string[] } | null>(null);
+
+  useEffect(() => {
+    if (!arquivos[editorIndex]) {
+      setEditorPreviewUrl("");
+      return;
+    }
+    const url = URL.createObjectURL(arquivos[editorIndex]);
+    setEditorPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [arquivos, editorIndex]);
 
   const carros = useQuery({
     queryKey: ["admin", "carros"],
@@ -116,6 +130,20 @@ function Painel() {
       urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
     }
     return urls;
+  }
+
+  async function processarFotosSelecionadas() {
+    if (!arquivos.length) return;
+    setSalvando(true);
+    try {
+      const processadas = await Promise.all(arquivos.map((file) => prepararImagem(file, crop)));
+      setArquivos(processadas);
+      toast.success("Fotos preparadas em WebP e prontas para salvar.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível preparar as fotos.");
+    } finally {
+      setSalvando(false);
+    }
   }
 
   async function salvar(e: React.FormEvent) {
@@ -151,6 +179,8 @@ function Painel() {
       setEditId(null);
       setArquivos([]);
       setArquivoInputKey((key) => key + 1);
+      setEditorIndex(0);
+      setCrop({ ...DEFAULT_CROP });
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
     } catch {
@@ -193,6 +223,18 @@ function Painel() {
     const path = foto.includes(marker) ? decodeURIComponent(foto.split(marker)[1]) : null;
     if (path) await supabase.storage.from("carros").remove([path]);
     toast.success("Imagem removida.");
+    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
+    qc.invalidateQueries({ queryKey: ["carros"] });
+  }
+
+  async function definirCapa(c: Carro, foto: string) {
+    const fotos = [foto, ...(c.fotos ?? []).filter((item) => item !== foto)];
+    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
+    if (error) {
+      toast.error("Não foi possível definir a capa.");
+      return;
+    }
+    toast.success("Foto definida como capa do card.");
     qc.invalidateQueries({ queryKey: ["admin", "carros"] });
     qc.invalidateQueries({ queryKey: ["carros"] });
   }
@@ -245,6 +287,8 @@ function Painel() {
     });
     setArquivos([]);
     setArquivoInputKey((key) => key + 1);
+    setEditorIndex(0);
+    setCrop({ ...DEFAULT_CROP });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -352,7 +396,43 @@ function Painel() {
                 <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => setArquivos(Array.from(e.target.files ?? []))} className={inputCls} />
               </label>
             </div>
-            {arquivos.length > 0 && <p className="mt-2 text-xs text-muted-foreground">{arquivos.length} imagem(ns) selecionada(s) para enviar.</p>}
+            {arquivos.length > 0 && (
+              <div className="mt-5 rounded-lg border border-primary/30 bg-background p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-foreground">Editor de capa e fotos</p>
+                    <p className="text-xs text-muted-foreground">O padrão começa em 4:3, mas você pode escolher qualquer tamanho. O mesmo ajuste será aplicado às fotos escolhidas.</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{arquivos.length} foto(s) selecionada(s)</span>
+                </div>
+                <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+                  <div className="overflow-hidden rounded-lg bg-black">
+                    <div
+                      className="mx-auto max-h-[420px] w-full max-w-2xl bg-cover bg-center bg-no-repeat"
+                      style={{
+                        backgroundImage: `url(${editorPreviewUrl})`,
+                        backgroundPosition: `${50 + crop.offsetX / 2}% ${50 + crop.offsetY / 2}%`,
+                        backgroundSize: `${crop.zoom * 100}%`,
+                        aspectRatio: `${crop.width} / ${crop.height}`,
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-xs text-muted-foreground">Zoom: {crop.zoom.toFixed(1)}x<input type="range" min="1" max="3" step="0.1" value={crop.zoom} onChange={(e) => setCrop((value) => ({ ...value, zoom: Number(e.target.value) }))} className="w-full accent-primary" /></label>
+                    <label className="block text-xs text-muted-foreground">Horizontal: {crop.offsetX}<input type="range" min="-100" max="100" value={crop.offsetX} onChange={(e) => setCrop((value) => ({ ...value, offsetX: Number(e.target.value) }))} className="w-full accent-primary" /></label>
+                    <label className="block text-xs text-muted-foreground">Vertical: {crop.offsetY}<input type="range" min="-100" max="100" value={crop.offsetY} onChange={(e) => setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))} className="w-full accent-primary" /></label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <label className="text-xs text-muted-foreground">Largura<input type="number" min="400" max="1600" step="100" value={crop.width} onChange={(e) => setCrop((value) => ({ ...value, width: Math.min(1600, Math.max(400, Number(e.target.value) || 1200)), height: Math.round((Math.min(1600, Math.max(400, Number(e.target.value) || 1200)) * 3) / 4) }))} className={inputCls} /></label>
+                      <label className="text-xs text-muted-foreground">Altura<input type="number" min="300" max="1600" step="100" value={crop.height} onChange={(e) => setCrop((value) => ({ ...value, height: Math.min(1600, Math.max(300, Number(e.target.value) || 900)) }))} className={inputCls} /></label>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {arquivos.map((arquivo, index) => <button type="button" key={`${arquivo.name}-${index}`} onClick={() => setEditorIndex(index)} className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>{index + 1}. {arquivo.name.slice(0, 14)}</button>)}
+                    </div>
+                    <button type="button" onClick={() => void processarFotosSelecionadas()} disabled={salvando} className="w-full rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">{salvando ? "Preparando..." : "Aplicar crop e otimizar"}</button>
+                  </div>
+                </div>
+              </div>
+            )}
             {editId && (
               <div className="mt-4">
                 <p className="text-xs text-muted-foreground">Fotos atuais</p>
@@ -360,9 +440,10 @@ function Painel() {
                   {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto) => (
                     <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
                       <img src={foto} alt="" className="h-full w-full object-cover" />
-                      <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="absolute right-1 top-1 rounded bg-destructive px-2 py-1 text-xs text-destructive-foreground">
-                        Remover
-                      </button>
+                      <div className="absolute inset-x-1 bottom-1 flex gap-1">
+                        <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void definirCapa(carro, foto); }} className="flex-1 rounded bg-primary px-1 py-1 text-[10px] font-semibold text-primary-foreground">Capa</button>
+                        <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
+                      </div>
                     </div>
                   ))}
                 </div>
