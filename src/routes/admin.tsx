@@ -25,24 +25,49 @@ export const Route = createFileRoute("/admin")({
 const inputCls =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
 
+function isAdminUser(user: { app_metadata?: { role?: string }; user_metadata?: { role?: string; is_admin?: boolean } } | null | undefined) {
+  const role = user?.app_metadata?.role ?? user?.user_metadata?.role;
+  return role === "admin" || role === "Administrador" || user?.user_metadata?.is_admin === true;
+}
+
 function Admin() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<{ app_metadata?: { role?: string }; user_metadata?: { role?: string; is_admin?: boolean } } | null>(null);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUserId(data.user?.id ?? null);
+      setUser(data.user ?? null);
       setCarregando(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setUserId(session?.user?.id ?? null);
+      setUser(session?.user ?? null);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
   if (carregando) return <div className="p-16 text-center text-sm text-muted-foreground">Carregando...</div>;
   if (!userId) return <Login />;
+  if (!isAdminUser(user)) return <PainelRestrito />;
   return <Painel />;
+}
+
+function PainelRestrito() {
+  return (
+    <div className="mx-auto max-w-xl px-4 py-20">
+      <div className="rounded-xl border border-destructive/40 bg-card p-6 text-center">
+        <h1 className="text-2xl font-bold text-foreground">Acesso restrito</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Este usuário não tem permissão de administrador para alterar o estoque. No Supabase, o perfil autenticado precisa ter papel/metadata de admin ou uma policy de INSERT/UPDATE/DELETE para a tabela <strong>carros</strong>.
+        </p>
+        <button onClick={() => supabase.auth.signOut()} className="mt-5 rounded-full border border-border px-5 py-2 text-sm text-muted-foreground">
+          Sair
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function Login() {
@@ -160,6 +185,11 @@ function Painel() {
     e.preventDefault();
     setSalvando(true);
     try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!isAdminUser(userData.user)) {
+        throw new Error("Seu usuário não tem permissão de administrador no Supabase para escrever na tabela carros.");
+      }
+
       const novas = fotoEditando ? [] : await uploadFotos();
       const fotosEditadas = await uploadArquivos(Object.values(substituicoes));
       const payload = {
@@ -202,8 +232,10 @@ function Painel() {
       setSubstituicoes({});
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
-    } catch {
-      toast.error("Erro ao salvar. Verifique se seu usuário é administrador.");
+    } catch (error) {
+      const mensagem = error instanceof Error ? error.message : "Erro ao salvar.";
+      console.error("Erro ao salvar carro:", error);
+      toast.error(mensagem);
     } finally {
       setSalvando(false);
     }
