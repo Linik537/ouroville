@@ -8,6 +8,12 @@ import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
 
+type AnalyticsSummaryRow = {
+  event_type: string;
+  car_id: number | null;
+  total: number;
+};
+
 export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({
@@ -117,10 +123,16 @@ function Painel() {
   const analytics = useQuery({
     queryKey: ["admin", "analytics"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("analytics_events").select("event_type, car_id");
+      const { data, error } = await supabase.rpc("get_analytics_summary");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []).map((row) => ({
+        event_type: String(row.event_type),
+        car_id: row.car_id === null ? null : Number(row.car_id),
+        total: Number(row.total),
+      })) as AnalyticsSummaryRow[];
     },
+    refetchInterval: 15_000,
+    refetchOnWindowFocus: true,
   });
 
   async function uploadArquivos(files: File[]): Promise<string[]> {
@@ -562,12 +574,22 @@ function Painel() {
             ))}
           </div>
         </>
-      ) : <AnalyticsPanel eventos={analytics.data ?? []} carros={carros.data ?? []} />}
+      ) : analytics.isPending ? (
+        <p className="mt-8 text-sm text-muted-foreground">Carregando métricas...</p>
+      ) : analytics.isError ? (
+        <div className="mt-8 rounded-xl border border-destructive/50 bg-card p-5">
+          <p className="font-medium text-destructive">Não foi possível carregar as métricas.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Confirme que a correção de métricas foi executada no Supabase e tente novamente.</p>
+          <button type="button" onClick={() => void analytics.refetch()} className="mt-4 rounded-full border border-border px-4 py-2 text-sm text-foreground">Tentar novamente</button>
+        </div>
+      ) : <AnalyticsPanel eventos={analytics.data} carros={carros.data ?? []} />}
     </div>
   );
 }
 
-function AnalyticsPanel({ eventos, carros }: { eventos: { event_type: string; car_id: number | null }[]; carros: Carro[] }) {
-  const total = (tipo: string, carId?: number) => eventos.filter((evento) => evento.event_type === tipo && (carId === undefined || evento.car_id === carId)).length;
+function AnalyticsPanel({ eventos, carros }: { eventos: AnalyticsSummaryRow[]; carros: Carro[] }) {
+  const total = (tipo: string, carId?: number) => eventos
+    .filter((evento) => evento.event_type === tipo && (carId === undefined || evento.car_id === carId))
+    .reduce((sum, evento) => sum + evento.total, 0);
   return <div className="mt-6 space-y-6"><div className="grid gap-4 sm:grid-cols-3">{[["Entradas no site", total("site_visit")], ["Visualizações de carros", total("car_view")], ["Interesses via WhatsApp", total("whatsapp_click")]].map(([titulo, valor]) => <div key={String(titulo)} className="rounded-xl border border-border/70 bg-card p-5"><p className="text-sm text-muted-foreground">{titulo}</p><p className="mt-2 text-3xl font-bold text-primary">{valor}</p></div>)}</div><section className="rounded-xl border border-border/70 bg-card p-5"><h2 className="text-lg font-semibold text-foreground">Desempenho por veículo</h2><div className="mt-4 space-y-3">{carros.map((carro) => <div key={carro.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-sm last:border-0"><span className="font-medium text-foreground">{carro.marca} {carro.modelo} {carro.ano}</span><span className="text-muted-foreground">{total("car_view", carro.id)} visualizações · <strong className="text-primary">{total("whatsapp_click", carro.id)} interesses</strong></span></div>)}{carros.length === 0 && <p className="text-sm text-muted-foreground">Nenhum veículo cadastrado.</p>}</div></section></div>;
 }

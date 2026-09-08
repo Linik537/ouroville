@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
 import { trackAnalyticsEvent } from "@/lib/supabase";
@@ -20,15 +20,21 @@ const WhatsAppContext = createContext<WhatsAppContextType>({
 export function WhatsAppProvider({ children }: { children: ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);
   const [carId, setCarId] = useState<number | null>(null);
+  const updateMessage = useCallback((msg: string | null, id: number | null = null) => {
+    setMessage(msg);
+    setCarId(id);
+  }, []);
 
   useEffect(() => {
-    if (sessionStorage.getItem("ouroville-site-visit")) return;
-    sessionStorage.setItem("ouroville-site-visit", "1");
-    void trackAnalyticsEvent("site_visit");
+    const visitKey = "ouroville-site-visit-v2";
+    if (sessionStorage.getItem(visitKey)) return;
+    void trackAnalyticsEvent("site_visit").then((registered) => {
+      if (registered) sessionStorage.setItem(visitKey, "1");
+    });
   }, []);
 
   return (
-    <WhatsAppContext.Provider value={{ message, carId, setMessage: (msg, id = null) => { setMessage(msg); setCarId(id); } }}>
+    <WhatsAppContext.Provider value={{ message, carId, setMessage: updateMessage }}>
       {children}
     </WhatsAppContext.Provider>
   );

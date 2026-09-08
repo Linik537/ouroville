@@ -35,14 +35,32 @@ export type Carro = {
 
 export type AnalyticsEventType = "site_visit" | "car_view" | "whatsapp_click";
 
-export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number) {
+export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number): Promise<boolean> {
   try {
-    await supabase.rpc("track_analytics_event", {
-      _event_type: eventType,
-      _car_id: carId ?? null,
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/track_analytics_event`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _event_type: eventType,
+        _car_id: carId ?? null,
+      }),
+      keepalive: true,
     });
-  } catch {
-    // Analytics must never interrupt a visitor's journey to WhatsApp.
+
+    if (!response.ok) {
+      console.error("Não foi possível registrar a métrica:", response.status, await response.text());
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    // A falha não interrompe a navegação do visitante, mas permanece visível para diagnóstico.
+    console.error("Não foi possível registrar a métrica:", error);
+    return false;
   }
 }
 
