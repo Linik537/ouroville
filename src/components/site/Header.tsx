@@ -51,7 +51,7 @@ export function Header() {
             href={whatsappLink("Olá! Qual carro a Ouroville recomenda em 2026?")}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-base font-semibold text-black transition hover:bg-white/90 md:ml-0"
+            className="gold-glow ml-auto inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-base font-semibold text-black transition hover:brightness-110 md:ml-0"
           >
             <MessageCircle className="h-5 w-5 text-black" aria-hidden />
             <span className="hidden sm:inline">{SITE.phoneDisplay}</span>
