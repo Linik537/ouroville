@@ -87,6 +87,7 @@ function Painel() {
   const [crop, setCrop] = useState<CropSettings>({ ...DEFAULT_CROP });
   const [editorPreviewUrl, setEditorPreviewUrl] = useState("");
   const [fotoEditando, setFotoEditando] = useState<string | null>(null);
+  const [substituicoes, setSubstituicoes] = useState<Record<string, File>>({});
   const [salvando, setSalvando] = useState(false);
   const [planilha, setPlanilha] = useState<File | null>(null);
   const [urlPlanilha, setUrlPlanilha] = useState("");
@@ -121,10 +122,10 @@ function Painel() {
     },
   });
 
-  async function uploadFotos(): Promise<string[]> {
-    if (!arquivos.length) return [];
+  async function uploadArquivos(files: File[]): Promise<string[]> {
+    if (!files.length) return [];
     const urls: string[] = [];
-    for (const file of arquivos) {
+    for (const file of files) {
       const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/[^a-zA-Z0-9._-]+/g, "-")}`;
       const { error } = await supabase.storage.from("carros").upload(path, file);
       if (error) throw error;
@@ -133,12 +134,19 @@ function Painel() {
     return urls;
   }
 
+  async function uploadFotos(): Promise<string[]> {
+    return uploadArquivos(arquivos);
+  }
+
   async function processarFotosSelecionadas() {
     if (!arquivos.length) return;
     setSalvando(true);
     try {
       const processadas = await Promise.all(arquivos.map((file) => prepararImagem(file, crop)));
       setArquivos(processadas);
+      if (fotoEditando && processadas[0]) {
+        setSubstituicoes((atuais) => ({ ...atuais, [fotoEditando]: processadas[0] }));
+      }
       toast.success("Fotos preparadas em WebP e prontas para salvar.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível preparar as fotos.");
@@ -151,7 +159,8 @@ function Painel() {
     e.preventDefault();
     setSalvando(true);
     try {
-      const novas = await uploadFotos();
+      const novas = fotoEditando ? [] : await uploadFotos();
+      const fotosEditadas = await uploadArquivos(Object.values(substituicoes));
       const payload = {
         marca: form.marca,
         modelo: form.modelo,
@@ -168,12 +177,14 @@ function Painel() {
       };
       if (editId) {
         const atual = carros.data?.find((c) => c.id === editId);
-        const fotos = fotoEditando
-          ? (atual?.fotos ?? []).map((foto) => (foto === fotoEditando ? novas[0] ?? foto : foto))
-          : [...(atual?.fotos ?? []), ...novas];
+        const urlsEditadas = Object.keys(substituicoes).reduce<Record<string, string>>((mapa, foto, index) => {
+          if (fotosEditadas[index]) mapa[foto] = fotosEditadas[index];
+          return mapa;
+        }, {});
+        const fotos = (atual?.fotos ?? []).map((foto) => urlsEditadas[foto] ?? foto).concat(novas);
         const { error } = await supabase.from("carros").update({ ...payload, fotos }).eq("id", editId);
         if (error) throw error;
-        if (fotoEditando && novas[0]) await removerArquivoStorage(fotoEditando);
+        await Promise.all(Object.keys(urlsEditadas).map((foto) => removerArquivoStorage(foto)));
       } else {
         const { error } = await supabase.from("carros").insert({ ...payload, fotos: novas, status: "disponivel" });
         if (error) throw error;
@@ -186,6 +197,7 @@ function Painel() {
       setEditorIndex(0);
       setCrop({ ...DEFAULT_CROP });
       setFotoEditando(null);
+      setSubstituicoes({});
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
     } catch {
@@ -485,7 +497,7 @@ function Painel() {
                 {salvando ? "Salvando..." : editId ? "Salvar alterações" : "Adicionar carro"}
               </button>
               {editId && (
-                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setFotoEditando(null); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
+                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setFotoEditando(null); setSubstituicoes({}); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
                   Cancelar
                 </button>
               )}

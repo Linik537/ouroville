@@ -8,7 +8,7 @@ import {
   MessageCircle,
   Palette,
 } from "lucide-react";
-import { useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
 import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
@@ -60,8 +60,23 @@ function Detalhe() {
     queryFn: () => fetchCarro(Number(id)),
   });
   const [ativa, setAtiva] = useState(0);
+  const pausaAte = useRef(0);
 
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
+
+  useEffect(() => {
+    if (fotos.length < 2) return;
+    const timer = window.setInterval(() => {
+      if (Date.now() < pausaAte.current) return;
+      setAtiva((atual) => (atual + 1) % fotos.length);
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [fotos.length]);
+
+  function selecionarFoto(indice: number) {
+    pausaAte.current = Date.now() + 12000;
+    setAtiva(indice);
+  }
   const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
   const nomeMarca = carro ? formatCarName(carro.marca) : "";
   const nomeModelo = carro ? formatCarName(carro.modelo) : "";
@@ -199,7 +214,7 @@ function Detalhe() {
               {fotos.map((f, i) => (
                 <button
                   key={f + i}
-                  onClick={() => setAtiva(i)}
+                  onClick={() => selecionarFoto(i)}
                   aria-label={`Ver foto ${i + 1}`}
                   className={`h-20 w-28 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                 >
