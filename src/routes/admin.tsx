@@ -36,8 +36,15 @@ function Admin() {
         setCarregando(false);
         return;
       }
-      const { data } = await supabase.from("admins").select("user_id").eq("user_id", userId).maybeSingle();
-      setAccess(data ? "allowed" : "forbidden");
+      // is_admin runs inside Supabase with the correct table privileges. Reading
+      // admins directly can be blocked by an older RLS/grant setup even for an admin.
+      const { data, error } = await supabase.rpc("is_admin", { _uid: userId });
+      if (error) {
+        console.error("Não foi possível verificar o acesso administrativo:", error);
+        setAccess("forbidden");
+      } else {
+        setAccess(data === true ? "allowed" : "forbidden");
+      }
       setCarregando(false);
     }
     supabase.auth.getUser().then(({ data }) => void checkAccess(data.user?.id));
