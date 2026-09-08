@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
-import { carTitle, PLACEHOLDER_CAR, supabase, type Carro } from "@/lib/supabase";
+import { carTitle, PLACEHOLDER_CAR, supabase, trackAnalyticsEvent, type Carro } from "@/lib/supabase";
 import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
 
 async function fetchCarro(id: number) {
@@ -129,7 +129,11 @@ function Detalhe() {
   const nomeCarro = carro ? `${nomeMarca} ${nomeModelo} ${carro.ano}` : "";
 
   const mensagemWhatsApp = carro ? `Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.` : null;
-  useWhatsAppMessage(mensagemWhatsApp);
+  useWhatsAppMessage(mensagemWhatsApp, carro?.id);
+
+  useEffect(() => {
+    if (carro) void trackAnalyticsEvent("car_view", carro.id);
+  }, [carro]);
 
   if (isLoading) {
     return (
@@ -353,6 +357,7 @@ function Detalhe() {
 
           <a
             href={whatsappLink(mensagemWhatsApp ?? "")}
+            onClick={() => void trackAnalyticsEvent("whatsapp_click", carro.id)}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"

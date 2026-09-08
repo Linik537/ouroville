@@ -1,22 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Chaves publicáveis: configure-as no ambiente de cada deploy, nunca no código-fonte.
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Chave publicável do projeto: a segurança é aplicada pelas políticas RLS no Supabase.
+const SUPABASE_URL = "https://xjokgcsozlqiqjfnzxle.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_c50RR1HGqK3NSgAC_x85bA_AWtnc9Lc";
 
-export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
-
-export const supabase = createClient(
-  SUPABASE_URL || "https://not-configured.invalid",
-  SUPABASE_PUBLISHABLE_KEY || "not-configured",
-  {
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     storage: typeof window === "undefined" ? undefined : window.localStorage,
   },
-  },
-);
+});
 
 export type Carro = {
   id: number;
@@ -39,15 +33,18 @@ export type Carro = {
   created_at: string;
 };
 
-export type Lead = {
-  id: number;
-  nome: string;
-  telefone: string | null;
-  email: string | null;
-  carro_interesse: string | null;
-  mensagem: string | null;
-  created_at: string;
-};
+export type AnalyticsEventType = "site_visit" | "car_view" | "whatsapp_click";
+
+export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number) {
+  try {
+    await supabase.rpc("track_analytics_event", {
+      _event_type: eventType,
+      _car_id: carId ?? null,
+    });
+  } catch {
+    // Analytics must never interrupt a visitor's journey to WhatsApp.
+  }
+}
 
 export const slugify = (s: string) =>
   s

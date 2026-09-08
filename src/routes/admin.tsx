@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { brl } from "@/lib/site";
-import { isSupabaseConfigured, supabase, type Carro, type Lead } from "@/lib/supabase";
+import { supabase, type Carro } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
@@ -48,15 +48,10 @@ function Admin() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (!isSupabaseConfigured) return <ConfigRequired />;
   if (carregando || access === "checking") return <div className="p-16 text-center text-sm text-muted-foreground">Verificando acesso...</div>;
   if (access === "signed_out") return <Login />;
   if (access === "forbidden") return <AccessDenied />;
   return <Painel />;
-}
-
-function ConfigRequired() {
-  return <div className="mx-auto max-w-lg px-4 py-24 text-center"><h1 className="text-2xl font-bold text-foreground">Configuração necessária</h1><p className="mt-3 text-sm text-muted-foreground">Defina as variáveis públicas do Supabase antes de usar o painel.</p></div>;
 }
 
 function AccessDenied() {
@@ -97,7 +92,7 @@ const vazio = {
 
 function Painel() {
   const qc = useQueryClient();
-  const [aba, setAba] = useState<"estoque" | "leads">("estoque");
+  const [aba, setAba] = useState<"estoque" | "analytics">("estoque");
   const [form, setForm] = useState({ ...vazio });
   const [editId, setEditId] = useState<number | null>(null);
   const [arquivos, setArquivos] = useState<File[]>([]);
@@ -132,12 +127,12 @@ function Painel() {
     },
   });
 
-  const leads = useQuery({
-    queryKey: ["admin", "leads"],
+  const analytics = useQuery({
+    queryKey: ["admin", "analytics"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("analytics_events").select("event_type, car_id");
       if (error) throw error;
-      return (data ?? []) as Lead[];
+      return data ?? [];
     },
   });
 
@@ -402,10 +397,10 @@ function Painel() {
       </div>
 
       <div className="mt-6 flex gap-2">
-        {(["estoque", "leads"] as const).map((a) => (
+        {(["estoque", "analytics"] as const).map((a) => (
           <button key={a} onClick={() => setAba(a)}
             className={`rounded-full px-4 py-2 text-sm font-medium ${aba === a ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>
-            {a === "estoque" ? "Estoque" : "Leads"}
+            {a === "estoque" ? "Estoque" : "Métricas"}
           </button>
         ))}
       </div>
@@ -580,23 +575,12 @@ function Painel() {
             ))}
           </div>
         </>
-      ) : (
-        <div className="mt-6 space-y-3">
-          {(leads.data ?? []).map((l) => (
-            <div key={l.id} className="rounded-lg border border-border/70 bg-card p-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-medium text-foreground">{l.nome}</span>
-                <span className="text-sm text-muted-foreground">{l.telefone}</span>
-                <span className="ml-auto text-xs text-muted-foreground">
-                  {new Date(l.created_at).toLocaleString("pt-BR")}
-                </span>
-              </div>
-              {l.mensagem && <p className="mt-2 text-sm text-muted-foreground">{l.mensagem}</p>}
-            </div>
-          ))}
-          {(leads.data ?? []).length === 0 && <p className="text-sm text-muted-foreground">Nenhum lead ainda.</p>}
-        </div>
-      )}
+      ) : <AnalyticsPanel eventos={analytics.data ?? []} carros={carros.data ?? []} />}
     </div>
   );
+}
+
+function AnalyticsPanel({ eventos, carros }: { eventos: { event_type: string; car_id: number | null }[]; carros: Carro[] }) {
+  const total = (tipo: string, carId?: number) => eventos.filter((evento) => evento.event_type === tipo && (carId === undefined || evento.car_id === carId)).length;
+  return <div className="mt-6 space-y-6"><div className="grid gap-4 sm:grid-cols-3">{[["Entradas no site", total("site_visit")], ["Visualizações de carros", total("car_view")], ["Interesses via WhatsApp", total("whatsapp_click")]].map(([titulo, valor]) => <div key={String(titulo)} className="rounded-xl border border-border/70 bg-card p-5"><p className="text-sm text-muted-foreground">{titulo}</p><p className="mt-2 text-3xl font-bold text-primary">{valor}</p></div>)}</div><section className="rounded-xl border border-border/70 bg-card p-5"><h2 className="text-lg font-semibold text-foreground">Desempenho por veículo</h2><div className="mt-4 space-y-3">{carros.map((carro) => <div key={carro.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-sm last:border-0"><span className="font-medium text-foreground">{carro.marca} {carro.modelo} {carro.ano}</span><span className="text-muted-foreground">{total("car_view", carro.id)} visualizações · <strong className="text-primary">{total("whatsapp_click", carro.id)} interesses</strong></span></div>)}{carros.length === 0 && <p className="text-sm text-muted-foreground">Nenhum veículo cadastrado.</p>}</div></section></div>;
 }

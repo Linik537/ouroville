@@ -3,6 +3,8 @@ import { Menu, MessageCircle, Phone, X } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
+import { trackAnalyticsEvent } from "@/lib/supabase";
+import { useWhatsAppContext } from "@/components/site/WhatsAppFloater";
 
 const nav = [
   { to: "/estoque", label: "ESTOQUE" },
@@ -12,6 +14,8 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { message, carId } = useWhatsAppContext();
+  const activeMessage = message || "Olá! Qual carro a Ouroville recomenda em 2026?";
 
   return (
     <div className="sticky top-0 z-50">
@@ -48,7 +52,8 @@ export function Header() {
           </a>
 
           <a
-            href={whatsappLink("Olá! Qual carro a Ouroville recomenda em 2026?")}
+            href={whatsappLink(activeMessage)}
+            onClick={() => { if (carId) void trackAnalyticsEvent("whatsapp_click", carId); }}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow ml-auto inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-base font-semibold text-black transition hover:brightness-110 md:ml-0"

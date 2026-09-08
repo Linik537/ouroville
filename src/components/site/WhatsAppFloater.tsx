@@ -1,47 +1,62 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
+import { trackAnalyticsEvent } from "@/lib/supabase";
 
 const DEFAULT_MESSAGE = "Olá! Qual carro a Ouroville recomenda em 2026?";
 
 type WhatsAppContextType = {
   message: string | null;
-  setMessage: (msg: string | null) => void;
+  carId: number | null;
+  setMessage: (msg: string | null, carId?: number | null) => void;
 };
 
 const WhatsAppContext = createContext<WhatsAppContextType>({
   message: null,
+  carId: null,
   setMessage: () => {},
 });
 
 export function WhatsAppProvider({ children }: { children: ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);
+  const [carId, setCarId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("ouroville-site-visit")) return;
+    sessionStorage.setItem("ouroville-site-visit", "1");
+    void trackAnalyticsEvent("site_visit");
+  }, []);
 
   return (
-    <WhatsAppContext.Provider value={{ message, setMessage }}>
+    <WhatsAppContext.Provider value={{ message, carId, setMessage: (msg, id = null) => { setMessage(msg); setCarId(id); } }}>
       {children}
     </WhatsAppContext.Provider>
   );
 }
 
-export function useWhatsAppMessage(message: string | null | undefined) {
+export function useWhatsAppMessage(message: string | null | undefined, carId?: number) {
   const { setMessage } = useContext(WhatsAppContext);
 
   useEffect(() => {
     if (message) {
-      setMessage(message);
-      return () => setMessage(null);
+      setMessage(message, carId);
+      return () => setMessage(null, null);
     }
-  }, [message, setMessage]);
+  }, [message, carId, setMessage]);
+}
+
+export function useWhatsAppContext() {
+  return useContext(WhatsAppContext);
 }
 
 export function WhatsAppFloater() {
-  const { message } = useContext(WhatsAppContext);
+  const { message, carId } = useContext(WhatsAppContext);
   const activeMessage = message || DEFAULT_MESSAGE;
 
   return (
     <a
       href={whatsappLink(activeMessage)}
+      onClick={() => { if (carId) void trackAnalyticsEvent("whatsapp_click", carId); }}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Fale conosco pelo WhatsApp"
