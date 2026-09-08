@@ -100,7 +100,7 @@ function Detalhe() {
   }
 
   function selecionarFoto(indice: number) {
-    pausaAte.current = Date.now() + 12000;
+    pausaAte.current = Date.now() + 8000;
     trocarFoto(indice);
   }
 
