@@ -14,6 +14,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EstoqueRouteImport } from './routes/estoque'
 import { Route as FinancieRouteImport } from './routes/financie'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as InteresseIdRouteImport } from './routes/interesse.$id'
+import { Route as PulseEventIdRouteImport } from './routes/pulse.$event.$id'
 import { Route as CarrosMarcaModeloAnoIdRouteImport } from './routes/carros.$marca.$modelo.$ano.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +43,16 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InteresseIdRoute = InteresseIdRouteImport.update({
+  id: '/interesse/$id',
+  path: '/interesse/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PulseEventIdRoute = PulseEventIdRouteImport.update({
+  id: '/pulse/$event/$id',
+  path: '/pulse/$event/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CarrosMarcaModeloAnoIdRoute = CarrosMarcaModeloAnoIdRouteImport.update({
   id: '/carros/$marca/$modelo/$ano/$id',
   path: '/carros/$marca/$modelo/$ano/$id',
@@ -53,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/estoque': typeof EstoqueRoute
   '/financie': typeof FinancieRoute
   '/sobre': typeof SobreRoute
+  '/interesse/$id': typeof InteresseIdRoute
+  '/pulse/$event/$id': typeof PulseEventIdRoute
   '/carros/$marca/$modelo/$ano/$id': typeof CarrosMarcaModeloAnoIdRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +75,8 @@ export interface FileRoutesByTo {
   '/estoque': typeof EstoqueRoute
   '/financie': typeof FinancieRoute
   '/sobre': typeof SobreRoute
+  '/interesse/$id': typeof InteresseIdRoute
+  '/pulse/$event/$id': typeof PulseEventIdRoute
   '/carros/$marca/$modelo/$ano/$id': typeof CarrosMarcaModeloAnoIdRoute
 }
 export interface FileRoutesById {
@@ -70,6 +86,8 @@ export interface FileRoutesById {
   '/estoque': typeof EstoqueRoute
   '/financie': typeof FinancieRoute
   '/sobre': typeof SobreRoute
+  '/interesse/$id': typeof InteresseIdRoute
+  '/pulse/$event/$id': typeof PulseEventIdRoute
   '/carros/$marca/$modelo/$ano/$id': typeof CarrosMarcaModeloAnoIdRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +98,8 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/financie'
     | '/sobre'
+    | '/interesse/$id'
+    | '/pulse/$event/$id'
     | '/carros/$marca/$modelo/$ano/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +108,8 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/financie'
     | '/sobre'
+    | '/interesse/$id'
+    | '/pulse/$event/$id'
     | '/carros/$marca/$modelo/$ano/$id'
   id:
     | '__root__'
@@ -96,6 +118,8 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/financie'
     | '/sobre'
+    | '/interesse/$id'
+    | '/pulse/$event/$id'
     | '/carros/$marca/$modelo/$ano/$id'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +129,8 @@ export interface RootRouteChildren {
   EstoqueRoute: typeof EstoqueRoute
   FinancieRoute: typeof FinancieRoute
   SobreRoute: typeof SobreRoute
+  InteresseIdRoute: typeof InteresseIdRoute
+  PulseEventIdRoute: typeof PulseEventIdRoute
   CarrosMarcaModeloAnoIdRoute: typeof CarrosMarcaModeloAnoIdRoute
 }
 
@@ -145,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/interesse/$id': {
+      id: '/interesse/$id'
+      path: '/interesse/$id'
+      fullPath: '/interesse/$id'
+      preLoaderRoute: typeof InteresseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pulse/$event/$id': {
+      id: '/pulse/$event/$id'
+      path: '/pulse/$event/$id'
+      fullPath: '/pulse/$event/$id'
+      preLoaderRoute: typeof PulseEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/carros/$marca/$modelo/$ano/$id': {
       id: '/carros/$marca/$modelo/$ano/$id'
       path: '/carros/$marca/$modelo/$ano/$id'
@@ -161,6 +201,8 @@ const rootRouteChildren: RootRouteChildren = {
   EstoqueRoute: EstoqueRoute,
   FinancieRoute: FinancieRoute,
   SobreRoute: SobreRoute,
+  InteresseIdRoute: InteresseIdRoute,
+  PulseEventIdRoute: PulseEventIdRoute,
   CarrosMarcaModeloAnoIdRoute: CarrosMarcaModeloAnoIdRoute,
 }
 export const routeTree = rootRouteImport

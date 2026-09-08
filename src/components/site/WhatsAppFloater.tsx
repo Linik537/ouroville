@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
-import { trackAnalyticsEvent } from "@/lib/supabase";
 
 const DEFAULT_MESSAGE = "Olá! Qual carro a Ouroville recomenda em 2026?";
 
@@ -55,8 +54,7 @@ export function WhatsAppFloater() {
 
   return (
     <a
-      href={whatsappLink(activeMessage)}
-      onClick={() => { if (carId) void trackAnalyticsEvent("whatsapp_click", carId); }}
+      href={carId ? `/interesse/${carId}` : whatsappLink(activeMessage)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Fale conosco pelo WhatsApp"

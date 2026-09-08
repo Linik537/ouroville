@@ -3,7 +3,6 @@ import { Menu, MessageCircle, Phone, X } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
-import { trackAnalyticsEvent } from "@/lib/supabase";
 import { useWhatsAppContext } from "@/components/site/WhatsAppFloater";
 
 const nav = [
@@ -52,8 +51,7 @@ export function Header() {
           </a>
 
           <a
-            href={whatsappLink(activeMessage)}
-            onClick={() => { if (carId) void trackAnalyticsEvent("whatsapp_click", carId); }}
+            href={carId ? `/interesse/${carId}` : whatsappLink(activeMessage)}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow ml-auto inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-base font-semibold text-black transition hover:brightness-110 md:ml-0"

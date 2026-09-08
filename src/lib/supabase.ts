@@ -37,9 +37,10 @@ export type AnalyticsEventType = "site_visit" | "car_view" | "whatsapp_click";
 
 export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number) {
   try {
-    await supabase.rpc("track_analytics_event", {
-      _event_type: eventType,
-      _car_id: carId ?? null,
+    await fetch(`/pulse/${eventType}/${carId ?? 0}`, {
+      method: "POST",
+      credentials: "same-origin",
+      keepalive: true,
     });
   } catch {
     // Analytics must never interrupt a visitor's journey to WhatsApp.
