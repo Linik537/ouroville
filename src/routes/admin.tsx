@@ -86,6 +86,7 @@ function Painel() {
   const [editorIndex, setEditorIndex] = useState(0);
   const [crop, setCrop] = useState<CropSettings>({ ...DEFAULT_CROP });
   const [editorPreviewUrl, setEditorPreviewUrl] = useState("");
+  const [fotoEditando, setFotoEditando] = useState<string | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [planilha, setPlanilha] = useState<File | null>(null);
   const [urlPlanilha, setUrlPlanilha] = useState("");
@@ -167,9 +168,12 @@ function Painel() {
       };
       if (editId) {
         const atual = carros.data?.find((c) => c.id === editId);
-        const fotos = [...(atual?.fotos ?? []), ...novas];
+        const fotos = fotoEditando
+          ? (atual?.fotos ?? []).map((foto) => (foto === fotoEditando ? novas[0] ?? foto : foto))
+          : [...(atual?.fotos ?? []), ...novas];
         const { error } = await supabase.from("carros").update({ ...payload, fotos }).eq("id", editId);
         if (error) throw error;
+        if (fotoEditando && novas[0]) await removerArquivoStorage(fotoEditando);
       } else {
         const { error } = await supabase.from("carros").insert({ ...payload, fotos: novas, status: "disponivel" });
         if (error) throw error;
@@ -181,6 +185,7 @@ function Painel() {
       setArquivoInputKey((key) => key + 1);
       setEditorIndex(0);
       setCrop({ ...DEFAULT_CROP });
+      setFotoEditando(null);
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
     } catch {
@@ -219,12 +224,32 @@ function Painel() {
       toast.error("Não foi possível remover a imagem.");
       return;
     }
-    const marker = "/storage/v1/object/public/carros/";
-    const path = foto.includes(marker) ? decodeURIComponent(foto.split(marker)[1]) : null;
-    if (path) await supabase.storage.from("carros").remove([path]);
+    await removerArquivoStorage(foto);
     toast.success("Imagem removida.");
     qc.invalidateQueries({ queryKey: ["admin", "carros"] });
     qc.invalidateQueries({ queryKey: ["carros"] });
+  }
+
+  async function removerArquivoStorage(foto: string) {
+    const marker = "/storage/v1/object/public/carros/";
+    const path = foto.includes(marker) ? decodeURIComponent(foto.split(marker)[1]) : null;
+    if (path) await supabase.storage.from("carros").remove([path]);
+  }
+
+  async function editarFoto(foto: string) {
+    try {
+      const resposta = await fetch(foto);
+      if (!resposta.ok) throw new Error("Não foi possível abrir esta imagem.");
+      const blob = await resposta.blob();
+      const nome = foto.split("/").pop()?.split("?")[0] ?? "foto-do-carro.jpg";
+      setArquivos([new File([blob], nome, { type: blob.type || "image/jpeg" })]);
+      setFotoEditando(foto);
+      setEditorIndex(0);
+      setCrop({ ...DEFAULT_CROP });
+      toast.success("Imagem carregada no editor.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível abrir esta imagem.");
+    }
   }
 
   async function definirCapa(c: Carro, foto: string) {
@@ -289,6 +314,7 @@ function Painel() {
     setArquivoInputKey((key) => key + 1);
     setEditorIndex(0);
     setCrop({ ...DEFAULT_CROP });
+    setFotoEditando(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -393,7 +419,7 @@ function Painel() {
               </label>
               <label className="block text-xs text-muted-foreground">
                 Adicionar fotos
-                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => setArquivos(Array.from(e.target.files ?? []))} className={inputCls} />
+                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => { setArquivos(Array.from(e.target.files ?? [])); setFotoEditando(null); }} className={inputCls} />
               </label>
             </div>
             {arquivos.length > 0 && (
@@ -401,7 +427,7 @@ function Painel() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-foreground">Editor de capa e fotos</p>
-                    <p className="text-xs text-muted-foreground">O padrão começa em 4:3, mas você pode escolher qualquer tamanho. O mesmo ajuste será aplicado às fotos escolhidas.</p>
+                    <p className="text-xs text-muted-foreground">{fotoEditando ? "Ajuste a imagem existente e salve para substituí-la." : "O padrão começa em 4:3, mas você pode escolher qualquer tamanho. O mesmo ajuste será aplicado às fotos escolhidas."}</p>
                   </div>
                   <span className="text-xs text-muted-foreground">{arquivos.length} foto(s) selecionada(s)</span>
                 </div>
@@ -441,6 +467,7 @@ function Painel() {
                     <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
                       <img src={foto} alt="" className="h-full w-full object-cover" />
                       <div className="absolute inset-x-1 bottom-1 flex gap-1">
+                        <button type="button" onClick={() => void editarFoto(foto)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
                         <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void definirCapa(carro, foto); }} className="flex-1 rounded bg-primary px-1 py-1 text-[10px] font-semibold text-primary-foreground">Capa</button>
                         <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
                       </div>
@@ -458,7 +485,7 @@ function Painel() {
                 {salvando ? "Salvando..." : editId ? "Salvar alterações" : "Adicionar carro"}
               </button>
               {editId && (
-                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
+                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setFotoEditando(null); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
                   Cancelar
                 </button>
               )}
