@@ -151,6 +151,7 @@ function Detalhe() {
     );
   }
 
+  const versao = (carro.versao ?? carro.cor ?? "").trim();
   const ficha: FichaItem[] = [
     {
       label: "Ano / Modelo",

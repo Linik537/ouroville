@@ -6,7 +6,8 @@ import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
   const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
-  const versao = carro.versao?.trim() || carro.cor?.trim() || "";
+  const versao = (carro.versao ?? carro.cor ?? "").trim();
+
   return (
     <Link
       to="/carros/$marca/$modelo/$ano/$id"
@@ -16,9 +17,9 @@ export function CarCard({ carro }: { carro: Carro }) {
         ano: String(carro.ano),
         id: String(carro.id),
       }}
-      className="group flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card transition hover:border-primary/60"
+      className="group flex flex-col overflow-hidden rounded-[28px] border border-[#d4a64a]/80 bg-[#17130d] shadow-[0_0_0_1px_rgba(212,166,74,0.18)] transition duration-200 hover:-translate-y-0.5 hover:border-[#e8bf60]"
     >
-      <div className="relative aspect-4/3 overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img
           src={foto}
           alt={`${carTitle(carro)} à venda na Ouroville Motors`}
@@ -31,20 +32,31 @@ export function CarCard({ carro }: { carro: Carro }) {
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <h3 className="font-oswald text-[22px] font-semibold leading-tight tracking-wide">
-          <span className="text-white">{formatCarName(carro.marca)}</span>{" "}<span className="text-gold">{formatCarName(carro.modelo)}</span>
+
+      <div className="flex flex-1 flex-col gap-3 px-4 pb-4 pt-3">
+        <h3 className="font-oswald text-[22px] font-semibold leading-none tracking-[0.02em] text-foreground">
+          <span className="text-white">{formatCarName(carro.marca)}</span>{" "}
+          <span className="text-gold">{formatCarName(carro.modelo)}</span>
         </h3>
-        {versao && <p className="line-clamp-1 text-sm text-muted-foreground">{versao}</p>}
+
+        {versao && <p className="line-clamp-1 text-sm text-foreground/80">{versao}</p>}
+
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-primary" />{carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}</span>
-          <span className="inline-flex items-center gap-1.5"><Gauge className="h-4 w-4 text-primary" />{km(quilometragem)}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarDays className="h-4 w-4 text-primary" />
+            {carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <Gauge className="h-4 w-4 text-primary" />
+            {km(quilometragem)}
+          </span>
         </div>
+
         <div className="mt-1 flex items-center justify-between gap-3">
-          <span className="rounded-full bg-gold px-4 py-1.5 font-inter text-base font-medium tracking-wide text-primary-foreground">
+          <span className="inline-flex rounded-full bg-gold px-5 py-2 font-inter text-lg font-normal tracking-wide text-primary-foreground">
             {brl(carro.preco)}
           </span>
-          <span className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition group-hover:border-primary group-hover:text-primary">
+          <span className="inline-flex rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition group-hover:border-primary group-hover:text-primary">
             Ver mais
           </span>
         </div>
