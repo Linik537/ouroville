@@ -155,14 +155,13 @@ function Detalhe() {
     );
   }
 
-  const versao = (carro.versao ?? carro.cor ?? "").trim();
+  const versao = carro.versao?.trim();
   const ficha: FichaItem[] = [
     {
       label: "Ano / Modelo",
       value: `${carro.ano}/${carro.ano_modelo ?? carro.ano}`,
       Icon: CalendarDays,
     },
-    { label: "Versão", value: carro.versao ?? "-", Icon: Cog },
     { label: "Quilometragem", value: km(quilometragem), Icon: Gauge },
     { label: "Câmbio", value: carro.cambio ?? "Automático", Icon: Cog },
     { label: "Combustível", value: carro.combustivel ?? "Gasolina", Icon: Fuel },
@@ -338,7 +337,7 @@ function Detalhe() {
             <span className="text-gold">{nomeModelo}</span>{" "}
             <span className="text-white">{carro.ano}</span>
           </h1>
-          {carro.versao && <p className="mt-1 text-base text-muted-foreground">{carro.versao}</p>}
+          {versao && <p className="mt-1 text-base text-muted-foreground">{versao}</p>}
           <p className="gold-glow mt-10 inline-flex rounded-full bg-gold px-6 py-3 font-inter text-xl font-semibold tracking-wide text-black sm:text-2xl">
             {brl(carro.preco)}
           </p>

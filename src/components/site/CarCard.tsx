@@ -6,7 +6,7 @@ import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 export function CarCard({ carro }: { carro: Carro }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
   const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
-  const versao = (carro.versao ?? carro.cor ?? "").trim();
+  const versao = carro.versao?.trim();
 
   return (
     <Link

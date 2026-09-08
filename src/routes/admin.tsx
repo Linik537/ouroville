@@ -177,7 +177,7 @@ function Painel() {
       const payload = {
         marca: form.marca,
         modelo: form.modelo,
-        versao: form.versao || null,
+        versao: form.versao.trim() || null,
         ano: Number(form.ano),
         ano_modelo: form.ano_modelo ? Number(form.ano_modelo) : null,
         preco: form.preco ? Number(form.preco) : null,
@@ -363,7 +363,7 @@ function Painel() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const campo = (name: keyof typeof vazio, label: string, type = "text") => (
+  const campo = (name: keyof typeof vazio, label: string, type = "text", required = false) => (
     <label className="block text-xs text-muted-foreground">
       {label}
       {type === "number" ? (
@@ -378,6 +378,7 @@ function Painel() {
       ) : (
         <input
           type={type}
+          required={required}
           value={form[name]}
           onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
           className={inputCls}
@@ -454,7 +455,7 @@ function Painel() {
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
-              {campo("versao", "Versão")}
+              {campo("versao", "Versão", "text", true)}
               {campo("ano", "Ano", "number")}
               {campo("ano_modelo", "Ano / Modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}
@@ -558,7 +559,14 @@ function Painel() {
           <div className="mt-8 space-y-3">
             {(carros.data ?? []).map((c) => (
               <div key={c.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-card p-4">
-                <span className="font-medium text-foreground">{c.marca} {c.modelo} {c.ano}</span>
+                <div>
+                  <span className="font-medium text-foreground">{c.marca} {c.modelo} {c.ano}</span>
+                  {c.versao?.trim() ? (
+                    <p className="mt-0.5 text-xs text-muted-foreground">{c.versao.trim()}</p>
+                  ) : (
+                    <p className="mt-0.5 text-xs font-medium text-destructive">Versão não informada</p>
+                  )}
+                </div>
                 <span className="text-sm text-muted-foreground">{brl(c.preco)}</span>
                 <span className={`rounded-full px-3 py-1 text-xs ${c.status === "vendido" ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground"}`}>
                   {c.status === "vendido" ? "Vendido" : "Disponível"}
