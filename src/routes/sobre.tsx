@@ -42,12 +42,14 @@ function Sobre() {
       toast.error("É necessário aceitar o uso dos dados.");
       return;
     }
+    // Campo invisível: bots frequentemente o preenchem; pessoas nunca o veem.
+    if (String(fd.get("website") ?? "").trim()) return;
     setEnviando(true);
-    const { error } = await supabase.from("leads").insert({
-      nome: String(fd.get("nome") ?? ""),
-      telefone: String(fd.get("telefone") ?? ""),
-      mensagem: String(fd.get("mensagem") ?? ""),
-      consentimento: true,
+    const { error } = await supabase.rpc("submit_lead", {
+      _nome: String(fd.get("nome") ?? ""),
+      _telefone: String(fd.get("telefone") ?? ""),
+      _mensagem: String(fd.get("mensagem") ?? ""),
+      _consentimento: true,
     });
     setEnviando(false);
     if (error) {
@@ -113,6 +115,10 @@ function Sobre() {
         <form onSubmit={onSubmit} className="rounded-xl border border-border/70 bg-card p-6">
           <h2 className="text-lg font-semibold text-foreground">Fale conosco</h2>
           <div className="mt-4 space-y-4">
+            <label className="sr-only" aria-hidden="true">
+              Website
+              <input name="website" tabIndex={-1} autoComplete="off" />
+            </label>
             <label className="block text-xs text-muted-foreground">
               Nome
               <input name="nome" required className={inputCls} />

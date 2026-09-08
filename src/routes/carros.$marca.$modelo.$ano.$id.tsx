@@ -155,15 +155,15 @@ function Detalhe() {
   const ficha: FichaItem[] = [
     {
       label: "Ano / Modelo",
-      value: `${carro.ano_modelo ?? carro.ano}/${carro.ano_modelo ?? carro.ano}`,
+      value: `${carro.ano}/${carro.ano_modelo ?? carro.ano}`,
       Icon: CalendarDays,
     },
     { label: "Versão", value: carro.versao ?? "-", Icon: Cog },
     { label: "Quilometragem", value: km(quilometragem), Icon: Gauge },
     { label: "Câmbio", value: carro.cambio ?? "Automático", Icon: Cog },
     { label: "Combustível", value: carro.combustivel ?? "Gasolina", Icon: Fuel },
-    { label: "Motor", value: carro.motor ?? "4.4 V8 Biturbo - 600cv", Icon: Zap },
-    { label: "Tração", value: carro.tracao ?? "Integral M xDrive", Icon: GitBranch },
+    { label: "Motor", value: carro.motor ?? "-", Icon: Zap },
+    { label: "Tração", value: carro.tracao ?? "-", Icon: GitBranch },
   ];
 
   const carSchema = {

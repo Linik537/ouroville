@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { brl } from "@/lib/site";
-import { supabase, type Carro, type Lead } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase, type Carro, type Lead } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
@@ -26,23 +26,41 @@ const inputCls =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
 
 function Admin() {
-  const [userId, setUserId] = useState<string | null>(null);
+  const [access, setAccess] = useState<"checking" | "signed_out" | "forbidden" | "allowed">("checking");
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? null);
+    async function checkAccess(userId?: string) {
+      if (!userId) {
+        setAccess("signed_out");
+        setCarregando(false);
+        return;
+      }
+      const { data } = await supabase.from("admins").select("user_id").eq("user_id", userId).maybeSingle();
+      setAccess(data ? "allowed" : "forbidden");
       setCarregando(false);
-    });
+    }
+    supabase.auth.getUser().then(({ data }) => void checkAccess(data.user?.id));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUserId(session?.user?.id ?? null);
+      setCarregando(true);
+      void checkAccess(session?.user?.id);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (carregando) return <div className="p-16 text-center text-sm text-muted-foreground">Carregando...</div>;
-  if (!userId) return <Login />;
+  if (!isSupabaseConfigured) return <ConfigRequired />;
+  if (carregando || access === "checking") return <div className="p-16 text-center text-sm text-muted-foreground">Verificando acesso...</div>;
+  if (access === "signed_out") return <Login />;
+  if (access === "forbidden") return <AccessDenied />;
   return <Painel />;
+}
+
+function ConfigRequired() {
+  return <div className="mx-auto max-w-lg px-4 py-24 text-center"><h1 className="text-2xl font-bold text-foreground">Configuração necessária</h1><p className="mt-3 text-sm text-muted-foreground">Defina as variáveis públicas do Supabase antes de usar o painel.</p></div>;
+}
+
+function AccessDenied() {
+  return <div className="mx-auto max-w-lg px-4 py-24 text-center"><h1 className="text-2xl font-bold text-foreground">Acesso não autorizado</h1><p className="mt-3 text-sm text-muted-foreground">Esta conta não está cadastrada como administradora.</p><button onClick={() => void supabase.auth.signOut()} className="mt-6 rounded-full border border-border px-5 py-2 text-sm text-muted-foreground hover:text-primary">Sair</button></div>;
 }
 
 function Login() {
@@ -74,7 +92,7 @@ function Login() {
 
 const vazio = {
   marca: "", modelo: "", versao: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
-  combustivel: "Flex", cambio: "Automático", motor: "", tracao: "", descricao: "", destaque: "",
+  combustivel: "Flex", cambio: "Automático", cor: "", motor: "", tracao: "", descricao: "", destaque: "",
 };
 
 function Painel() {
@@ -172,6 +190,7 @@ function Painel() {
         quilometragem: form.quilometragem ? Number(form.quilometragem) : null,
         combustivel: form.combustivel,
         cambio: form.cambio,
+        cor: form.cor || null,
         motor: form.motor || null,
         tracao: form.tracao || null,
         descricao: form.descricao || null,
@@ -340,7 +359,7 @@ function Painel() {
       marca: c.marca, modelo: c.modelo, versao: c.versao ?? "", ano: String(c.ano),
       ano_modelo: c.ano_modelo ? String(c.ano_modelo) : "", preco: c.preco ? String(c.preco) : "",
       quilometragem: c.quilometragem ? String(c.quilometragem) : "", combustivel: c.combustivel ?? "Flex",
-      cambio: c.cambio ?? "Automático", motor: c.motor ?? "", tracao: c.tracao ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
+      cambio: c.cambio ?? "Automático", cor: c.cor ?? "", motor: c.motor ?? "", tracao: c.tracao ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
     });
     setArquivos([]);
     setArquivoInputKey((key) => key + 1);
@@ -446,6 +465,7 @@ function Painel() {
               {campo("ano_modelo", "Ano / Modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}
               {campo("quilometragem", "Quilometragem", "number")}
+              {campo("cor", "Cor")}
               {campo("motor", "Motor")}
               {campo("tracao", "Tração")}
               {campo("destaque", "Selo (ex: Único dono)")}

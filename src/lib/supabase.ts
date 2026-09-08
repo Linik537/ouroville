@@ -1,16 +1,22 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Projeto Supabase próprio do cliente (chave publicável - segura no frontend)
-const SUPABASE_URL = "https://xjokgcsozlqiqjfnzxle.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_c50RR1HGqK3NSgAC_x85bA_AWtnc9Lc";
+// Chaves publicáveis: configure-as no ambiente de cada deploy, nunca no código-fonte.
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
+export const supabase = createClient(
+  SUPABASE_URL || "https://not-configured.invalid",
+  SUPABASE_PUBLISHABLE_KEY || "not-configured",
+  {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
     storage: typeof window === "undefined" ? undefined : window.localStorage,
   },
-});
+  },
+);
 
 export type Carro = {
   id: number;
