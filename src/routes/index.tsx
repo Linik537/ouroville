@@ -92,7 +92,7 @@ function Home() {
           <div className="relative -top-3">
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ouroville Motors</p>
             <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
-              Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro<span className="font-brand-primary text-[0.5em] font-normal normal-case text-white">ville</span></span>
+              Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro<span className="font-sans text-[0.4em] font-light normal-case text-white">ville</span></span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
               Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
