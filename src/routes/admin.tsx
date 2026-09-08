@@ -73,8 +73,8 @@ function Login() {
 }
 
 const vazio = {
-  marca: "", modelo: "", versao: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
-  combustivel: "Flex", cambio: "Automático", cor: "", descricao: "", destaque: "",
+  marca: "", modelo: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
+  combustivel: "Flex", cambio: "Automático", motor: "", tracao: "", descricao: "", destaque: "",
 };
 
 function Painel() {
@@ -165,14 +165,14 @@ function Painel() {
       const payload = {
         marca: form.marca,
         modelo: form.modelo,
-        versao: form.versao || null,
         ano: Number(form.ano),
         ano_modelo: form.ano_modelo ? Number(form.ano_modelo) : null,
         preco: form.preco ? Number(form.preco) : null,
         quilometragem: form.quilometragem ? Number(form.quilometragem) : null,
         combustivel: form.combustivel,
         cambio: form.cambio,
-        cor: form.cor || null,
+        motor: form.motor || null,
+        tracao: form.tracao || null,
         descricao: form.descricao || null,
         destaque: form.destaque || null,
       };
@@ -302,13 +302,15 @@ function Painel() {
       }
       const registros = resultado.carros.map((carro: ImportacaoCarro) => ({
         ...carro,
-        versao: carro.versao ?? null,
+        versao: null,
         ano_modelo: carro.ano_modelo ?? null,
         preco: carro.preco ?? null,
         quilometragem: carro.quilometragem ?? null,
         combustivel: carro.combustivel ?? null,
         cambio: carro.cambio ?? null,
-        cor: carro.cor ?? null,
+        motor: carro.motor ?? null,
+        tracao: carro.tracao ?? null,
+        cor: null,
         descricao: carro.descricao ?? null,
         destaque: carro.destaque ?? null,
         fotos: [],
@@ -332,10 +334,10 @@ function Painel() {
   function editar(c: Carro) {
     setEditId(c.id);
     setForm({
-      marca: c.marca, modelo: c.modelo, versao: c.versao ?? "", ano: String(c.ano),
+      marca: c.marca, modelo: c.modelo, ano: String(c.ano),
       ano_modelo: c.ano_modelo ? String(c.ano_modelo) : "", preco: c.preco ? String(c.preco) : "",
       quilometragem: c.quilometragem ? String(c.quilometragem) : "", combustivel: c.combustivel ?? "Flex",
-      cambio: c.cambio ?? "Automático", cor: c.cor ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
+      cambio: c.cambio ?? "Automático", motor: c.motor ?? "", tracao: c.tracao ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
     });
     setArquivos([]);
     setArquivoInputKey((key) => key + 1);
@@ -436,12 +438,12 @@ function Painel() {
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
-              {campo("versao", "Versão")}
               {campo("ano", "Ano", "number")}
-              {campo("ano_modelo", "Ano modelo", "number")}
+              {campo("ano_modelo", "Ano / Modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}
               {campo("quilometragem", "Quilometragem", "number")}
-              {campo("cor", "Cor")}
+              {campo("motor", "Motor")}
+              {campo("tracao", "Tração")}
               {campo("destaque", "Selo (ex: Único dono)")}
               <label className="block text-xs text-muted-foreground">
                 Combustível
