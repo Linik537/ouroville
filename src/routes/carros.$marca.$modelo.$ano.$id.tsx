@@ -320,8 +320,8 @@ function Detalhe() {
           )}
           {carro.descricao && (
             <section className="mt-8">
-              <h2 className="text-xl font-semibold text-foreground">Descrição</h2>
-              <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-muted-foreground">{carro.descricao}</p>
+              <h2 className="text-xl font-semibold text-gold">Descrição</h2>
+              <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-white">{carro.descricao}</p>
             </section>
           )}
         </div>
