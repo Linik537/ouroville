@@ -10,6 +10,8 @@ export type ImportacaoCarro = {
   quilometragem?: number;
   combustivel?: string;
   cambio?: string;
+  motor?: string;
+  tracao?: string;
   cor?: string;
   descricao?: string;
   destaque?: string;
@@ -31,6 +33,8 @@ const aliases: Record<keyof ImportacaoCarro, string[]> = {
   quilometragem: ["quilometragem", "km", "kilometragem", "mileage"],
   combustivel: ["combustivel", "combustível", "fuel"],
   cambio: ["cambio", "câmbio", "transmissao", "transmissão", "transmission"],
+  motor: ["motor", "motorizacao", "motorização", "engine", "potencia", "potência"],
+  tracao: ["tracao", "tração", "drivetrain", "drive", "tracao integral", "tração integral"],
   cor: ["cor", "color"],
   descricao: ["descricao", "descrição", "observacao", "observação", "description"],
   destaque: ["destaque", "selo", "tag", "badge"],
