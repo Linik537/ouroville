@@ -276,6 +276,20 @@ function Painel() {
     qc.invalidateQueries({ queryKey: ["carros"] });
   }
 
+  async function moverFoto(c: Carro, indice: number, direcao: -1 | 1) {
+    const fotos = [...(c.fotos ?? [])];
+    const destino = indice + direcao;
+    if (destino < 0 || destino >= fotos.length) return;
+    [fotos[indice], fotos[destino]] = [fotos[destino], fotos[indice]];
+    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
+    if (error) {
+      toast.error("Não foi possível alterar a ordem das fotos.");
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
+    qc.invalidateQueries({ queryKey: ["carros"] });
+  }
+
   async function importarPlanilha() {
     setImportando(true);
     setResultadoImportacao(null);
@@ -431,7 +445,7 @@ function Painel() {
               </label>
               <label className="block text-xs text-muted-foreground">
                 Adicionar fotos
-                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => { setArquivos(Array.from(e.target.files ?? [])); setFotoEditando(null); }} className={inputCls} />
+                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => { const selecionadas = Array.from(e.target.files ?? []); setArquivos((atuais) => [...(fotoEditando ? atuais.slice(1) : atuais), ...selecionadas]); setFotoEditando(null); }} className={inputCls} />
               </label>
             </div>
             {arquivos.length > 0 && (
@@ -475,13 +489,18 @@ function Painel() {
               <div className="mt-4">
                 <p className="text-xs text-muted-foreground">Fotos atuais</p>
                 <div className="mt-2 flex flex-wrap gap-3">
-                  {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto) => (
+                  {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto, indice, fotos) => (
                     <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
                       <img src={foto} alt="" className="h-full w-full object-cover" />
+                      <span className="absolute left-1 top-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground">{indice + 1}</span>
                       <div className="absolute inset-x-1 bottom-1 flex gap-1">
                         <button type="button" onClick={() => void editarFoto(foto)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
                         <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void definirCapa(carro, foto); }} className="flex-1 rounded bg-primary px-1 py-1 text-[10px] font-semibold text-primary-foreground">Capa</button>
                         <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
+                      </div>
+                      <div className="absolute right-1 top-1 flex gap-1">
+                        <button type="button" aria-label="Mover foto para a esquerda" disabled={indice === 0} onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void moverFoto(carro, indice, -1); }} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8592;</button>
+                        <button type="button" aria-label="Mover foto para a direita" disabled={indice === fotos.length - 1} onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void moverFoto(carro, indice, 1); }} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8594;</button>
                       </div>
                     </div>
                   ))}

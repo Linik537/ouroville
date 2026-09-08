@@ -61,9 +61,10 @@ function Detalhe() {
   });
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
-  const [imagemVisivel, setImagemVisivel] = useState(true);
+  const [imagemEntrando, setImagemEntrando] = useState(true);
   const pausaAte = useRef(0);
   const transicao = useRef<number | null>(null);
+  const inicioMiniaturasRef = useRef(0);
 
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
 
@@ -81,10 +82,16 @@ function Detalhe() {
 
   function trocarFoto(indice: number) {
     if (indice === ativa) return;
+    if (indice < inicioMiniaturasRef.current || indice >= inicioMiniaturasRef.current + janelaMiniaturas) {
+      inicioMiniaturasRef.current = Math.min(
+        Math.max(0, indice - 2),
+        Math.max(0, fotos.length - janelaMiniaturas),
+      );
+    }
     setAnterior(ativa);
-    setImagemVisivel(false);
+    setImagemEntrando(false);
     setAtiva(indice);
-    requestAnimationFrame(() => setImagemVisivel(true));
+    window.setTimeout(() => setImagemEntrando(true), 20);
     if (transicao.current) window.clearTimeout(transicao.current);
     transicao.current = window.setTimeout(() => setAnterior(null), 420);
   }
@@ -95,14 +102,16 @@ function Detalhe() {
   }
 
   function moverGaleria(direcao: -1 | 1) {
-    selecionarFoto((ativa + direcao + fotos.length) % fotos.length);
+    const proxima = (ativa + direcao + fotos.length) % fotos.length;
+    inicioMiniaturasRef.current = Math.min(
+      Math.max(0, proxima - 2),
+      Math.max(0, fotos.length - Math.min(5, fotos.length)),
+    );
+    selecionarFoto(proxima);
   }
 
   const janelaMiniaturas = Math.min(5, fotos.length);
-  const inicioMiniaturas = Math.min(
-    Math.max(0, ativa - (janelaMiniaturas - 1)),
-    Math.max(0, fotos.length - janelaMiniaturas),
-  );
+  const inicioMiniaturas = inicioMiniaturasRef.current;
   const miniaturas = fotos.slice(inicioMiniaturas, inicioMiniaturas + janelaMiniaturas);
   const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
   const nomeMarca = carro ? formatCarName(carro.marca) : "";
@@ -237,7 +246,7 @@ function Detalhe() {
                 alt=""
                 aria-hidden
                 className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
-                style={{ opacity: 1 }}
+                style={{ opacity: anterior === null ? 0 : 1 }}
               />
             )}
             <img
@@ -245,7 +254,7 @@ function Detalhe() {
               alt={`${carTitle(carro)} - foto ${ativa + 1}`}
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[420ms] ease-out"
-              style={{ opacity: imagemVisivel ? 1 : 0 }}
+              style={{ opacity: imagemEntrando ? 1 : 0 }}
             />
           </div>
           {fotos.length > 1 && (
@@ -268,7 +277,13 @@ function Detalhe() {
                 <button
                   key={f + i}
                   type="button"
-                  onClick={() => selecionarFoto(i)}
+                  onClick={() => {
+                    inicioMiniaturasRef.current = Math.min(
+                      Math.max(0, i - 2),
+                      Math.max(0, fotos.length - janelaMiniaturas),
+                    );
+                    selecionarFoto(i);
+                  }}
                   aria-label={`Ver foto ${i + 1}`}
                   className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                 >
