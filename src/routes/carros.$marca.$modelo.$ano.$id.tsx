@@ -63,6 +63,7 @@ function Detalhe() {
   const [anterior, setAnterior] = useState<number | null>(null);
   const ativaRef = useRef(0);
   const pausaAte = useRef(0);
+  const retomadaTimer = useRef<number | null>(null);
   const transicao = useRef<number | null>(null);
   const inicioMiniaturasRef = useRef(0);
 
@@ -80,6 +81,7 @@ function Detalhe() {
     }, 4000);
     return () => {
       window.clearInterval(timer);
+      if (retomadaTimer.current) window.clearTimeout(retomadaTimer.current);
       if (transicao.current) window.clearTimeout(transicao.current);
     };
   }, [fotos.length]);
@@ -102,6 +104,10 @@ function Detalhe() {
   function selecionarFoto(indice: number) {
     pausaAte.current = Date.now() + 8000;
     trocarFoto(indice);
+    if (retomadaTimer.current) window.clearTimeout(retomadaTimer.current);
+    retomadaTimer.current = window.setTimeout(() => {
+      trocarFoto((ativaRef.current + 1) % fotos.length);
+    }, 8000);
   }
 
   function moverGaleria(direcao: -1 | 1) {
