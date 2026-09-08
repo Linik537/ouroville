@@ -95,7 +95,7 @@ function Home() {
             <p className="mx-auto mt-5 max-w-2xl text-base text-foreground/90">
               Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
             </p>
-            <p className="mx-auto -mt-1 max-w-2xl text-sm text-muted-foreground/90">
+            <p className="mx-auto -mt-1 max-w-2xl text-base text-foreground/80">
               Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
             </p>
           </div>
