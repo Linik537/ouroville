@@ -144,18 +144,6 @@ Ao finalizar
 
 Me dê um resumo do que foi criado, quais tabelas e políticas de segurança foram configuradas, e liste claramente quaisquer passos manuais que eu ainda precise fazer (ex: conectar o Supabase, criar meu usuário administrador, configurar alguma variável de ambiente).
 
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://ouroville.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/102b73ee-f82c-48c8-af8b-5b1f5f430987).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
