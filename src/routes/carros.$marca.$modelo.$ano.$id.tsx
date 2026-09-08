@@ -356,7 +356,8 @@ function Detalhe() {
           </div>
 
           <a
-            href={`/interesse/${carro.id}`}
+            href={whatsappLink(mensagemWhatsApp ?? "")}
+            onClick={() => void trackAnalyticsEvent("whatsapp_click", carro.id)}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
