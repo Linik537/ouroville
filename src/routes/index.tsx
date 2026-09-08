@@ -92,10 +92,10 @@ function Home() {
             <h1 className="mt-5 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
               Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro<span className="font-ville text-[0.55em] font-normal normal-case text-white">ville</span></span>
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-foreground/90">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-foreground/90">
               Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
             </p>
-            <p className="mx-auto -mt-1 max-w-2xl text-base text-foreground/80">
+            <p className="mx-auto mt-1 max-w-2xl text-base leading-relaxed text-foreground/80">
               Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
             </p>
           </div>
