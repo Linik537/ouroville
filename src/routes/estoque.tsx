@@ -3,7 +3,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
-import { HoursBar } from "@/components/site/HoursBar";
 import { NumberInput } from "@/components/site/NumberInput";
 import { SITE } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
@@ -100,7 +99,6 @@ function Estoque() {
 
   return (
     <div className="relative z-30 bg-background">
-      <HoursBar />
       <div className="mx-auto max-w-7xl px-4 py-10">
         <h1 className="text-3xl font-bold text-foreground">Estoque</h1>
 

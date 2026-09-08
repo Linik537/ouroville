@@ -5,7 +5,6 @@ import { useState } from "react";
 import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HeroHeadlights } from "@/components/site/HeroHeadlights";
-import { HoursBar } from "@/components/site/HoursBar";
 import { SITE, getAutoDealerSchema } from "@/lib/site";
 import { fetchCarros } from "@/lib/supabase";
 
@@ -76,7 +75,6 @@ function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <HoursBar />
       <section className="relative overflow-hidden border-b border-border/60">
         <img
           src={heroCar}
@@ -96,6 +94,9 @@ function Home() {
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-foreground">
               Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+              Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
             </p>
           </div>
 
