@@ -19,13 +19,13 @@
  */
 
 @theme inline {
-  --font-display: "Barlow Condensed", "Archivo", sans-serif;
-  --font-sans: "Archivo", system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Inter", sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
   --font-ville: "Barlow Condensed", sans-serif;
   --font-inter: "Inter", sans-serif;
-  --font-oswald: "Oswald", "Archivo", sans-serif;
-  --font-brand-primary: "Russo One", "Archivo", sans-serif;
-  --font-brand-secondary: "Audiowide", "Archivo", sans-serif;
+  --font-oswald: "Oswald", "Inter", sans-serif;
+  --font-brand-primary: "Russo One", "Inter", sans-serif;
+  --font-brand-secondary: "Audiowide", "Inter", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
