@@ -75,7 +75,7 @@ function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <section className="relative overflow-hidden border-b border-border/60">
+      <section className="relative overflow-hidden border-y border-border/60">
         <img
           src={heroCar}
           alt="Carro premium em showroom escuro com iluminação dourada"
@@ -86,10 +86,10 @@ function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />
         <HeroHeadlights />
-        <div className="relative mx-auto max-w-5xl px-4 pb-28 pt-20 text-center">
+        <div className="relative mx-auto max-w-5xl px-4 pb-32 pt-24 text-center">
           <div className="relative -top-1">
-            <h1 className="mt-0 font-display text-5xl font-bold uppercase leading-[0.95] tracking-wide text-foreground sm:text-7xl">
-              Encontre o seu próximo carro, <span className="text-gold">no padrão de ouro<span className="font-ville text-[0.55em] font-normal normal-case text-white">ville</span></span>
+            <h1 className="mt-0 font-display text-5xl font-bold leading-[0.95] tracking-wide text-foreground sm:text-7xl">
+              Encontre o seu próximo carro, <span className="text-gold">no padrão de <span className="capitalize">ouro</span></span>
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-foreground/90">
               Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
