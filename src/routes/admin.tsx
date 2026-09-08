@@ -197,8 +197,15 @@ function Painel() {
           return mapa;
         }, {});
         const fotos = (atual?.fotos ?? []).map((foto) => urlsEditadas[foto] ?? foto).concat(novas);
-        const { error } = await supabase.from("carros").update({ ...payload, fotos }).eq("id", editId);
+        const { data: carroAtualizado, error } = await supabase.rpc("admin_update_car", {
+          _car_id: editId,
+          _payload: { ...payload, fotos },
+        });
         if (error) throw error;
+        if (!carroAtualizado || Number(carroAtualizado.id) !== editId) {
+          throw new Error("O banco não confirmou a atualização do veículo.");
+        }
+        qc.setQueryData(["carro", String(editId)], carroAtualizado as Carro);
         await Promise.all(Object.keys(urlsEditadas).map((foto) => removerArquivoStorage(foto)));
       } else {
         const { error } = await supabase.from("carros").insert({ ...payload, fotos: novas, status: "disponivel" });
@@ -213,8 +220,10 @@ function Painel() {
       setCrop({ ...DEFAULT_CROP });
       setFotoEditando(null);
       setSubstituicoes({});
-      qc.invalidateQueries({ queryKey: ["admin", "carros"] });
-      qc.invalidateQueries({ queryKey: ["carros"] });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["admin", "carros"] }),
+        qc.invalidateQueries({ queryKey: ["carros"] }),
+      ]);
     } catch (error) {
       const mensagem = error instanceof Error ? error.message : "Erro ao salvar.";
       console.error("Erro ao salvar carro:", error);
@@ -455,7 +464,7 @@ function Painel() {
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
-              {campo("versao", "Versão", "text", true)}
+              {campo("versao", "Versão")}
               {campo("ano", "Ano", "number")}
               {campo("ano_modelo", "Ano / Modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}

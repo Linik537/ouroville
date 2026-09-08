@@ -39,7 +39,9 @@ export function CarCard({ carro }: { carro: Carro }) {
           <span className="text-gold">{formatCarName(carro.modelo)}</span>
         </h3>
 
-        {versao && <p className="line-clamp-1 text-sm text-foreground/80">{versao}</p>}
+        <p className="min-h-5 line-clamp-1 text-sm text-foreground/80" aria-hidden={!versao}>
+          {versao || "\u00a0"}
+        </p>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
