@@ -87,6 +87,11 @@ security definer
 set search_path = public
 as $$
 begin
+  -- Visitas e cliques de administradores autenticados não entram nas métricas.
+  if auth.uid() is not null and public.is_admin(auth.uid()) then
+    return;
+  end if;
+
   if _event_type not in ('site_visit', 'car_view', 'whatsapp_click') then
     raise exception 'Evento inválido.';
   end if;

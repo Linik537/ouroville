@@ -37,11 +37,13 @@ export type AnalyticsEventType = "site_visit" | "car_view" | "whatsapp_click";
 
 export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number): Promise<boolean> {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const authorizationToken = session?.access_token ?? SUPABASE_PUBLISHABLE_KEY;
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/track_analytics_event`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_PUBLISHABLE_KEY,
-        Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${authorizationToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
