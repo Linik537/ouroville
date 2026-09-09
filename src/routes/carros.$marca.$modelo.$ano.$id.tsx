@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, Cog, Fuel, Gauge, GitBranch, MessageCircle, Zap } from "lucide-react";
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import {
   carTitle,
@@ -54,6 +54,9 @@ type FichaItem = {
   Icon: ComponentType<{ className?: string }>;
 };
 
+const ROTACAO_AUTOMATICA_MS = 4000;
+const PAUSA_APOS_SELECAO_MS = 10000;
+
 function Detalhe() {
   const { id } = Route.useParams();
   const { data: carro, isLoading } = useQuery({
@@ -62,56 +65,67 @@ function Detalhe() {
   });
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
+  const [reinicioRotacao, setReinicioRotacao] = useState(0);
   const ativaRef = useRef(0);
-  const pausaAte = useRef(0);
-  const retomadaTimer = useRef<number | null>(null);
+  const rotacaoTimer = useRef<number | null>(null);
+  const proximoAtraso = useRef(ROTACAO_AUTOMATICA_MS);
   const transicao = useRef<number | null>(null);
   const inicioMiniaturasRef = useRef(0);
 
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
+  const janelaMiniaturas = Math.min(5, fotos.length);
 
   useEffect(() => {
     ativaRef.current = ativa;
   }, [ativa]);
 
-  useEffect(() => {
-    if (fotos.length < 2) return;
-    const timer = window.setInterval(() => {
-      if (Date.now() < pausaAte.current) return;
-      trocarFoto((ativaRef.current + 1) % fotos.length);
-    }, 4000);
-    return () => {
-      window.clearInterval(timer);
-      if (retomadaTimer.current) window.clearTimeout(retomadaTimer.current);
+  const trocarFoto = useCallback(
+    (indice: number) => {
+      if (indice === ativaRef.current) return;
+      if (
+        indice < inicioMiniaturasRef.current ||
+        indice >= inicioMiniaturasRef.current + janelaMiniaturas
+      ) {
+        inicioMiniaturasRef.current = Math.min(
+          Math.max(0, indice - 2),
+          Math.max(0, fotos.length - janelaMiniaturas),
+        );
+      }
+      setAnterior(ativaRef.current);
+      ativaRef.current = indice;
+      setAtiva(indice);
       if (transicao.current) window.clearTimeout(transicao.current);
-    };
-  }, [fotos.length]);
+      transicao.current = window.setTimeout(() => setAnterior(null), 420);
+    },
+    [fotos.length, janelaMiniaturas],
+  );
 
-  function trocarFoto(indice: number) {
-    if (indice === ativaRef.current) return;
-    if (
-      indice < inicioMiniaturasRef.current ||
-      indice >= inicioMiniaturasRef.current + janelaMiniaturas
-    ) {
-      inicioMiniaturasRef.current = Math.min(
-        Math.max(0, indice - 2),
-        Math.max(0, fotos.length - janelaMiniaturas),
-      );
-    }
-    setAnterior(ativaRef.current);
-    ativaRef.current = indice;
-    setAtiva(indice);
-    if (transicao.current) window.clearTimeout(transicao.current);
-    transicao.current = window.setTimeout(() => setAnterior(null), 420);
-  }
+  useEffect(() => {
+    if (rotacaoTimer.current) window.clearTimeout(rotacaoTimer.current);
+    if (fotos.length < 2) return;
+
+    const atraso = proximoAtraso.current;
+    proximoAtraso.current = ROTACAO_AUTOMATICA_MS;
+    rotacaoTimer.current = window.setTimeout(() => {
+      trocarFoto((ativaRef.current + 1) % fotos.length);
+    }, atraso);
+
+    return () => {
+      if (rotacaoTimer.current) window.clearTimeout(rotacaoTimer.current);
+    };
+  }, [ativa, fotos.length, reinicioRotacao, trocarFoto]);
+
+  useEffect(
+    () => () => {
+      if (transicao.current) window.clearTimeout(transicao.current);
+    },
+    [],
+  );
 
   function selecionarFoto(indice: number) {
-    pausaAte.current = Date.now() + 8000;
+    proximoAtraso.current = PAUSA_APOS_SELECAO_MS;
+    setReinicioRotacao((valor) => valor + 1);
     trocarFoto(indice);
-    if (retomadaTimer.current) window.clearTimeout(retomadaTimer.current);
-    retomadaTimer.current = window.setTimeout(() => {
-      trocarFoto((ativaRef.current + 1) % fotos.length);
-    }, 8000);
   }
 
   function moverGaleria(direcao: -1 | 1) {
@@ -123,7 +137,6 @@ function Detalhe() {
     selecionarFoto(proxima);
   }
 
-  const janelaMiniaturas = Math.min(5, fotos.length);
   const inicioMiniaturas = inicioMiniaturasRef.current;
   const miniaturas = fotos.slice(inicioMiniaturas, inicioMiniaturas + janelaMiniaturas);
   const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
