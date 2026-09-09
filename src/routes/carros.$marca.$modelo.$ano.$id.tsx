@@ -430,7 +430,7 @@ function Detalhe() {
       <div className="mt-12 text-center">
         <Link
           to="/estoque"
-          className="gold-glow inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+          className="inline-flex h-12 items-center gap-2 rounded-full border border-border/70 bg-transparent px-8 text-base font-semibold text-white transition hover:border-white/60"
         >
           Ver o estoque completo
         </Link>
