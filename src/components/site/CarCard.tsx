@@ -17,7 +17,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
         ano: String(carro.ano),
         id: String(carro.id),
       }}
-      className="group flex flex-col overflow-hidden rounded-[28px] border border-[#d4a64a]/80 bg-[#17130d] shadow-[0_0_0_1px_rgba(212,166,74,0.18)] transition duration-200 hover:-translate-y-0.5 hover:border-[#e8bf60]"
+      className="group flex flex-col overflow-hidden rounded-[28px] border border-[#d4a64a]/80 bg-card shadow-[0_0_0_1px_rgba(212,166,74,0.18)] transition duration-200 hover:-translate-y-0.5 hover:border-[#e8bf60] sm:bg-[#17130d]"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img
@@ -54,11 +54,11 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
           </span>
         </div>
 
-        <div className={`flex items-center justify-between ${compact ? "mt-0 gap-2 sm:mt-1 sm:gap-3" : "mt-1 gap-3"}`}>
+        <div className={`flex items-center ${compact ? "mt-0 justify-center gap-2 sm:mt-1 sm:justify-between sm:gap-3" : "mt-1 justify-between gap-3"}`}>
           <span className={`inline-flex rounded-full bg-gold font-inter font-normal tracking-wide text-primary-foreground ${compact ? "px-3 py-1.5 text-sm sm:px-5 sm:py-2 sm:text-lg" : "px-5 py-2 text-lg"}`}>
             {brl(carro.preco)}
           </span>
-          <span className={`inline-flex rounded-full border border-border font-medium text-foreground transition group-hover:border-primary group-hover:text-primary ${compact ? "px-3 py-1.5 text-xs sm:px-4 sm:text-sm" : "px-4 py-1.5 text-sm"}`}>
+          <span className={`rounded-full border border-border font-medium text-foreground transition group-hover:border-primary group-hover:text-primary ${compact ? "hidden px-3 py-1.5 text-xs sm:inline-flex sm:px-4 sm:text-sm" : "inline-flex px-4 py-1.5 text-sm"}`}>
             Ver mais
           </span>
         </div>
