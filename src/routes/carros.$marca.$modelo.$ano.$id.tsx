@@ -162,6 +162,7 @@ function Detalhe() {
     if (!faixa || typeof ResizeObserver === "undefined") return;
 
     const atualizarJanela = (largura: number) => {
+      const layoutDesktop = window.matchMedia("(min-width: 1024px)").matches;
       const semSetas = Math.min(
         MAX_MINIATURAS_VISIVEIS,
         Math.max(
@@ -180,11 +181,9 @@ function Detalhe() {
             (LARGURA_MINIATURA_PX + ESPACO_MINIATURAS_PX),
         ),
       );
-      const proximoMaximo = Math.min(
-        MAX_MINIATURAS_VISIVEIS,
-        fotos.length,
-        precisaDeSetas ? comSetas : semSetas,
-      );
+      const proximoMaximo = layoutDesktop
+        ? Math.min(MAX_MINIATURAS_VISIVEIS, fotos.length)
+        : Math.min(MAX_MINIATURAS_VISIVEIS, fotos.length, precisaDeSetas ? comSetas : semSetas);
 
       setMaxMiniaturasVisiveis((atual) => {
         if (atual === proximoMaximo) return atual;
@@ -412,7 +411,7 @@ function Detalhe() {
                         selecionarFoto(i);
                       }}
                       aria-label={`Ver foto ${i + 1}`}
-                      className={`aspect-[7/5] h-20 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
+                      className={`h-20 w-28 shrink-0 overflow-hidden rounded-md border lg:min-w-0 lg:flex-1 lg:shrink lg:basis-0 ${i === ativa ? "border-primary" : "border-border"}`}
                     >
                       <ResilientImage
                         src={f}
