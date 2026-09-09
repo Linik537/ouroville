@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, MessageCircle, Phone, X } from "lucide-react";
 import { useState } from "react";
-import logo from "@/assets/ouroville-logo.jpg";
+import logo from "@/assets/ouroville-logo-ville.png";
 import { SITE, whatsappLink } from "@/lib/site";
 import { scrollToPageTop } from "@/lib/scroll";
 import { trackAnalyticsEvent } from "@/lib/supabase";
@@ -23,7 +23,7 @@ export function Header() {
       <header className="border-b border-border/60 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6">
           <Link to="/" onClick={scrollToPageTop} className="flex items-center gap-3" aria-label={`${SITE.name} : página inicial`}>
-            <img src={logo} alt={`Logo ${SITE.name}`} className="h-14 w-14 rounded-md object-cover sm:h-16 sm:w-16" />
+            <img src={logo} alt={`Logo ${SITE.name}`} className="h-14 w-14 object-contain sm:h-16 sm:w-16" />
             <span className="hidden items-baseline gap-1 sm:flex">
               <span className="font-brand-primary text-2xl text-gold sm:text-3xl">Ouroville</span>
               <span className="font-brand-secondary text-2xl text-foreground sm:text-3xl">Motors</span>
