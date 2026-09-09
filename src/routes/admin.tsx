@@ -92,7 +92,7 @@ function Painel() {
   const [arquivoInputKey, setArquivoInputKey] = useState(0);
   const [editorIndex, setEditorIndex] = useState(0);
   const [crop, setCrop] = useState<CropSettings>({ ...DEFAULT_CROP });
-  const [editorPreviewUrl, setEditorPreviewUrl] = useState("");
+  const [arquivoPreviewUrls, setArquivoPreviewUrls] = useState<string[]>([]);
   const [fotoEditando, setFotoEditando] = useState<string | null>(null);
   const [substituicoes, setSubstituicoes] = useState<Record<string, File>>({});
   const [salvando, setSalvando] = useState(false);
@@ -102,14 +102,12 @@ function Painel() {
   const [resultadoImportacao, setResultadoImportacao] = useState<{ total: number; erros: string[] } | null>(null);
 
   useEffect(() => {
-    if (!arquivos[editorIndex]) {
-      setEditorPreviewUrl("");
-      return;
-    }
-    const url = URL.createObjectURL(arquivos[editorIndex]);
-    setEditorPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [arquivos, editorIndex]);
+    const urls = arquivos.map((arquivo) => URL.createObjectURL(arquivo));
+    setArquivoPreviewUrls(urls);
+    return () => urls.forEach((url) => URL.revokeObjectURL(url));
+  }, [arquivos]);
+
+  const editorPreviewUrl = arquivoPreviewUrls[editorIndex] ?? "";
 
   const carros = useQuery({
     queryKey: ["admin", "carros"],
@@ -233,6 +231,41 @@ function Painel() {
     }
   }
 
+  async function atualizarFotosDoCarro(carro: Carro, fotos: string[]) {
+    const { data, error } = await supabase.rpc("admin_update_car", {
+      _car_id: carro.id,
+      _payload: {
+        marca: carro.marca,
+        modelo: carro.modelo,
+        versao: carro.versao,
+        ano: carro.ano,
+        ano_modelo: carro.ano_modelo,
+        preco: carro.preco,
+        quilometragem: carro.quilometragem,
+        combustivel: carro.combustivel,
+        cambio: carro.cambio,
+        cor: carro.cor,
+        motor: carro.motor,
+        tracao: carro.tracao,
+        descricao: carro.descricao,
+        destaque: carro.destaque,
+        fotos,
+      },
+    });
+    if (error) throw error;
+    if (!data || Number(data.id) !== carro.id) {
+      throw new Error("O banco não confirmou a alteração das fotos.");
+    }
+
+    const atualizado = data as Carro;
+    qc.setQueryData<Carro[]>(["admin", "carros"], (atuais) =>
+      atuais?.map((item) => (item.id === carro.id ? atualizado : item)),
+    );
+    qc.setQueryData(["carro", String(carro.id)], atualizado);
+    void qc.invalidateQueries({ queryKey: ["carros"] });
+    return atualizado;
+  }
+
   async function alternarStatus(c: Carro) {
     const status = c.status === "vendido" ? "disponivel" : "vendido";
     const { error } = await supabase.from("carros").update({ status }).eq("id", c.id);
@@ -257,15 +290,13 @@ function Painel() {
 
   async function removerFoto(c: Carro, foto: string) {
     const fotos = (c.fotos ?? []).filter((item) => item !== foto);
-    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
-    if (error) {
-      toast.error("Não foi possível remover a imagem.");
-      return;
+    try {
+      await atualizarFotosDoCarro(c, fotos);
+      await removerArquivoStorage(foto);
+      toast.success("Imagem removida.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível remover a imagem.");
     }
-    await removerArquivoStorage(foto);
-    toast.success("Imagem removida.");
-    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
-    qc.invalidateQueries({ queryKey: ["carros"] });
   }
 
   async function removerArquivoStorage(foto: string) {
@@ -292,14 +323,12 @@ function Painel() {
 
   async function definirCapa(c: Carro, foto: string) {
     const fotos = [foto, ...(c.fotos ?? []).filter((item) => item !== foto)];
-    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
-    if (error) {
-      toast.error("Não foi possível definir a capa.");
-      return;
+    try {
+      await atualizarFotosDoCarro(c, fotos);
+      toast.success("Foto definida como capa do card.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível definir a capa.");
     }
-    toast.success("Foto definida como capa do card.");
-    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
-    qc.invalidateQueries({ queryKey: ["carros"] });
   }
 
   async function moverFoto(c: Carro, indice: number, direcao: -1 | 1) {
@@ -307,13 +336,27 @@ function Painel() {
     const destino = indice + direcao;
     if (destino < 0 || destino >= fotos.length) return;
     [fotos[indice], fotos[destino]] = [fotos[destino], fotos[indice]];
-    const { error } = await supabase.from("carros").update({ fotos }).eq("id", c.id);
-    if (error) {
-      toast.error("Não foi possível alterar a ordem das fotos.");
-      return;
+    try {
+      await atualizarFotosDoCarro(c, fotos);
+      toast.success("Ordem das fotos atualizada.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível alterar a ordem das fotos.");
     }
-    qc.invalidateQueries({ queryKey: ["admin", "carros"] });
-    qc.invalidateQueries({ queryKey: ["carros"] });
+  }
+
+  function removerArquivoSelecionado(indice: number) {
+    const restantes = arquivos.filter((_, atual) => atual !== indice);
+    setArquivos(restantes);
+    setEditorIndex((atual) => Math.min(atual, Math.max(0, restantes.length - 1)));
+  }
+
+  function moverArquivoSelecionado(indice: number, direcao: -1 | 1) {
+    const destino = indice + direcao;
+    if (destino < 0 || destino >= arquivos.length) return;
+    const ordenados = [...arquivos];
+    [ordenados[indice], ordenados[destino]] = [ordenados[destino], ordenados[indice]];
+    setArquivos(ordenados);
+    setEditorIndex(destino);
   }
 
   async function importarPlanilha() {
@@ -529,7 +572,7 @@ function Painel() {
             )}
             {editId && (
               <div className="mt-4">
-                <p className="text-xs text-muted-foreground">Fotos atuais</p>
+                <p className="text-xs text-muted-foreground">Fotos atuais e novas</p>
                 <div className="mt-2 flex flex-wrap gap-3">
                   {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto, indice, fotos) => (
                     <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
@@ -546,6 +589,23 @@ function Painel() {
                       </div>
                     </div>
                   ))}
+                  {!fotoEditando && arquivoPreviewUrls.map((preview, indice) => {
+                    const totalAtuais = carros.data?.find((carro) => carro.id === editId)?.fotos?.length ?? 0;
+                    return (
+                      <div key={`${arquivos[indice]?.name}-${indice}`} className="relative h-24 w-32 overflow-hidden rounded-md border border-primary">
+                        <img src={preview} alt={`Nova foto ${indice + 1}`} className="h-full w-full object-cover" />
+                        <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">Nova {totalAtuais + indice + 1}</span>
+                        <div className="absolute inset-x-1 bottom-1 flex gap-1">
+                          <button type="button" onClick={() => setEditorIndex(indice)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
+                          <button type="button" onClick={() => removerArquivoSelecionado(indice)} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
+                        </div>
+                        <div className="absolute right-1 top-1 flex gap-1">
+                          <button type="button" aria-label="Mover nova foto para a esquerda" disabled={indice === 0} onClick={() => moverArquivoSelecionado(indice, -1)} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8592;</button>
+                          <button type="button" aria-label="Mover nova foto para a direita" disabled={indice === arquivoPreviewUrls.length - 1} onClick={() => moverArquivoSelecionado(indice, 1)} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8594;</button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
