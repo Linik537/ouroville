@@ -7,6 +7,8 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
   const quilometragem = carro.quilometragem ?? (carro.marca.toUpperCase() === "BYD" ? 0 : null);
   const versao = carro.versao?.trim();
+  const anoCompleto = `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`;
+  const kmCompacta = quilometragem == null ? "-" : quilometragem < 1000 ? `${quilometragem} km` : `${Math.round(quilometragem / 1000)}k km`;
 
   return (
     <Link
@@ -43,14 +45,14 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
           {versao || "\u00a0"}
         </p>
 
-        <div className={`flex items-center text-muted-foreground ${compact ? "gap-2 text-[11px] sm:gap-4 sm:text-sm" : "gap-4 text-sm"}`}>
-          <span className={`inline-flex items-center ${compact ? "gap-1 sm:gap-1.5" : "gap-1.5"}`}>
+        <div className={`flex items-center text-muted-foreground ${compact ? "gap-2 text-xs sm:gap-4 sm:text-sm" : "gap-4 text-sm"}`}>
+          <span className={`inline-flex shrink-0 items-center whitespace-nowrap ${compact ? "gap-1 sm:gap-1.5" : "gap-1.5"}`}>
             <CalendarDays className={`${compact ? "h-3.5 w-3.5 sm:h-4 sm:w-4" : "h-4 w-4"} text-primary`} />
-            {carro.ano}{carro.ano_modelo ? `/${carro.ano_modelo}` : ""}
+            {compact ? <><span className="sm:hidden">{carro.ano}</span><span className="hidden sm:inline">{anoCompleto}</span></> : anoCompleto}
           </span>
-          <span className={`inline-flex items-center ${compact ? "gap-1 sm:gap-1.5" : "gap-1.5"}`}>
+          <span className={`inline-flex shrink-0 items-center whitespace-nowrap ${compact ? "gap-1 sm:gap-1.5" : "gap-1.5"}`}>
             <Gauge className={`${compact ? "h-3.5 w-3.5 sm:h-4 sm:w-4" : "h-4 w-4"} text-primary`} />
-            {km(quilometragem)}
+            {compact ? <><span className="sm:hidden">{kmCompacta}</span><span className="hidden sm:inline">{km(quilometragem)}</span></> : km(quilometragem)}
           </span>
         </div>
 
