@@ -80,7 +80,7 @@ function Detalhe() {
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
   const [reinicioRotacao, setReinicioRotacao] = useState(0);
-  const [maxMiniaturasVisiveis, setMaxMiniaturasVisiveis] = useState(MAX_MINIATURAS_VISIVEIS);
+  const [maxMiniaturasVisiveis, setMaxMiniaturasVisiveis] = useState(1);
   const ativaRef = useRef(0);
   const rotacaoTimer = useRef<number | null>(null);
   const proximoAtraso = useRef(ROTACAO_AUTOMATICA_MS);
@@ -327,7 +327,7 @@ function Detalhe() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+    <div className="mx-auto w-full min-w-0 max-w-6xl overflow-x-hidden px-4 py-10 sm:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(carSchema) }}
@@ -343,8 +343,8 @@ function Detalhe() {
         / {nomeCarro}
       </nav>
 
-      <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
-        <div className="lg:col-start-1 lg:row-start-1">
+      <div className="mt-5 grid min-w-0 grid-cols-[minmax(0,1fr)] items-start gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="min-w-0 max-w-full lg:col-start-1 lg:row-start-1">
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-transparent">
             {anterior !== null && (
               <ResilientImage
@@ -364,7 +364,10 @@ function Detalhe() {
             />
           </div>
           {fotos.length > 1 && (
-            <div ref={faixaMiniaturasRef} className="mt-3 flex w-full items-center gap-2">
+            <div
+              ref={faixaMiniaturasRef}
+              className="mt-3 flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden"
+            >
               {fotos.length > janelaMiniaturas && (
                 <button
                   type="button"
@@ -417,7 +420,7 @@ function Detalhe() {
           )}
         </div>
 
-        <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <aside className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <h1 className="font-oswald text-[30px] font-semibold leading-tight tracking-wide sm:text-[32px]">
             <span className="text-white">{nomeMarca}</span>{" "}
             <span className="text-gold">{nomeModelo}</span>{" "}
