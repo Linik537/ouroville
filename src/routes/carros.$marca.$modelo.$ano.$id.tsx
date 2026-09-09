@@ -1,6 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarDays, Cog, Fuel, Gauge, GitBranch, MessageCircle, Zap } from "lucide-react";
+import {
+  CalendarDays,
+  Cog,
+  Fuel,
+  Gauge,
+  GitBranch,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Zap,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import {
@@ -362,7 +372,7 @@ function Detalhe() {
             <span className="text-gold">{nomeModelo}</span>{" "}
             <span className="text-white">{carro.ano}</span>
           </h1>
-          {versao && <p className="mt-1 text-base text-muted-foreground">{versao}</p>}
+          {versao && <p className="mt-1 text-lg text-white/85">{versao}</p>}
           <p className="text-gold mt-10 inline-block font-inter text-2xl font-bold tracking-wide sm:text-3xl">
             {brl(carro.preco)}
           </p>
@@ -387,9 +397,23 @@ function Detalhe() {
             onClick={() => void trackAnalyticsEvent("whatsapp_click", carro.id)}
             target="_blank"
             rel="noopener noreferrer"
-            className="gold-glow mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+            className="gold-glow mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-gold px-6 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
           >
             <MessageCircle className="h-5 w-5" /> Tenho interesse
+          </a>
+          <a
+            href="tel:34998290394"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-semibold text-white transition hover:border-white/60"
+          >
+            <Phone className="h-5 w-5" aria-hidden /> Ligar para a concessionária
+          </a>
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-semibold text-white transition hover:border-white/60"
+          >
+            <MapPin className="h-5 w-5" aria-hidden /> Onde estamos - Ouroville Motors
           </a>
         </aside>
 
