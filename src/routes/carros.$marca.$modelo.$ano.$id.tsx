@@ -12,6 +12,7 @@ import {
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import { carTitle, PLACEHOLDER_CAR, supabase, trackAnalyticsEvent, type Carro } from "@/lib/supabase";
+import { ResilientImage } from "@/components/site/ResilientImage";
 import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
 
 async function fetchCarro(id: number) {
@@ -260,14 +261,14 @@ function Detalhe() {
         <div className="lg:col-start-1 lg:row-start-1">
           <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-muted">
             {anterior !== null && (
-              <img
+              <ResilientImage
                 src={fotos[anterior] ?? fotos[0]}
                 alt=""
                 aria-hidden
                 className="absolute inset-0 h-full w-full object-cover"
               />
             )}
-            <img
+            <ResilientImage
               key={`${fotos[ativa]}-${ativa}`}
               src={fotos[ativa] ?? fotos[0]}
               alt={`${carTitle(carro)} - foto ${ativa + 1}`}
@@ -306,7 +307,7 @@ function Detalhe() {
                   aria-label={`Ver foto ${i + 1}`}
                   className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                 >
-                  <img src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                  <ResilientImage src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                 </button>
                 );
               })}

@@ -86,6 +86,29 @@ export const PLACEHOLDER_CAR =
     `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#1a1a1a"/><text x="400" y="300" fill="#8a8a8a" font-family="sans-serif" font-size="28" text-anchor="middle">Foto em breve</text></svg>`,
   );
 
+const INVENTORY_CACHE_KEY = "ouroville-inventory-v1";
+const INVENTORY_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+
+function readInventoryCache(): Carro[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(INVENTORY_CACHE_KEY) ?? "null") as { savedAt?: number; rows?: Carro[] } | null;
+    if (!cached?.savedAt || !Array.isArray(cached.rows) || Date.now() - cached.savedAt > INVENTORY_CACHE_MAX_AGE) return null;
+    return cached.rows;
+  } catch {
+    return null;
+  }
+}
+
+function writeInventoryCache(rows: Carro[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(INVENTORY_CACHE_KEY, JSON.stringify({ savedAt: Date.now(), rows }));
+  } catch {
+    // O estoque continua funcionando mesmo se o navegador bloquear o armazenamento local.
+  }
+}
+
 export async function fetchCarros(filters?: {
   termo?: string | undefined;
   marca?: string | undefined;
@@ -95,26 +118,27 @@ export async function fetchCarros(filters?: {
   precoMax?: number | undefined;
   limit?: number | undefined;
 }) {
+  let rows: Carro[];
   try {
-    let q = supabase.from("carros").select("*").eq("status", "disponivel");
-    if (filters?.marca) q = q.eq("marca", filters.marca);
-    if (filters?.cambio) q = q.eq("cambio", filters.cambio);
-    if (filters?.combustivel) q = q.eq("combustivel", filters.combustivel);
-    if (filters?.anoMin && Number.isFinite(filters.anoMin)) q = q.gte("ano", filters.anoMin);
-    if (filters?.precoMax && Number.isFinite(filters.precoMax)) q = q.lte("preco", filters.precoMax);
-    if (filters?.limit && Number.isFinite(filters.limit)) q = q.limit(filters.limit);
-    const { data, error } = await q.order("created_at", { ascending: false });
-    if (error) {
-      console.error("Erro ao buscar carros do Supabase:", error);
-      return [];
-    }
-    let rows = (data ?? []) as Carro[];
-    if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
-    return rows;
+    const { data, error } = await supabase.from("carros").select("*").eq("status", "disponivel").order("created_at", { ascending: false });
+    if (error) throw error;
+    rows = (data ?? []) as Carro[];
+    writeInventoryCache(rows);
   } catch (err) {
-    console.error("Exceção ao buscar carros:", err);
-    return [];
+    const cached = readInventoryCache();
+    if (!cached) throw err;
+    console.warn("Supabase temporariamente indisponível; exibindo o último estoque carregado.", err);
+    rows = cached;
   }
+
+  if (filters?.marca) rows = rows.filter((carro) => carro.marca === filters.marca);
+  if (filters?.cambio) rows = rows.filter((carro) => carro.cambio === filters.cambio);
+  if (filters?.combustivel) rows = rows.filter((carro) => carro.combustivel === filters.combustivel);
+  if (filters?.anoMin && Number.isFinite(filters.anoMin)) rows = rows.filter((carro) => carro.ano >= filters.anoMin!);
+  if (filters?.precoMax && Number.isFinite(filters.precoMax)) rows = rows.filter((carro) => carro.preco !== null && carro.preco <= filters.precoMax!);
+  if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
+  if (filters?.limit && Number.isFinite(filters.limit)) rows = rows.slice(0, filters.limit);
+  return rows;
 }
 
 // Busca tolerante a erros de digitação (client-side, complementa o índice trigram do Postgres)

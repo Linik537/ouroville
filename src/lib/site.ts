@@ -37,21 +37,8 @@ export function km(value: number | null | undefined) {
   return `${value.toLocaleString("pt-BR")} km`;
 }
 
-const vehicleAcronyms = new Set(["BYD", "BMW", "CAOA", "GWM", "JAC", "KIA", "RAM", "VW", "HR-V"]);
-
 export function formatCarName(value: string) {
-  return value
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => {
-      const uppercase = word.toLocaleUpperCase("pt-BR");
-      if (vehicleAcronyms.has(uppercase)) return uppercase;
-      return word.toLocaleLowerCase("pt-BR").replace(/(^|[-/])([a-zà-ÿ])/g, (_, separator, letter) =>
-        `${separator}${letter.toLocaleUpperCase("pt-BR")}`,
-      );
-    })
-    .join(" ");
+  return value.trim().replace(/\s+/g, " ");
 }
 
 export function getAutoDealerSchema() {

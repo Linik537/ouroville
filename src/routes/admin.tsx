@@ -7,6 +7,7 @@ import { supabase, type Carro } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
 import { calcularAreaCrop, DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
+import { ResilientImage } from "@/components/site/ResilientImage";
 
 type AnalyticsSummaryRow = {
   event_type: string;
@@ -55,6 +56,24 @@ function CropPreview({ src, crop, ratio, className }: { src: string; crop: CropS
   }, [src, crop, ratio]);
 
   return <canvas ref={canvasRef} className={className} style={{ aspectRatio: ratio }} />;
+}
+
+async function baixarImagemComRetry(url: string) {
+  let ultimoErro: Error | null = null;
+  for (let tentativa = 0; tentativa < 4; tentativa += 1) {
+    try {
+      const separador = url.includes("?") ? "&" : "?";
+      const resposta = await fetch(tentativa === 0 ? url : `${url}${separador}retry=${tentativa}`, { cache: "no-store" });
+      if (resposta.ok) return resposta;
+      ultimoErro = new Error(`HTTP ${resposta.status}`);
+      if (resposta.status < 500 || tentativa === 3) break;
+    } catch (error) {
+      ultimoErro = error instanceof Error ? error : new Error("Falha de rede.");
+      if (tentativa === 3) break;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, [400, 900, 1_800][tentativa]));
+  }
+  throw new Error(`Não foi possível abrir esta imagem${ultimoErro ? `: ${ultimoErro.message}` : "."}`);
 }
 
 function Admin() {
@@ -384,8 +403,7 @@ function Painel() {
 
   async function editarFoto(foto: string) {
     try {
-      const resposta = await fetch(foto);
-      if (!resposta.ok) throw new Error("Não foi possível abrir esta imagem.");
+      const resposta = await baixarImagemComRetry(foto);
       const blob = await resposta.blob();
       const nome = foto.split("/").pop()?.split("?")[0] ?? "foto-do-carro.jpg";
       setArquivos([new File([blob], nome, { type: blob.type || "image/jpeg" })]);
@@ -659,7 +677,7 @@ function Painel() {
                 <div className="mt-2 flex flex-wrap gap-3">
                   {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto, indice, fotos) => (
                     <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
-                      <img src={foto} alt="" className="h-full w-full object-cover" />
+                      <ResilientImage src={foto} alt="" className="h-full w-full object-cover" />
                       <span className="absolute left-1 top-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground">{indice + 1}</span>
                       <div className="absolute inset-x-1 bottom-1 flex gap-1">
                         <button type="button" onClick={() => void editarFoto(foto)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>

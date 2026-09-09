@@ -8,8 +8,10 @@ export const getRouter = () => {
       queries: {
         staleTime: 30_000,
         gcTime: 5 * 60_000,
-        refetchOnWindowFocus: false,
-        retry: 1,
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+        retry: 3,
+        retryDelay: (attempt) => Math.min(500 * 2 ** attempt, 4_000),
       },
     },
   });

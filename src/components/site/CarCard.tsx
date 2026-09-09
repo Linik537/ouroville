@@ -3,6 +3,7 @@ import { CalendarDays, Gauge } from "lucide-react";
 import { brl, formatCarName, km } from "@/lib/site";
 import { scrollToPageTop } from "@/lib/scroll";
 import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
+import { ResilientImage } from "@/components/site/ResilientImage";
 
 export function CarCard({ carro, compact = false }: { carro: Carro; compact?: boolean }) {
   const foto = carro.fotos?.[0] ?? PLACEHOLDER_CAR;
@@ -25,7 +26,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
       className="group flex flex-col overflow-hidden rounded-[28px] bg-card transition duration-200 hover:-translate-y-0.5 sm:bg-[#17130d]"
     >
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] border border-border bg-muted">
-        <img
+        <ResilientImage
           src={foto}
           alt={`${carTitle(carro)} à venda na Ouroville Motors`}
           loading="lazy"
