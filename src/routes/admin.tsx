@@ -179,12 +179,25 @@ function Painel() {
     if (!arquivos.length) return;
     setSalvando(true);
     try {
-      const processadas = await Promise.all(arquivos.map((file) => prepararImagem(file, crop)));
-      setArquivos(processadas);
-      if (fotoEditando && processadas[0]) {
-        setSubstituicoes((atuais) => ({ ...atuais, [fotoEditando]: processadas[0] }));
+      const indiceAtual = Math.min(editorIndex, arquivos.length - 1);
+      const processada = await prepararImagem(arquivos[indiceAtual], crop);
+
+      if (fotoEditando) {
+        setSubstituicoes((atuais) => ({ ...atuais, [fotoEditando]: processada }));
+        setArquivos([]);
+        setFotoEditando(null);
+        setEditorIndex(0);
+        setCrop({ ...DEFAULT_CROP });
+        setArquivoInputKey((key) => key + 1);
+        toast.success("Recorte aplicado. Você já pode editar outra foto.");
+        return;
       }
-      toast.success("Fotos preparadas em WebP e prontas para salvar.");
+
+      setArquivos((atuais) => atuais.map((arquivo, indice) => (indice === indiceAtual ? processada : arquivo)));
+      const proximoIndice = indiceAtual < arquivos.length - 1 ? indiceAtual + 1 : indiceAtual;
+      setEditorIndex(proximoIndice);
+      setCrop({ ...DEFAULT_CROP });
+      toast.success(indiceAtual < arquivos.length - 1 ? "Foto preparada. Agora ajuste a próxima." : "Foto preparada em WebP e pronta para salvar.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível preparar as fotos.");
     } finally {
@@ -438,7 +451,13 @@ function Painel() {
     setEditorIndex(0);
     setCrop({ ...DEFAULT_CROP });
     setFotoEditando(null);
+    setSubstituicoes({});
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function selecionarArquivoParaEditar(indice: number) {
+    setEditorIndex(indice);
+    setCrop({ ...DEFAULT_CROP });
   }
 
   const campo = (name: keyof typeof vazio, label: string, type = "text", required = false) => (
@@ -589,9 +608,9 @@ function Painel() {
                     <label className="block text-xs text-muted-foreground">Vertical: {crop.offsetY}<input type="range" min="-100" max="100" step="1" value={crop.offsetY} onChange={(e) => setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))} className="w-full accent-primary" /><span className="mt-1 flex justify-between text-[10px]"><span>Topo</span><span>Base</span></span></label>
                     <p className="rounded-md border border-border bg-card px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">As extremidades dos controles alcançam todo o espaço disponível da imagem original. A miniatura mostra o pequeno recorte adicional aplicado abaixo da foto principal.</p>
                     <div className="flex flex-wrap gap-2">
-                      {arquivos.map((arquivo, index) => <button type="button" key={`${arquivo.name}-${index}`} onClick={() => setEditorIndex(index)} className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>{index + 1}. {arquivo.name.slice(0, 14)}</button>)}
+                      {arquivos.map((arquivo, index) => <button type="button" key={`${arquivo.name}-${index}`} onClick={() => selecionarArquivoParaEditar(index)} className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>{index + 1}. {arquivo.name.slice(0, 14)}</button>)}
                     </div>
-                    <button type="button" onClick={() => void processarFotosSelecionadas()} disabled={salvando} className="w-full rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">{salvando ? "Preparando..." : "Aplicar crop e otimizar"}</button>
+                    <button type="button" onClick={() => void processarFotosSelecionadas()} disabled={salvando} className="w-full rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">{salvando ? "Preparando..." : "Aplicar nesta foto e otimizar"}</button>
                   </div>
                 </div>
               </div>
@@ -622,7 +641,7 @@ function Painel() {
                         <img src={preview} alt={`Nova foto ${indice + 1}`} className="h-full w-full object-cover" />
                         <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">Nova {totalAtuais + indice + 1}</span>
                         <div className="absolute inset-x-1 bottom-1 flex gap-1">
-                          <button type="button" onClick={() => setEditorIndex(indice)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
+                          <button type="button" onClick={() => selecionarArquivoParaEditar(indice)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
                           <button type="button" onClick={() => removerArquivoSelecionado(indice)} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
                         </div>
                         <div className="absolute right-1 top-1 flex gap-1">
