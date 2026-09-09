@@ -54,7 +54,7 @@ function Home() {
   const [termo, setTermo] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["carros", "home"],
-    queryFn: () => fetchCarros({ limit: 6 }),
+    queryFn: () => fetchCarros({ novidades: true, limit: 6 }),
   });
 
   const marcas = Array.from(new Set((data ?? []).map((c) => c.marca))).slice(0, 12);

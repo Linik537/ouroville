@@ -29,6 +29,8 @@ export type Carro = {
   fotos: string[] | null;
   descricao: string | null;
   destaque: string | null;
+  mostrar_novidades?: boolean;
+  ordem_novidades?: number | null;
   status: "disponivel" | "vendido";
   created_at: string;
 };
@@ -116,6 +118,7 @@ export async function fetchCarros(filters?: {
   combustivel?: string | undefined;
   anoMin?: number | undefined;
   precoMax?: number | undefined;
+  novidades?: boolean | undefined;
   limit?: number | undefined;
 }) {
   let rows: Carro[];
@@ -136,6 +139,11 @@ export async function fetchCarros(filters?: {
   if (filters?.combustivel) rows = rows.filter((carro) => carro.combustivel === filters.combustivel);
   if (filters?.anoMin && Number.isFinite(filters.anoMin)) rows = rows.filter((carro) => carro.ano >= filters.anoMin!);
   if (filters?.precoMax && Number.isFinite(filters.precoMax)) rows = rows.filter((carro) => carro.preco !== null && carro.preco <= filters.precoMax!);
+  if (filters?.novidades && rows.some((carro) => typeof carro.mostrar_novidades === "boolean")) {
+    rows = rows
+      .filter((carro) => carro.mostrar_novidades)
+      .sort((a, b) => (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) - (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER));
+  }
   if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
   if (filters?.limit && Number.isFinite(filters.limit)) rows = rows.slice(0, filters.limit);
   return rows;

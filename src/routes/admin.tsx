@@ -145,6 +145,9 @@ function Painel() {
   const [urlPlanilha, setUrlPlanilha] = useState("");
   const [importando, setImportando] = useState(false);
   const [resultadoImportacao, setResultadoImportacao] = useState<{ total: number; erros: string[] } | null>(null);
+  const [novidadesIds, setNovidadesIds] = useState<number[] | null>(null);
+  const [carroParaNovidades, setCarroParaNovidades] = useState("");
+  const [salvandoNovidades, setSalvandoNovidades] = useState(false);
 
   useEffect(() => {
     const urls = arquivos.map((arquivo) => URL.createObjectURL(arquivo));
@@ -177,6 +180,18 @@ function Painel() {
     refetchInterval: 15_000,
     refetchOnWindowFocus: true,
   });
+
+  useEffect(() => {
+    if (!carros.data || novidadesIds !== null) return;
+    const possuiConfiguracao = carros.data.some((carro) => typeof carro.mostrar_novidades === "boolean");
+    const selecionados = possuiConfiguracao
+      ? carros.data
+          .filter((carro) => carro.mostrar_novidades)
+          .sort((a, b) => (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) - (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER))
+          .map((carro) => carro.id)
+      : carros.data.filter((carro) => carro.status === "disponivel").slice(0, 6).map((carro) => carro.id);
+    setNovidadesIds(selecionados);
+  }, [carros.data, novidadesIds]);
 
   async function uploadArquivos(files: File[]): Promise<string[]> {
     if (!files.length) return [];
@@ -360,6 +375,41 @@ function Painel() {
     qc.setQueryData(["carro", String(carro.id)], atualizado);
     void qc.invalidateQueries({ queryKey: ["carros"] });
     return atualizado;
+  }
+
+  async function salvarConfiguracaoNovidades() {
+    const ids = (novidadesIds ?? []).filter((id) => carros.data?.some((carro) => carro.id === id && carro.status === "disponivel"));
+    setSalvandoNovidades(true);
+    try {
+      const { error } = await supabase.rpc("admin_set_latest_cars", { _car_ids: ids });
+      if (error) throw error;
+      qc.setQueryData<Carro[]>(["admin", "carros"], (atuais) =>
+        atuais?.map((carro) => {
+          const posicao = ids.indexOf(carro.id);
+          return { ...carro, mostrar_novidades: posicao >= 0, ordem_novidades: posicao >= 0 ? posicao + 1 : null };
+        }),
+      );
+      setNovidadesIds(ids);
+      await qc.invalidateQueries({ queryKey: ["carros"] });
+      toast.success("Últimas Novidades atualizadas.");
+    } catch (error) {
+      const mensagem = error instanceof Error ? error.message : "Não foi possível salvar a seleção.";
+      const migrationPendente = /admin_set_latest_cars|schema cache|could not find/i.test(mensagem);
+      toast.error(migrationPendente
+        ? "A atualização do banco ainda não foi aplicada. Execute a migration de Últimas Novidades no Supabase."
+        : mensagem);
+    } finally {
+      setSalvandoNovidades(false);
+    }
+  }
+
+  function moverNovidade(indice: number, direcao: -1 | 1) {
+    if (!novidadesIds) return;
+    const destino = indice + direcao;
+    if (destino < 0 || destino >= novidadesIds.length) return;
+    const ordenados = [...novidadesIds];
+    [ordenados[indice], ordenados[destino]] = [ordenados[destino], ordenados[indice]];
+    setNovidadesIds(ordenados);
   }
 
   async function alternarStatus(c: Carro) {
@@ -601,6 +651,60 @@ function Painel() {
                 )}
               </div>
             )}
+          </section>
+
+          <section className="mt-6 rounded-xl border border-primary/40 bg-card p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Últimas Novidades</h2>
+                <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                  Escolha até seis veículos para a página inicial. A ordem abaixo será a ordem exibida no site.
+                </p>
+              </div>
+              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{novidadesIds?.length ?? 0}/6 selecionados</span>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {(novidadesIds ?? []).map((id, indice) => {
+                const carro = carros.data?.find((item) => item.id === id);
+                if (!carro) return null;
+                return (
+                  <div key={id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{indice + 1}</span>
+                    <span className="min-w-0 flex-1 text-sm font-medium text-foreground">{carro.marca} {carro.modelo} {carro.ano}</span>
+                    <button type="button" aria-label="Mover para cima" disabled={indice === 0} onClick={() => moverNovidade(indice, -1)} className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30">↑</button>
+                    <button type="button" aria-label="Mover para baixo" disabled={indice === (novidadesIds?.length ?? 0) - 1} onClick={() => moverNovidade(indice, 1)} className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30">↓</button>
+                    <button type="button" onClick={() => setNovidadesIds((atuais) => atuais?.filter((item) => item !== id) ?? [])} className="rounded-md border border-destructive/60 px-3 py-1 text-xs text-destructive">Remover</button>
+                  </div>
+                );
+              })}
+              {(novidadesIds?.length ?? 0) === 0 && <p className="rounded-lg border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">Nenhum carro selecionado.</p>}
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <select value={carroParaNovidades} onChange={(e) => setCarroParaNovidades(e.target.value)} className={`${inputCls} flex-1`}>
+                <option value="">Selecione um carro disponível</option>
+                {(carros.data ?? [])
+                  .filter((carro) => carro.status === "disponivel" && !(novidadesIds ?? []).includes(carro.id))
+                  .map((carro) => <option key={carro.id} value={carro.id}>{carro.marca} {carro.modelo} {carro.ano}</option>)}
+              </select>
+              <button
+                type="button"
+                disabled={!carroParaNovidades || (novidadesIds?.length ?? 0) >= 6}
+                onClick={() => {
+                  const id = Number(carroParaNovidades);
+                  if (!Number.isFinite(id) || (novidadesIds ?? []).includes(id)) return;
+                  setNovidadesIds((atuais) => [...(atuais ?? []), id]);
+                  setCarroParaNovidades("");
+                }}
+                className="rounded-full border border-primary px-5 py-2 text-sm font-semibold text-primary disabled:opacity-40"
+              >
+                Adicionar
+              </button>
+              <button type="button" disabled={salvandoNovidades} onClick={() => void salvarConfiguracaoNovidades()} className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+                {salvandoNovidades ? "Salvando..." : "Salvar seleção"}
+              </button>
+            </div>
           </section>
 
           <form onSubmit={salvar} className="mt-6 rounded-xl border border-border/70 bg-card p-6">
