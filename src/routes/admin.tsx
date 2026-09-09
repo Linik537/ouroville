@@ -141,7 +141,7 @@ function Painel() {
     for (const file of files) {
       const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/[^a-zA-Z0-9._-]+/g, "-")}`;
       const { error } = await supabase.storage.from("carros").upload(path, file);
-      if (error) throw error;
+      if (error) throw new Error(`Não foi possível enviar a foto "${file.name}": ${error.message}`);
       urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
     }
     return urls;
