@@ -41,20 +41,20 @@ export function HeroHeadlights() {
       animationRef.current = layer.animate(
         [
           { opacity: 0, offset: 0 },
-          { opacity: 1, offset: 0.025 },
-          { opacity: 1, offset: 0.12 },
-          { opacity: 0.4, offset: 0.14 },
-          { opacity: 0.2, offset: 0.16 },
-          { opacity: 0, offset: 0.18 },
-          { opacity: 0, offset: 0.22 },
-          { opacity: 1, offset: 0.24 },
-          { opacity: 1, offset: 0.34 },
-          { opacity: 0.4, offset: 0.36 },
-          { opacity: 0.2, offset: 0.38 },
-          { opacity: 0, offset: 0.4 },
+          { opacity: 1, offset: 0.015 },
+          { opacity: 1, offset: 0.1 },
+          { opacity: 0.4, offset: 0.19 },
+          { opacity: 0.2, offset: 0.24 },
+          { opacity: 0, offset: 0.28 },
+          { opacity: 0, offset: 0.3 },
+          { opacity: 1, offset: 0.315 },
+          { opacity: 1, offset: 0.4 },
+          { opacity: 0.4, offset: 0.49 },
+          { opacity: 0.2, offset: 0.54 },
+          { opacity: 0, offset: 0.58 },
           { opacity: 0, offset: 1 },
         ],
-        { duration: 800, easing: "linear", fill: "both" },
+        { duration: 700, easing: "linear", fill: "both" },
       );
     };
 
