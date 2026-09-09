@@ -3,9 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   CalendarDays,
   Cog,
+  Disc3,
   Fuel,
   Gauge,
-  GitBranch,
   MapPin,
   MessageCircle,
   Phone,
@@ -199,7 +199,7 @@ function Detalhe() {
     { label: "Câmbio", value: carro.cambio ?? "Automático", Icon: Cog },
     { label: "Combustível", value: carro.combustivel ?? "Gasolina", Icon: Fuel },
     { label: "Motor", value: carro.motor ?? "-", Icon: Zap },
-    { label: "Tração", value: carro.tracao ?? "-", Icon: GitBranch },
+    { label: "Tração", value: carro.tracao ?? "-", Icon: Disc3 },
   ];
 
   const carSchema = {
