@@ -66,6 +66,10 @@ type FichaItem = {
 
 const ROTACAO_AUTOMATICA_MS = 4000;
 const PAUSA_APOS_SELECAO_MS = 10000;
+const MAX_MINIATURAS_VISIVEIS = 5;
+const LARGURA_MINIATURA_PX = 112;
+const LARGURA_SETA_PX = 32;
+const ESPACO_MINIATURAS_PX = 8;
 
 function Detalhe() {
   const { id } = Route.useParams();
@@ -76,14 +80,16 @@ function Detalhe() {
   const [ativa, setAtiva] = useState(0);
   const [anterior, setAnterior] = useState<number | null>(null);
   const [reinicioRotacao, setReinicioRotacao] = useState(0);
+  const [maxMiniaturasVisiveis, setMaxMiniaturasVisiveis] = useState(MAX_MINIATURAS_VISIVEIS);
   const ativaRef = useRef(0);
   const rotacaoTimer = useRef<number | null>(null);
   const proximoAtraso = useRef(ROTACAO_AUTOMATICA_MS);
   const transicao = useRef<number | null>(null);
   const inicioMiniaturasRef = useRef(0);
+  const faixaMiniaturasRef = useRef<HTMLDivElement | null>(null);
 
   const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
-  const janelaMiniaturas = Math.min(5, fotos.length);
+  const janelaMiniaturas = Math.min(maxMiniaturasVisiveis, fotos.length);
 
   useEffect(() => {
     ativaRef.current = ativa;
@@ -97,7 +103,7 @@ function Detalhe() {
         indice >= inicioMiniaturasRef.current + janelaMiniaturas
       ) {
         inicioMiniaturasRef.current = Math.min(
-          Math.max(0, indice - 2),
+          Math.max(0, indice - Math.floor(janelaMiniaturas / 2)),
           Math.max(0, fotos.length - janelaMiniaturas),
         );
       }
@@ -132,6 +138,53 @@ function Detalhe() {
     [],
   );
 
+  useEffect(() => {
+    const faixa = faixaMiniaturasRef.current;
+    if (!faixa || typeof ResizeObserver === "undefined") return;
+
+    const atualizarJanela = (largura: number) => {
+      const semSetas = Math.min(
+        MAX_MINIATURAS_VISIVEIS,
+        Math.max(
+          1,
+          Math.floor(
+            (largura + ESPACO_MINIATURAS_PX) / (LARGURA_MINIATURA_PX + ESPACO_MINIATURAS_PX),
+          ),
+        ),
+      );
+      const precisaDeSetas = fotos.length > semSetas;
+      const larguraDasSetas = precisaDeSetas ? LARGURA_SETA_PX * 2 + ESPACO_MINIATURAS_PX * 2 : 0;
+      const comSetas = Math.max(
+        1,
+        Math.floor(
+          (Math.max(0, largura - larguraDasSetas) + ESPACO_MINIATURAS_PX) /
+            (LARGURA_MINIATURA_PX + ESPACO_MINIATURAS_PX),
+        ),
+      );
+      const proximoMaximo = Math.min(
+        MAX_MINIATURAS_VISIVEIS,
+        fotos.length,
+        precisaDeSetas ? comSetas : semSetas,
+      );
+
+      setMaxMiniaturasVisiveis((atual) => {
+        if (atual === proximoMaximo) return atual;
+        inicioMiniaturasRef.current = Math.min(
+          Math.max(0, ativaRef.current - Math.floor(proximoMaximo / 2)),
+          Math.max(0, fotos.length - proximoMaximo),
+        );
+        return proximoMaximo;
+      });
+    };
+
+    const observer = new ResizeObserver(([entrada]) => {
+      if (entrada) atualizarJanela(entrada.contentRect.width);
+    });
+    atualizarJanela(faixa.getBoundingClientRect().width);
+    observer.observe(faixa);
+    return () => observer.disconnect();
+  }, [fotos.length]);
+
   function selecionarFoto(indice: number) {
     proximoAtraso.current = PAUSA_APOS_SELECAO_MS;
     setReinicioRotacao((valor) => valor + 1);
@@ -141,8 +194,8 @@ function Detalhe() {
   function moverGaleria(direcao: -1 | 1) {
     const proxima = (ativaRef.current + direcao + fotos.length) % fotos.length;
     inicioMiniaturasRef.current = Math.min(
-      Math.max(0, proxima - 2),
-      Math.max(0, fotos.length - Math.min(5, fotos.length)),
+      Math.max(0, proxima - Math.floor(janelaMiniaturas / 2)),
+      Math.max(0, fotos.length - janelaMiniaturas),
     );
     selecionarFoto(proxima);
   }
@@ -311,8 +364,8 @@ function Detalhe() {
             />
           </div>
           {fotos.length > 1 && (
-            <div className="mt-3 flex w-full items-center gap-2">
-              {fotos.length > 5 && (
+            <div ref={faixaMiniaturasRef} className="mt-3 flex w-full items-center gap-2">
+              {fotos.length > janelaMiniaturas && (
                 <button
                   type="button"
                   onClick={() => moverGaleria(-1)}
@@ -322,7 +375,7 @@ function Detalhe() {
                   &#8249;
                 </button>
               )}
-              <div className="grid min-w-0 flex-1 grid-cols-5 gap-2">
+              <div className="flex min-w-0 flex-1 justify-center gap-2 overflow-hidden">
                 {miniaturas.map((f, localIndex) => {
                   const i = inicioMiniaturas + localIndex;
                   return (
@@ -331,13 +384,13 @@ function Detalhe() {
                       type="button"
                       onClick={() => {
                         inicioMiniaturasRef.current = Math.min(
-                          Math.max(0, i - 2),
+                          Math.max(0, i - Math.floor(janelaMiniaturas / 2)),
                           Math.max(0, fotos.length - janelaMiniaturas),
                         );
                         selecionarFoto(i);
                       }}
                       aria-label={`Ver foto ${i + 1}`}
-                      className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
+                      className={`aspect-[7/5] h-20 shrink-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                     >
                       <ResilientImage
                         src={f}
@@ -350,7 +403,7 @@ function Detalhe() {
                   );
                 })}
               </div>
-              {fotos.length > 5 && (
+              {fotos.length > janelaMiniaturas && (
                 <button
                   type="button"
                   onClick={() => moverGaleria(1)}
