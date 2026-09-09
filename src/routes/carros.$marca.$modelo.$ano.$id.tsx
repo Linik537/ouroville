@@ -292,7 +292,7 @@ function Detalhe() {
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
         <div className="lg:col-start-1 lg:row-start-1">
-          <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-muted">
+          <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border/70 bg-transparent">
             {anterior !== null && (
               <ResilientImage
                 src={fotos[anterior] ?? fotos[0]}

@@ -30,7 +30,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
       resetScroll
       className="group flex flex-col overflow-hidden rounded-[28px] bg-background transition duration-200 hover:-translate-y-0.5"
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] border border-border bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] border border-border bg-transparent">
         <ResilientImage
           src={foto}
           alt={`${carTitle(carro)} à venda na Ouroville Motors`}

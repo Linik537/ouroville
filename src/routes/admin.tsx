@@ -14,6 +14,12 @@ import {
 import { NumberInput } from "@/components/site/NumberInput";
 import { ResilientImage } from "@/components/site/ResilientImage";
 
+const SUCCESS_TOAST_DURATION_MS = 500;
+
+function showSuccess(message: string) {
+  toast.success(message, { duration: SUCCESS_TOAST_DURATION_MS });
+}
+
 type AnalyticsSummaryRow = {
   event_type: string;
   car_id: number | null;
@@ -331,7 +337,7 @@ function Painel() {
         setEditorIndex(0);
         setCrop({ ...DEFAULT_CROP });
         setArquivoInputKey((key) => key + 1);
-        toast.success("Recorte aplicado. Você já pode editar outra foto.");
+        showSuccess("Recorte aplicado. Você já pode editar outra foto.");
         return;
       }
 
@@ -341,7 +347,7 @@ function Painel() {
       const proximoIndice = indiceAtual < arquivos.length - 1 ? indiceAtual + 1 : indiceAtual;
       setEditorIndex(proximoIndice);
       setCrop({ ...DEFAULT_CROP });
-      toast.success(
+      showSuccess(
         indiceAtual < arquivos.length - 1
           ? "Foto preparada. Agora ajuste a próxima."
           : "Foto preparada em WebP e pronta para salvar.",
@@ -411,7 +417,7 @@ function Painel() {
         if (error) throw error;
         bancoConfirmou = true;
       }
-      toast.success("Carro salvo!");
+      showSuccess("Carro salvo!");
       setForm({ ...vazio });
       setEditId(null);
       setArquivos([]);
@@ -491,7 +497,7 @@ function Painel() {
       );
       setNovidadesIds(ids);
       await qc.invalidateQueries({ queryKey: ["carros"] });
-      toast.success("Últimas Novidades atualizadas.");
+      showSuccess("Últimas Novidades atualizadas.");
     } catch (error) {
       const mensagem =
         error instanceof Error ? error.message : "Não foi possível salvar a seleção.";
@@ -542,7 +548,7 @@ function Painel() {
     try {
       await atualizarFotosDoCarro(c, fotos);
       await removerArquivoStorage(foto);
-      toast.success("Imagem removida.");
+      showSuccess("Imagem removida.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível remover a imagem.");
     }
@@ -563,7 +569,7 @@ function Painel() {
       setFotoEditando(foto);
       setEditorIndex(0);
       setCrop({ ...DEFAULT_CROP });
-      toast.success("Imagem carregada no editor.");
+      showSuccess("Imagem carregada no editor.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível abrir esta imagem.");
     }
@@ -573,7 +579,7 @@ function Painel() {
     const fotos = [foto, ...(c.fotos ?? []).filter((item) => item !== foto)];
     try {
       await atualizarFotosDoCarro(c, fotos);
-      toast.success("Foto definida como capa do card.");
+      showSuccess("Foto definida como capa do card.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível definir a capa.");
     }
@@ -586,7 +592,7 @@ function Painel() {
     [fotos[indice], fotos[destino]] = [fotos[destino], fotos[indice]];
     try {
       await atualizarFotosDoCarro(c, fotos);
-      toast.success("Ordem das fotos atualizada.");
+      showSuccess("Ordem das fotos atualizada.");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Não foi possível alterar a ordem das fotos.",
@@ -644,7 +650,7 @@ function Painel() {
       setUrlPlanilha("");
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
-      toast.success(
+      showSuccess(
         `${registros.length} carro(s) importado(s). Agora adicione as imagens pela edição.`,
       );
     } catch (error) {

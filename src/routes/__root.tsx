@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { type ReactNode, useEffect } from "react";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
@@ -149,9 +149,27 @@ function RootComponent() {
           </div>
         </div>
         <WhatsAppFloater />
-        <Toaster position="top-center" richColors />
+        <DismissibleToaster />
       </WhatsAppProvider>
     </QueryClientProvider>
+  );
+}
+
+function DismissibleToaster() {
+  useEffect(() => {
+    const dismissOnClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("[data-sonner-toast]")) {
+        toast.dismiss();
+      }
+    };
+
+    document.addEventListener("click", dismissOnClick);
+    return () => document.removeEventListener("click", dismissOnClick);
+  }, []);
+
+  return (
+    <Toaster position="bottom-left" richColors toastOptions={{ className: "cursor-pointer" }} />
   );
 }
 

@@ -139,6 +139,10 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+img {
+  color: transparent;
+}
+
 @utility text-gold {
   background-image: linear-gradient(90deg, oklch(0.62 0.12 68), oklch(0.88 0.14 90));
   background-clip: text;
