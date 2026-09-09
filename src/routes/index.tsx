@@ -49,12 +49,6 @@ const websiteSchema = {
   },
 };
 
-const depoimentos = [
-  { nome: "Rafael M.", texto: "Atendimento impecável, carro entregue revisado e no prazo combinado." },
-  { nome: "Juliana S.", texto: "Consegui financiamento aprovado no mesmo dia. Equipe muito transparente." },
-  { nome: "Carlos E.", texto: "Melhor negociação da cidade. Já é o segundo carro que compro com eles." },
-];
-
 function Home() {
   const navigate = useNavigate();
   const [termo, setTermo] = useState("");
@@ -193,18 +187,6 @@ function Home() {
               <h3 className="mt-3 text-lg font-semibold text-foreground">{s.titulo}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{s.texto}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <h2 className="text-center text-2xl font-bold text-foreground sm:text-3xl">O que dizem nossos clientes</h2>
-        <div className="mt-8 grid gap-6 sm:grid-cols-3">
-          {depoimentos.map((d) => (
-            <figure key={d.nome} className="rounded-xl border border-border/70 bg-card p-6">
-              <blockquote className="text-sm text-muted-foreground">“{d.texto}”</blockquote>
-              <figcaption className="mt-4 text-sm font-semibold text-primary">{d.nome}</figcaption>
-            </figure>
           ))}
         </div>
       </section>
