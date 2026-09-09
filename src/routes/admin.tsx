@@ -162,17 +162,42 @@ function Painel() {
   async function uploadArquivos(files: File[]): Promise<string[]> {
     if (!files.length) return [];
     const urls: string[] = [];
-    for (const file of files) {
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/[^a-zA-Z0-9._-]+/g, "-")}`;
-      const { error } = await supabase.storage.from("carros").upload(path, file);
-      if (error) throw new Error(`Não foi possível enviar a foto "${file.name}": ${error.message}`);
-      urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
-    }
-    return urls;
-  }
+    const paths: string[] = [];
+    try {
+      for (const file of files) {
+        const extensaoOriginal = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const extensao = extensaoOriginal && ["jpg", "jpeg", "png", "webp"].includes(extensaoOriginal)
+          ? extensaoOriginal
+          : file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+        const path = `${Date.now()}-${crypto.randomUUID()}.${extensao}`;
+        paths.push(path);
+        let ultimoErro: Error | null = null;
 
-  async function uploadFotos(): Promise<string[]> {
-    return uploadArquivos(arquivos);
+        for (let tentativa = 0; tentativa < 4; tentativa += 1) {
+          const { error } = await supabase.storage.from("carros").upload(path, file, {
+            upsert: true,
+            contentType: file.type || undefined,
+            cacheControl: "31536000",
+          });
+          if (!error) {
+            ultimoErro = null;
+            break;
+          }
+
+          ultimoErro = new Error(error.message);
+          const falhaTemporaria = /(?:http\s*)?5\d\d|timeout|network|fetch|temporar/i.test(error.message);
+          if (!falhaTemporaria || tentativa === 3) break;
+          await new Promise((resolve) => window.setTimeout(resolve, [400, 900, 1800][tentativa]));
+        }
+
+        if (ultimoErro) throw new Error(`Não foi possível enviar a foto "${file.name}" após novas tentativas: ${ultimoErro.message}`);
+        urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
+      }
+      return urls;
+    } catch (error) {
+      if (paths.length) await supabase.storage.from("carros").remove(paths);
+      throw error;
+    }
   }
 
   async function processarFotosSelecionadas() {
@@ -208,9 +233,17 @@ function Painel() {
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
     setSalvando(true);
+    let uploadsDaTentativa: string[] = [];
+    let bancoConfirmou = false;
     try {
-      const novas = fotoEditando ? [] : await uploadFotos();
-      const fotosEditadas = await uploadArquivos(Object.values(substituicoes));
+      const arquivosNovos = fotoEditando ? [] : arquivos;
+      const substituicoesPendentes = Object.entries(substituicoes);
+      uploadsDaTentativa = await uploadArquivos([
+        ...arquivosNovos,
+        ...substituicoesPendentes.map(([, arquivo]) => arquivo),
+      ]);
+      const novas = uploadsDaTentativa.slice(0, arquivosNovos.length);
+      const fotosEditadas = uploadsDaTentativa.slice(arquivosNovos.length);
       const payload = {
         marca: form.marca,
         modelo: form.modelo,
@@ -229,7 +262,7 @@ function Painel() {
       };
       if (editId) {
         const atual = carros.data?.find((c) => c.id === editId);
-        const urlsEditadas = Object.keys(substituicoes).reduce<Record<string, string>>((mapa, foto, index) => {
+        const urlsEditadas = substituicoesPendentes.reduce<Record<string, string>>((mapa, [foto], index) => {
           if (fotosEditadas[index]) mapa[foto] = fotosEditadas[index];
           return mapa;
         }, {});
@@ -242,11 +275,13 @@ function Painel() {
         if (!carroAtualizado || Number(carroAtualizado.id) !== editId) {
           throw new Error("O banco não confirmou a atualização do veículo.");
         }
+        bancoConfirmou = true;
         qc.setQueryData(["carro", String(editId)], carroAtualizado as Carro);
         await Promise.all(Object.keys(urlsEditadas).map((foto) => removerArquivoStorage(foto)));
       } else {
         const { error } = await supabase.from("carros").insert({ ...payload, fotos: novas, status: "disponivel" });
         if (error) throw error;
+        bancoConfirmou = true;
       }
       toast.success("Carro salvo!");
       setForm({ ...vazio });
@@ -262,6 +297,9 @@ function Painel() {
         qc.invalidateQueries({ queryKey: ["carros"] }),
       ]);
     } catch (error) {
+      if (!bancoConfirmou && uploadsDaTentativa.length) {
+        await Promise.all(uploadsDaTentativa.map((foto) => removerArquivoStorage(foto)));
+      }
       const mensagem = error instanceof Error ? error.message : "Erro ao salvar.";
       console.error("Erro ao salvar carro:", error);
       toast.error(`Erro ao salvar. Verifique sua sessão e as permissões do Supabase. ${mensagem}`);
