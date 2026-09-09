@@ -20,7 +20,7 @@ export function Header() {
 
   return (
     <div className="sticky top-0 z-50">
-      <header className="border-b border-border/60 bg-background/95 backdrop-blur">
+      <header className="border-b border-border/60 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6">
           <Link to="/" onClick={scrollToPageTop} className="flex items-center gap-3" aria-label={`${SITE.name} : página inicial`}>
             <img src={logo} alt={`Logo ${SITE.name}`} className="h-14 w-14 rounded-md object-cover sm:h-16 sm:w-16" />
@@ -76,7 +76,7 @@ export function Header() {
         </div>
 
         {open && (
-          <nav className="border-t border-border/60 bg-background px-4 py-2 md:hidden">
+          <nav className="border-t border-border/60 bg-background/85 px-4 py-2 backdrop-blur-xl md:hidden">
             {nav.map((n) => (
               <Link
                 key={n.to}
