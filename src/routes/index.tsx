@@ -84,7 +84,7 @@ function Home() {
         <div className="relative mx-auto max-w-5xl px-4 pb-36 pt-28 text-center sm:pb-40 sm:pt-32">
           <div className="relative -top-1">
             <h1 className="mt-0 font-oswald text-[60px] font-bold leading-[0.95] tracking-wide text-foreground">
-              Encontre o seu próximo carro, <span className="text-gold">no padrão de <span className="capitalize">ouro</span></span>
+              Encontre o seu próximo carro, no padrão <span className="text-gold">Ouro</span><span className="text-foreground">ville</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-foreground/80">
               Segunda-Feira ao Sábado - 8h às 18h · Avenida João Pinheiro, 3488
