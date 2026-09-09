@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { brl } from "@/lib/site";
 import { supabase, type Carro } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
-import { DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
+import { calcularAreaCrop, DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
 
 type AnalyticsSummaryRow = {
@@ -30,6 +30,32 @@ export const Route = createFileRoute("/admin")({
 
 const inputCls =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
+
+function CropPreview({ src, crop, ratio, className }: { src: string; crop: CropSettings; ratio: number; className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !src) return;
+    const image = new Image();
+    image.onload = () => {
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      const width = Math.max(1, Math.round(canvas.getBoundingClientRect().width * Math.min(window.devicePixelRatio || 1, 2)));
+      const height = Math.max(1, Math.round(width / ratio));
+      canvas.width = width;
+      canvas.height = height;
+      const area = calcularAreaCrop(image.naturalWidth, image.naturalHeight, crop, ratio);
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
+      context.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, width, height);
+    };
+    image.src = src;
+    return () => { image.onload = null; };
+  }, [src, crop, ratio]);
+
+  return <canvas ref={canvasRef} className={className} style={{ aspectRatio: ratio }} />;
+}
 
 function Admin() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -538,30 +564,30 @@ function Painel() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-foreground">Editor de capa e fotos</p>
-                    <p className="text-xs text-muted-foreground">{fotoEditando ? "Ajuste a imagem existente e salve para substituí-la." : "O padrão começa em 4:3, mas você pode escolher qualquer tamanho. O mesmo ajuste será aplicado às fotos escolhidas."}</p>
+                    <p className="text-xs text-muted-foreground">{fotoEditando ? "Ajuste a imagem existente e salve para substituí-la." : "O ajuste será aplicado às fotos escolhidas no formato 4:3 usado pelo site."}</p>
                   </div>
                   <span className="text-xs text-muted-foreground">{arquivos.length} foto(s) selecionada(s)</span>
                 </div>
                 <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
-                  <div className="overflow-hidden rounded-lg bg-black">
-                    <div
-                      className="mx-auto max-h-[420px] w-full max-w-2xl bg-cover bg-center bg-no-repeat"
-                      style={{
-                        backgroundImage: `url(${editorPreviewUrl})`,
-                        backgroundPosition: `${50 + crop.offsetX / 2}% ${50 + crop.offsetY / 2}%`,
-                        backgroundSize: `${crop.zoom * 100}%`,
-                        aspectRatio: `${crop.width} / ${crop.height}`,
-                      }}
-                    />
+                  <div className="space-y-3">
+                    <div>
+                      <p className="mb-1.5 text-xs font-semibold text-foreground">Foto principal (4:3)</p>
+                      <div className="overflow-hidden rounded-lg border border-border bg-black">
+                        <CropPreview src={editorPreviewUrl} crop={crop} ratio={4 / 3} className="mx-auto block w-full max-w-2xl" />
+                      </div>
+                    </div>
+                    <div className="max-w-56">
+                      <p className="mb-1.5 text-xs font-semibold text-foreground">Miniatura inferior (7:5)</p>
+                      <div className="overflow-hidden rounded-md border border-border bg-black">
+                        <CropPreview src={editorPreviewUrl} crop={crop} ratio={7 / 5} className="block w-full" />
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <label className="block text-xs text-muted-foreground">Zoom: {crop.zoom.toFixed(1)}x<input type="range" min="1" max="3" step="0.1" value={crop.zoom} onChange={(e) => setCrop((value) => ({ ...value, zoom: Number(e.target.value) }))} className="w-full accent-primary" /></label>
-                    <label className="block text-xs text-muted-foreground">Horizontal: {crop.offsetX}<input type="range" min="-100" max="100" value={crop.offsetX} onChange={(e) => setCrop((value) => ({ ...value, offsetX: Number(e.target.value) }))} className="w-full accent-primary" /></label>
-                    <label className="block text-xs text-muted-foreground">Vertical: {crop.offsetY}<input type="range" min="-100" max="100" value={crop.offsetY} onChange={(e) => setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))} className="w-full accent-primary" /></label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <label className="text-xs text-muted-foreground">Largura<input type="number" min="400" max="1600" step="100" value={crop.width} onChange={(e) => setCrop((value) => ({ ...value, width: Math.min(1600, Math.max(400, Number(e.target.value) || 1200)), height: Math.round((Math.min(1600, Math.max(400, Number(e.target.value) || 1200)) * 3) / 4) }))} className={inputCls} /></label>
-                      <label className="text-xs text-muted-foreground">Altura<input type="number" min="300" max="1600" step="100" value={crop.height} onChange={(e) => setCrop((value) => ({ ...value, height: Math.min(1600, Math.max(300, Number(e.target.value) || 900)) }))} className={inputCls} /></label>
-                    </div>
+                    <label className="block text-xs text-muted-foreground">Horizontal: {crop.offsetX}<input type="range" min="-100" max="100" step="1" value={crop.offsetX} onChange={(e) => setCrop((value) => ({ ...value, offsetX: Number(e.target.value) }))} className="w-full accent-primary" /><span className="mt-1 flex justify-between text-[10px]"><span>Esquerda</span><span>Direita</span></span></label>
+                    <label className="block text-xs text-muted-foreground">Vertical: {crop.offsetY}<input type="range" min="-100" max="100" step="1" value={crop.offsetY} onChange={(e) => setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))} className="w-full accent-primary" /><span className="mt-1 flex justify-between text-[10px]"><span>Topo</span><span>Base</span></span></label>
+                    <p className="rounded-md border border-border bg-card px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">As extremidades dos controles alcançam todo o espaço disponível da imagem original. A miniatura mostra o pequeno recorte adicional aplicado abaixo da foto principal.</p>
                     <div className="flex flex-wrap gap-2">
                       {arquivos.map((arquivo, index) => <button type="button" key={`${arquivo.name}-${index}`} onClick={() => setEditorIndex(index)} className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>{index + 1}. {arquivo.name.slice(0, 14)}</button>)}
                     </div>
