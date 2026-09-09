@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CalendarDays, Gauge } from "lucide-react";
 import { brl, formatCarName, km } from "@/lib/site";
+import { scrollToPageTop } from "@/lib/scroll";
 import { carTitle, PLACEHOLDER_CAR, slugify, type Carro } from "@/lib/supabase";
 
 export function CarCard({ carro, compact = false }: { carro: Carro; compact?: boolean }) {
@@ -9,10 +10,6 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
   const versao = carro.versao?.trim();
   const anoCompleto = `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`;
   const kmCompacta = quilometragem == null ? "-" : quilometragem < 1000 ? `${quilometragem} km` : `${Math.round(quilometragem / 1000)}k km`;
-
-  const scrollToPageTop = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  };
 
   return (
     <Link

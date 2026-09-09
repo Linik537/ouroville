@@ -17,6 +17,7 @@ import { Footer } from "@/components/site/Footer";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { WhatsAppFloater, WhatsAppProvider } from "@/components/site/WhatsAppFloater";
 import { SITE } from "@/lib/site";
+import { scrollToPageTop } from "@/lib/scroll";
 
 function NotFoundComponent() {
   return (
@@ -159,7 +160,7 @@ function ScrollToTop() {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    scrollToPageTop();
   }, [pathname]);
 
   return null;

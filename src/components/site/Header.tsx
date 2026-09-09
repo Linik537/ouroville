@@ -3,6 +3,7 @@ import { Menu, MessageCircle, Phone, X } from "lucide-react";
 import { useState } from "react";
 import logo from "@/assets/ouroville-logo.jpg";
 import { SITE, whatsappLink } from "@/lib/site";
+import { scrollToPageTop } from "@/lib/scroll";
 import { trackAnalyticsEvent } from "@/lib/supabase";
 import { useWhatsAppContext } from "@/components/site/WhatsAppFloater";
 
@@ -11,10 +12,6 @@ const nav = [
   { to: "/sobre", label: "SOBRE" },
   { to: "/financie", label: "FINANCIE" },
 ] as const;
-
-function scrollToPageTop() {
-  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-}
 
 export function Header() {
   const [open, setOpen] = useState(false);
