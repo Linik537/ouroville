@@ -101,7 +101,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
           className={`flex items-center ${compact ? "mt-0 justify-center gap-2 sm:mt-1 sm:justify-between sm:gap-3" : "mt-1 justify-between gap-3"}`}
         >
           <span
-            className={`inline-flex rounded-full bg-gold font-inter font-normal tracking-wide text-primary-foreground ${compact ? "px-3 py-1.5 text-sm sm:px-5 sm:py-2 sm:text-lg" : "px-5 py-2 text-lg"}`}
+            className={`text-gold font-inter font-semibold tracking-wide ${compact ? "text-sm sm:text-lg" : "text-lg"}`}
           >
             {brl(carro.preco)}
           </span>
