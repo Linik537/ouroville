@@ -26,6 +26,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
           src={foto}
           alt={`${carTitle(carro)} à venda na Ouroville Motors`}
           loading="lazy"
+          decoding="async"
           className={`h-full w-full transition duration-500 group-hover:scale-105 ${compact ? "object-contain sm:object-cover" : "object-cover"}`}
         />
         {carro.destaque && (

@@ -76,6 +76,7 @@ function Home() {
           width={1920}
           height={1088}
           fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background/95" />

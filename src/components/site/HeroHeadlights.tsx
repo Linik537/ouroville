@@ -19,48 +19,71 @@ const LIGHTS = [
  * scroll threshold (down past 10px, or back up past 300px).
  */
 export function HeroHeadlights() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [flash, setFlash] = useState(0);
+  const flashRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<Animation | null>(null);
   const belowRef = useRef(false);
   const aboveRef = useRef(true);
   const lastScrollRef = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    const initialY = window.scrollY;
+    belowRef.current = initialY > DOWN_TRIGGER_PX;
+    aboveRef.current = initialY < UP_TRIGGER_PX;
+    lastScrollRef.current = initialY;
+    let frame = 0;
+
+    const flash = () => {
+      const layer = flashRef.current;
+      if (!layer) return;
+      animationRef.current?.cancel();
+      animationRef.current = layer.animate(
+        [
+          { opacity: 0, offset: 0 },
+          { opacity: 1, offset: 0.08 },
+          { opacity: 0, offset: 0.22 },
+          { opacity: 1, offset: 0.36 },
+          { opacity: 0, offset: 0.55 },
+          { opacity: 0, offset: 1 },
+        ],
+        { duration: 800, easing: "ease-in-out", fill: "both" },
+      );
+    };
+
+    const evaluateScroll = () => {
+      frame = 0;
+      const y = window.scrollY;
       const nowBelow = y > DOWN_TRIGGER_PX;
       const nowAbove = y < UP_TRIGGER_PX;
 
-      if (nowBelow && !belowRef.current && y > lastScrollRef.current) {
-        setFlash((f) => f + 1);
-      }
-      if (nowAbove && !aboveRef.current && y < lastScrollRef.current) {
-        setFlash((f) => f + 1);
-      }
+      if (nowBelow && !belowRef.current && y > lastScrollRef.current) flash();
+      if (nowAbove && !aboveRef.current && y < lastScrollRef.current) flash();
 
       belowRef.current = nowBelow;
       aboveRef.current = nowAbove;
       lastScrollRef.current = y;
     };
 
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(evaluateScroll);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+      animationRef.current?.cancel();
+    };
   }, []);
 
-  useEffect(() => {
-    if (flash === 0) return;
-    const t = setTimeout(() => setFlash(0), 900);
-    return () => clearTimeout(t);
-  }, [flash]);
-
   return (
-    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <CoverBox>
-        {flash > 0 &&
-          LIGHTS.map((l, i) => (
+        <div ref={flashRef} className="hero-headlights-flash absolute inset-0">
+          {LIGHTS.map((l, i) => (
             <div
-              key={`${flash}-${i}`}
+              key={i}
               className="hero-headlight absolute rounded-full"
               style={{
                 left: `${l.left * 100}%`,
@@ -71,6 +94,7 @@ export function HeroHeadlights() {
               }}
             />
           ))}
+        </div>
       </CoverBox>
     </div>
   );

@@ -272,6 +272,7 @@ function Detalhe() {
               src={fotos[ativa] ?? fotos[0]}
               alt={`${carTitle(carro)} - foto ${ativa + 1}`}
               loading={ativa === 0 ? "eager" : "lazy"}
+              decoding="async"
               className="car-gallery-fade absolute inset-0 h-full w-full object-cover"
             />
           </div>
@@ -305,7 +306,7 @@ function Detalhe() {
                   aria-label={`Ver foto ${i + 1}`}
                   className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
                 >
-                  <img src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" className="h-full w-full object-cover" />
+                  <img src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                 </button>
                 );
               })}
