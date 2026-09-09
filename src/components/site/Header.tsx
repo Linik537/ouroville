@@ -12,6 +12,10 @@ const nav = [
   { to: "/financie", label: "FINANCIE" },
 ] as const;
 
+function scrollToPageTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}
+
 export function Header() {
   const [open, setOpen] = useState(false);
   const { message, carId } = useWhatsAppContext();
@@ -21,7 +25,7 @@ export function Header() {
     <div className="sticky top-0 z-50">
       <header className="border-b border-border/60 bg-background/95 backdrop-blur">
         <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-3" aria-label={`${SITE.name} : página inicial`}>
+          <Link to="/" onClick={scrollToPageTop} className="flex items-center gap-3" aria-label={`${SITE.name} : página inicial`}>
             <img src={logo} alt={`Logo ${SITE.name}`} className="h-14 w-14 rounded-md object-cover sm:h-16 sm:w-16" />
             <span className="hidden items-baseline gap-1 sm:flex">
               <span className="font-brand-primary text-2xl text-gold sm:text-3xl">Ouroville</span>
@@ -34,6 +38,7 @@ export function Header() {
               <Link
                 key={n.to}
                 to={n.to}
+                onClick={n.to === "/estoque" ? scrollToPageTop : undefined}
                 className="rounded-md px-3 py-2 text-xl font-display font-semibold uppercase tracking-widest text-white transition hover:text-primary"
                 activeProps={{ className: "text-primary" }}
               >
@@ -79,7 +84,10 @@ export function Header() {
               <Link
                 key={n.to}
                 to={n.to}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  if (n.to === "/estoque") scrollToPageTop();
+                }}
                 className="block rounded-md px-2 py-3 text-lg font-display font-medium uppercase tracking-wide text-white"
               >
                 {n.label}

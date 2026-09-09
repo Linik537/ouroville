@@ -197,7 +197,6 @@
 .hero-headlights-flash {
   contain: paint;
   opacity: 0;
-  transform: translateZ(0);
   will-change: opacity;
 }
 
@@ -207,15 +206,6 @@
     0 0 12px 4px rgba(255, 255, 255, 0.95),
     0 0 40px 16px rgba(255, 255, 255, 0.55),
     0 0 90px 36px rgba(255, 255, 255, 0.28);
-}
-
-@media (pointer: coarse) {
-  .hero-headlight {
-    box-shadow:
-      0 0 8px 3px rgba(255, 255, 255, 0.9),
-      0 0 28px 10px rgba(255, 255, 255, 0.48),
-      0 0 52px 18px rgba(255, 255, 255, 0.2);
-  }
 }
 
 @keyframes car-gallery-fade-in {

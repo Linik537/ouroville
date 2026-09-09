@@ -3,11 +3,12 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
@@ -132,6 +133,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <WhatsAppProvider>
+        <ScrollToTop />
         <SmoothScroll />
         <div className="flex min-h-screen flex-col bg-background">
           <Header />
@@ -148,4 +150,17 @@ function RootComponent() {
       </WhatsAppProvider>
     </QueryClientProvider>
   );
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
 }

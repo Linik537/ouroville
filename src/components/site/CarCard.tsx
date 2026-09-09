@@ -19,9 +19,9 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
         ano: String(carro.ano),
         id: String(carro.id),
       }}
-      className="group flex flex-col overflow-hidden rounded-[28px] border border-[#d4a64a]/80 bg-card shadow-[0_0_0_1px_rgba(212,166,74,0.18)] transition duration-200 hover:-translate-y-0.5 hover:border-[#e8bf60] sm:bg-[#17130d]"
+      className="group flex flex-col overflow-hidden rounded-[28px] bg-card transition duration-200 hover:-translate-y-0.5 sm:bg-[#17130d]"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] border border-border bg-muted">
         <img
           src={foto}
           alt={`${carTitle(carro)} à venda na Ouroville Motors`}
@@ -36,7 +36,7 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
         )}
       </div>
 
-      <div className={`flex flex-1 flex-col ${compact ? "gap-2 px-3 pb-3 pt-2 sm:gap-3 sm:px-4 sm:pb-4 sm:pt-3" : "gap-3 px-4 pb-4 pt-3"}`}>
+      <div className={`flex flex-1 flex-col rounded-b-[28px] border border-t-0 border-[#d4a64a]/80 shadow-[0_0_0_1px_rgba(212,166,74,0.18)] transition group-hover:border-[#e8bf60] ${compact ? "gap-2 px-3 pb-3 pt-2 sm:gap-3 sm:px-4 sm:pb-4 sm:pt-3" : "gap-3 px-4 pb-4 pt-3"}`}>
         <h3 className={`font-oswald font-semibold leading-none tracking-[0.02em] text-foreground ${compact ? "text-[18px] sm:text-[22px]" : "text-[22px]"}`}>
           <span className="text-white">{formatCarName(carro.marca)}</span>{" "}
           <span className="text-gold">{formatCarName(carro.modelo)}</span>
