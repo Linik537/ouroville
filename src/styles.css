@@ -170,6 +170,28 @@ img {
   pointer-events: none;
 }
 
+.gold-outline {
+  position: relative;
+}
+
+.gold-outline::before {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(90deg, oklch(0.62 0.12 68), oklch(0.88 0.14 90));
+  content: "";
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
 @media (pointer: coarse) {
   .gold-glow::before {
     inset: -2px;

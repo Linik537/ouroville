@@ -139,7 +139,7 @@ function Detalhe() {
   }
 
   function moverGaleria(direcao: -1 | 1) {
-    const proxima = (ativa + direcao + fotos.length) % fotos.length;
+    const proxima = (ativaRef.current + direcao + fotos.length) % fotos.length;
     inicioMiniaturasRef.current = Math.min(
       Math.max(0, proxima - 2),
       Math.max(0, fotos.length - Math.min(5, fotos.length)),
@@ -316,9 +316,8 @@ function Detalhe() {
                 <button
                   type="button"
                   onClick={() => moverGaleria(-1)}
-                  aria-label="Ver fotos anteriores"
-                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
-                  disabled={inicioMiniaturas === 0}
+                  aria-label="Ver foto anterior"
+                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary"
                 >
                   &#8249;
                 </button>
@@ -355,9 +354,8 @@ function Detalhe() {
                 <button
                   type="button"
                   onClick={() => moverGaleria(1)}
-                  aria-label="Ver próximas fotos"
-                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary disabled:opacity-40"
-                  disabled={inicioMiniaturas + janelaMiniaturas >= fotos.length}
+                  aria-label="Ver próxima foto"
+                  className="flex h-20 w-8 shrink-0 items-center justify-center rounded-md border border-border text-xl text-foreground transition hover:border-primary hover:text-primary"
                 >
                   &#8250;
                 </button>
@@ -403,17 +401,18 @@ function Detalhe() {
           </a>
           <a
             href="tel:34998290394"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-semibold text-white transition hover:border-white/60"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-medium text-white transition hover:border-white/60"
           >
-            <Phone className="h-5 w-5" aria-hidden /> Ligar para a concessionária
+            <Phone className="h-5 w-5" strokeWidth={1.75} aria-hidden /> Ligar para a concessionária
           </a>
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-semibold text-white transition hover:border-white/60"
+            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-medium text-white transition hover:border-white/60"
           >
-            <MapPin className="h-5 w-5" aria-hidden /> Onde estamos - Ouroville Motors
+            <MapPin className="h-5 w-5" strokeWidth={1.75} aria-hidden /> Onde estamos - Ouroville
+            Motors
           </a>
         </aside>
 
@@ -430,7 +429,7 @@ function Detalhe() {
       <div className="mt-12 text-center">
         <Link
           to="/estoque"
-          className="inline-flex h-12 items-center gap-2 rounded-full border border-border/70 bg-transparent px-8 text-base font-semibold text-white transition hover:border-white/60"
+          className="gold-outline inline-flex h-12 items-center gap-2 rounded-full bg-transparent px-8 text-base font-semibold text-white transition"
         >
           Ver o estoque completo
         </Link>
