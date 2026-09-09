@@ -10,6 +10,10 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
   const anoCompleto = `${carro.ano}${carro.ano_modelo ? `/${carro.ano_modelo}` : ""}`;
   const kmCompacta = quilometragem == null ? "-" : quilometragem < 1000 ? `${quilometragem} km` : `${Math.round(quilometragem / 1000)}k km`;
 
+  const scrollToPageTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+
   return (
     <Link
       to="/carros/$marca/$modelo/$ano/$id"
@@ -19,6 +23,8 @@ export function CarCard({ carro, compact = false }: { carro: Carro; compact?: bo
         ano: String(carro.ano),
         id: String(carro.id),
       }}
+      onClick={scrollToPageTop}
+      resetScroll
       className="group flex flex-col overflow-hidden rounded-[28px] bg-card transition duration-200 hover:-translate-y-0.5 sm:bg-[#17130d]"
     >
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-[28px] border border-border bg-muted">
