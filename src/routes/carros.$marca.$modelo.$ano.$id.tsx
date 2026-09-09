@@ -11,7 +11,7 @@ import {
   Phone,
   Zap,
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
 import {
   carTitle,
@@ -88,8 +88,27 @@ function Detalhe() {
   const inicioMiniaturasRef = useRef(0);
   const faixaMiniaturasRef = useRef<HTMLDivElement | null>(null);
 
-  const fotos = carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR];
+  const fotos = useMemo(
+    () => (carro?.fotos?.length ? carro.fotos : [PLACEHOLDER_CAR]),
+    [carro?.fotos],
+  );
   const janelaMiniaturas = Math.min(maxMiniaturasVisiveis, fotos.length);
+
+  useEffect(() => {
+    const imagensPrecarregadas = fotos.map((src) => {
+      const imagem = new Image();
+      imagem.loading = "eager";
+      imagem.decoding = "async";
+      imagem.src = src;
+      return imagem;
+    });
+
+    return () => {
+      imagensPrecarregadas.forEach((imagem) => {
+        imagem.src = "";
+      });
+    };
+  }, [fotos]);
 
   useEffect(() => {
     ativaRef.current = ativa;
