@@ -153,10 +153,10 @@ function Home() {
             Ver todo estoque
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
           {isLoading
             ? Array.from({ length: 3 }).map((_, i) => <CarCardSkeleton key={i} />)
-            : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
+            : (data ?? []).map((c) => <CarCard key={c.id} carro={c} compact />)}
         </div>
         {!isLoading && (data ?? []).length > 0 && (
           <div className="mt-10 text-center">
