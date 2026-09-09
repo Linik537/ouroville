@@ -22,11 +22,22 @@ export function Header() {
     <div className="sticky top-0 z-50">
       <header className="border-b border-border/60 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center gap-4 px-4 sm:px-6">
-          <Link to="/" onClick={scrollToPageTop} className="flex items-center gap-3" aria-label={`${SITE.name} : página inicial`}>
-            <img src={logo} alt={`Logo ${SITE.name}`} className="h-14 w-14 object-contain sm:h-16 sm:w-16" />
+          <Link
+            to="/"
+            onClick={scrollToPageTop}
+            className="flex items-center gap-3"
+            aria-label={`${SITE.name} : página inicial`}
+          >
+            <img
+              src={logo}
+              alt={`Logo ${SITE.name}`}
+              className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+            />
             <span className="hidden items-baseline gap-1 sm:flex">
               <span className="font-brand-primary text-2xl text-gold sm:text-3xl">Ouroville</span>
-              <span className="font-brand-secondary text-2xl text-foreground sm:text-3xl">Motors</span>
+              <span className="font-brand-secondary text-2xl text-foreground sm:text-3xl">
+                Motors
+              </span>
             </span>
           </Link>
 
@@ -55,7 +66,9 @@ export function Header() {
 
           <a
             href={whatsappLink(activeMessage)}
-            onClick={() => { if (carId) void trackAnalyticsEvent("whatsapp_click", carId); }}
+            onClick={() => {
+              if (carId) void trackAnalyticsEvent("whatsapp_click", carId);
+            }}
             target="_blank"
             rel="noopener noreferrer"
             className="gold-glow ml-auto inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-base font-semibold text-black transition hover:brightness-110 md:ml-0"

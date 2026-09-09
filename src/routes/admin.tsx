@@ -5,7 +5,12 @@ import { toast } from "sonner";
 import { brl } from "@/lib/site";
 import { supabase, type Carro } from "@/lib/supabase";
 import { analisarFontePlanilha, type ImportacaoCarro } from "@/lib/spreadsheet";
-import { calcularAreaCrop, DEFAULT_CROP, prepararImagem, type CropSettings } from "@/lib/image-editor";
+import {
+  calcularAreaCrop,
+  DEFAULT_CROP,
+  prepararImagem,
+  type CropSettings,
+} from "@/lib/image-editor";
 import { NumberInput } from "@/components/site/NumberInput";
 import { ResilientImage } from "@/components/site/ResilientImage";
 
@@ -20,7 +25,10 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Painel administrativo : Ouroville Motors" },
-      { name: "description", content: "Área restrita de gestão de estoque e leads da Ouroville Motors." },
+      {
+        name: "description",
+        content: "Área restrita de gestão de estoque e leads da Ouroville Motors.",
+      },
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "Painel administrativo : Ouroville Motors" },
       { property: "og:description", content: "Área restrita." },
@@ -32,7 +40,17 @@ export const Route = createFileRoute("/admin")({
 const inputCls =
   "w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-primary";
 
-function CropPreview({ src, crop, ratio, className }: { src: string; crop: CropSettings; ratio: number; className?: string }) {
+function CropPreview({
+  src,
+  crop,
+  ratio,
+  className,
+}: {
+  src: string;
+  crop: CropSettings;
+  ratio: number;
+  className?: string;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -42,7 +60,12 @@ function CropPreview({ src, crop, ratio, className }: { src: string; crop: CropS
     image.onload = () => {
       const context = canvas.getContext("2d");
       if (!context) return;
-      const width = Math.max(1, Math.round(canvas.getBoundingClientRect().width * Math.min(window.devicePixelRatio || 1, 2)));
+      const width = Math.max(
+        1,
+        Math.round(
+          canvas.getBoundingClientRect().width * Math.min(window.devicePixelRatio || 1, 2),
+        ),
+      );
       const height = Math.max(1, Math.round(width / ratio));
       canvas.width = width;
       canvas.height = height;
@@ -52,7 +75,9 @@ function CropPreview({ src, crop, ratio, className }: { src: string; crop: CropS
       context.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, width, height);
     };
     image.src = src;
-    return () => { image.onload = null; };
+    return () => {
+      image.onload = null;
+    };
   }, [src, crop, ratio]);
 
   return <canvas ref={canvasRef} className={className} style={{ aspectRatio: ratio }} />;
@@ -63,7 +88,9 @@ async function baixarImagemComRetry(url: string) {
   for (let tentativa = 0; tentativa < 4; tentativa += 1) {
     try {
       const separador = url.includes("?") ? "&" : "?";
-      const resposta = await fetch(tentativa === 0 ? url : `${url}${separador}retry=${tentativa}`, { cache: "no-store" });
+      const resposta = await fetch(tentativa === 0 ? url : `${url}${separador}retry=${tentativa}`, {
+        cache: "no-store",
+      });
       if (resposta.ok) return resposta;
       ultimoErro = new Error(`HTTP ${resposta.status}`);
       if (resposta.status < 500 || tentativa === 3) break;
@@ -73,7 +100,9 @@ async function baixarImagemComRetry(url: string) {
     }
     await new Promise((resolve) => window.setTimeout(resolve, [400, 900, 1_800][tentativa]));
   }
-  throw new Error(`Não foi possível abrir esta imagem${ultimoErro ? `: ${ultimoErro.message}` : "."}`);
+  throw new Error(
+    `Não foi possível abrir esta imagem${ultimoErro ? `: ${ultimoErro.message}` : "."}`,
+  );
 }
 
 function Admin() {
@@ -91,7 +120,8 @@ function Admin() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (carregando) return <div className="p-16 text-center text-sm text-muted-foreground">Carregando...</div>;
+  if (carregando)
+    return <div className="p-16 text-center text-sm text-muted-foreground">Carregando...</div>;
   if (!userId) return <Login />;
   return <Painel />;
 }
@@ -112,10 +142,22 @@ function Login() {
   return (
     <div className="mx-auto max-w-sm px-4 py-24">
       <h1 className="text-2xl font-bold text-foreground">Painel administrativo</h1>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4 rounded-xl border border-border/70 bg-card p-6">
-        <label className="block text-xs text-muted-foreground">E-mail<input name="email" type="email" required className={inputCls} /></label>
-        <label className="block text-xs text-muted-foreground">Senha<input name="senha" type="password" required className={inputCls} /></label>
-        <button disabled={loading} className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+      <form
+        onSubmit={onSubmit}
+        className="mt-6 space-y-4 rounded-xl border border-border/70 bg-card p-6"
+      >
+        <label className="block text-xs text-muted-foreground">
+          E-mail
+          <input name="email" type="email" required className={inputCls} />
+        </label>
+        <label className="block text-xs text-muted-foreground">
+          Senha
+          <input name="senha" type="password" required className={inputCls} />
+        </label>
+        <button
+          disabled={loading}
+          className="w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+        >
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
@@ -124,8 +166,20 @@ function Login() {
 }
 
 const vazio = {
-  marca: "", modelo: "", versao: "", ano: "", ano_modelo: "", preco: "", quilometragem: "",
-  combustivel: "Flex", cambio: "Automático", cor: "", motor: "", tracao: "", descricao: "", destaque: "",
+  marca: "",
+  modelo: "",
+  versao: "",
+  ano: "",
+  ano_modelo: "",
+  preco: "",
+  quilometragem: "",
+  combustivel: "Flex",
+  cambio: "Automático",
+  cor: "",
+  motor: "",
+  tracao: "",
+  descricao: "",
+  destaque: "",
 };
 
 function Painel() {
@@ -144,7 +198,10 @@ function Painel() {
   const [planilha, setPlanilha] = useState<File | null>(null);
   const [urlPlanilha, setUrlPlanilha] = useState("");
   const [importando, setImportando] = useState(false);
-  const [resultadoImportacao, setResultadoImportacao] = useState<{ total: number; erros: string[] } | null>(null);
+  const [resultadoImportacao, setResultadoImportacao] = useState<{
+    total: number;
+    erros: string[];
+  } | null>(null);
   const [novidadesIds, setNovidadesIds] = useState<number[] | null>(null);
   const [carroParaNovidades, setCarroParaNovidades] = useState("");
   const [salvandoNovidades, setSalvandoNovidades] = useState(false);
@@ -160,7 +217,10 @@ function Painel() {
   const carros = useQuery({
     queryKey: ["admin", "carros"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("carros").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("carros")
+        .select("*")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Carro[];
     },
@@ -183,13 +243,22 @@ function Painel() {
 
   useEffect(() => {
     if (!carros.data || novidadesIds !== null) return;
-    const possuiConfiguracao = carros.data.some((carro) => typeof carro.mostrar_novidades === "boolean");
+    const possuiConfiguracao = carros.data.some(
+      (carro) => typeof carro.mostrar_novidades === "boolean",
+    );
     const selecionados = possuiConfiguracao
       ? carros.data
           .filter((carro) => carro.mostrar_novidades)
-          .sort((a, b) => (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) - (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER))
+          .sort(
+            (a, b) =>
+              (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) -
+              (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER),
+          )
           .map((carro) => carro.id)
-      : carros.data.filter((carro) => carro.status === "disponivel").slice(0, 6).map((carro) => carro.id);
+      : carros.data
+          .filter((carro) => carro.status === "disponivel")
+          .slice(0, 6)
+          .map((carro) => carro.id);
     setNovidadesIds(selecionados);
   }, [carros.data, novidadesIds]);
 
@@ -199,10 +268,19 @@ function Painel() {
     const paths: string[] = [];
     try {
       for (const file of files) {
-        const extensaoOriginal = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
-        const extensao = extensaoOriginal && ["jpg", "jpeg", "png", "webp"].includes(extensaoOriginal)
-          ? extensaoOriginal
-          : file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+        const extensaoOriginal = file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "");
+        const extensao =
+          extensaoOriginal && ["jpg", "jpeg", "png", "webp"].includes(extensaoOriginal)
+            ? extensaoOriginal
+            : file.type === "image/png"
+              ? "png"
+              : file.type === "image/webp"
+                ? "webp"
+                : "jpg";
         const path = `${Date.now()}-${crypto.randomUUID()}.${extensao}`;
         paths.push(path);
         let ultimoErro: Error | null = null;
@@ -219,12 +297,17 @@ function Painel() {
           }
 
           ultimoErro = new Error(error.message);
-          const falhaTemporaria = /(?:http\s*)?5\d\d|timeout|network|fetch|temporar/i.test(error.message);
+          const falhaTemporaria = /(?:http\s*)?5\d\d|timeout|network|fetch|temporar/i.test(
+            error.message,
+          );
           if (!falhaTemporaria || tentativa === 3) break;
           await new Promise((resolve) => window.setTimeout(resolve, [400, 900, 1800][tentativa]));
         }
 
-        if (ultimoErro) throw new Error(`Não foi possível enviar a foto "${file.name}" após novas tentativas: ${ultimoErro.message}`);
+        if (ultimoErro)
+          throw new Error(
+            `Não foi possível enviar a foto "${file.name}" após novas tentativas: ${ultimoErro.message}`,
+          );
         urls.push(supabase.storage.from("carros").getPublicUrl(path).data.publicUrl);
       }
       return urls;
@@ -252,11 +335,17 @@ function Painel() {
         return;
       }
 
-      setArquivos((atuais) => atuais.map((arquivo, indice) => (indice === indiceAtual ? processada : arquivo)));
+      setArquivos((atuais) =>
+        atuais.map((arquivo, indice) => (indice === indiceAtual ? processada : arquivo)),
+      );
       const proximoIndice = indiceAtual < arquivos.length - 1 ? indiceAtual + 1 : indiceAtual;
       setEditorIndex(proximoIndice);
       setCrop({ ...DEFAULT_CROP });
-      toast.success(indiceAtual < arquivos.length - 1 ? "Foto preparada. Agora ajuste a próxima." : "Foto preparada em WebP e pronta para salvar.");
+      toast.success(
+        indiceAtual < arquivos.length - 1
+          ? "Foto preparada. Agora ajuste a próxima."
+          : "Foto preparada em WebP e pronta para salvar.",
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível preparar as fotos.");
     } finally {
@@ -296,10 +385,13 @@ function Painel() {
       };
       if (editId) {
         const atual = carros.data?.find((c) => c.id === editId);
-        const urlsEditadas = substituicoesPendentes.reduce<Record<string, string>>((mapa, [foto], index) => {
-          if (fotosEditadas[index]) mapa[foto] = fotosEditadas[index];
-          return mapa;
-        }, {});
+        const urlsEditadas = substituicoesPendentes.reduce<Record<string, string>>(
+          (mapa, [foto], index) => {
+            if (fotosEditadas[index]) mapa[foto] = fotosEditadas[index];
+            return mapa;
+          },
+          {},
+        );
         const fotos = (atual?.fotos ?? []).map((foto) => urlsEditadas[foto] ?? foto).concat(novas);
         const { data: carroAtualizado, error } = await supabase.rpc("admin_update_car", {
           _car_id: editId,
@@ -313,7 +405,9 @@ function Painel() {
         qc.setQueryData(["carro", String(editId)], carroAtualizado as Carro);
         await Promise.all(Object.keys(urlsEditadas).map((foto) => removerArquivoStorage(foto)));
       } else {
-        const { error } = await supabase.from("carros").insert({ ...payload, fotos: novas, status: "disponivel" });
+        const { error } = await supabase
+          .from("carros")
+          .insert({ ...payload, fotos: novas, status: "disponivel" });
         if (error) throw error;
         bancoConfirmou = true;
       }
@@ -378,7 +472,9 @@ function Painel() {
   }
 
   async function salvarConfiguracaoNovidades() {
-    const ids = (novidadesIds ?? []).filter((id) => carros.data?.some((carro) => carro.id === id && carro.status === "disponivel"));
+    const ids = (novidadesIds ?? []).filter((id) =>
+      carros.data?.some((carro) => carro.id === id && carro.status === "disponivel"),
+    );
     setSalvandoNovidades(true);
     try {
       const { error } = await supabase.rpc("admin_set_latest_cars", { _car_ids: ids });
@@ -386,18 +482,25 @@ function Painel() {
       qc.setQueryData<Carro[]>(["admin", "carros"], (atuais) =>
         atuais?.map((carro) => {
           const posicao = ids.indexOf(carro.id);
-          return { ...carro, mostrar_novidades: posicao >= 0, ordem_novidades: posicao >= 0 ? posicao + 1 : null };
+          return {
+            ...carro,
+            mostrar_novidades: posicao >= 0,
+            ordem_novidades: posicao >= 0 ? posicao + 1 : null,
+          };
         }),
       );
       setNovidadesIds(ids);
       await qc.invalidateQueries({ queryKey: ["carros"] });
       toast.success("Últimas Novidades atualizadas.");
     } catch (error) {
-      const mensagem = error instanceof Error ? error.message : "Não foi possível salvar a seleção.";
+      const mensagem =
+        error instanceof Error ? error.message : "Não foi possível salvar a seleção.";
       const migrationPendente = /admin_set_latest_cars|schema cache|could not find/i.test(mensagem);
-      toast.error(migrationPendente
-        ? "A atualização do banco ainda não foi aplicada. Execute a migration de Últimas Novidades no Supabase."
-        : mensagem);
+      toast.error(
+        migrationPendente
+          ? "A atualização do banco ainda não foi aplicada. Execute a migration de Últimas Novidades no Supabase."
+          : mensagem,
+      );
     } finally {
       setSalvandoNovidades(false);
     }
@@ -485,7 +588,9 @@ function Painel() {
       await atualizarFotosDoCarro(c, fotos);
       toast.success("Ordem das fotos atualizada.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível alterar a ordem das fotos.");
+      toast.error(
+        error instanceof Error ? error.message : "Não foi possível alterar a ordem das fotos.",
+      );
     }
   }
 
@@ -510,7 +615,10 @@ function Painel() {
     try {
       const resultado = await analisarFontePlanilha(planilha ?? undefined, urlPlanilha);
       if (!resultado.carros.length) {
-        setResultadoImportacao({ total: 0, erros: resultado.erros.length ? resultado.erros : ["Nenhum carro válido foi encontrado."] });
+        setResultadoImportacao({
+          total: 0,
+          erros: resultado.erros.length ? resultado.erros : ["Nenhum carro válido foi encontrado."],
+        });
         return;
       }
       const registros = resultado.carros.map((carro: ImportacaoCarro) => ({
@@ -536,7 +644,9 @@ function Painel() {
       setUrlPlanilha("");
       qc.invalidateQueries({ queryKey: ["admin", "carros"] });
       qc.invalidateQueries({ queryKey: ["carros"] });
-      toast.success(`${registros.length} carro(s) importado(s). Agora adicione as imagens pela edição.`);
+      toast.success(
+        `${registros.length} carro(s) importado(s). Agora adicione as imagens pela edição.`,
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível importar a planilha.");
     } finally {
@@ -547,10 +657,20 @@ function Painel() {
   function editar(c: Carro) {
     setEditId(c.id);
     setForm({
-      marca: c.marca, modelo: c.modelo, versao: c.versao ?? "", ano: String(c.ano),
-      ano_modelo: c.ano_modelo ? String(c.ano_modelo) : "", preco: c.preco ? String(c.preco) : "",
-      quilometragem: c.quilometragem ? String(c.quilometragem) : "", combustivel: c.combustivel ?? "Flex",
-      cambio: c.cambio ?? "Automático", cor: c.cor ?? "", motor: c.motor ?? "", tracao: c.tracao ?? "", descricao: c.descricao ?? "", destaque: c.destaque ?? "",
+      marca: c.marca,
+      modelo: c.modelo,
+      versao: c.versao ?? "",
+      ano: String(c.ano),
+      ano_modelo: c.ano_modelo ? String(c.ano_modelo) : "",
+      preco: c.preco ? String(c.preco) : "",
+      quilometragem: c.quilometragem ? String(c.quilometragem) : "",
+      combustivel: c.combustivel ?? "Flex",
+      cambio: c.cambio ?? "Automático",
+      cor: c.cor ?? "",
+      motor: c.motor ?? "",
+      tracao: c.tracao ?? "",
+      descricao: c.descricao ?? "",
+      destaque: c.destaque ?? "",
     });
     setArquivos([]);
     setArquivoInputKey((key) => key + 1);
@@ -594,15 +714,21 @@ function Painel() {
     <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Painel administrativo</h1>
-        <button onClick={() => supabase.auth.signOut()} className="rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:text-primary">
+        <button
+          onClick={() => supabase.auth.signOut()}
+          className="rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:text-primary"
+        >
           Sair
         </button>
       </div>
 
       <div className="mt-6 flex gap-2">
         {(["estoque", "analytics"] as const).map((a) => (
-          <button key={a} onClick={() => setAba(a)}
-            className={`rounded-full px-4 py-2 text-sm font-medium ${aba === a ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>
+          <button
+            key={a}
+            onClick={() => setAba(a)}
+            className={`rounded-full px-4 py-2 text-sm font-medium ${aba === a ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}
+          >
             {a === "estoque" ? "Estoque" : "Métricas"}
           </button>
         ))}
@@ -615,14 +741,20 @@ function Painel() {
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Importar estoque</h2>
                 <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                  Envie Excel/CSV ou use um Google Sheets público. O cabeçalho pode começar em qualquer linha e as linhas vazias serão ignoradas.
+                  Envie Excel/CSV ou use um Google Sheets público. O cabeçalho pode começar em
+                  qualquer linha e as linhas vazias serão ignoradas.
                 </p>
               </div>
-              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">Marca, Modelo e Ano obrigatórios</span>
+              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                Marca, Modelo e Ano obrigatórios
+              </span>
             </div>
             <form
               className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end"
-              onSubmit={(e) => { e.preventDefault(); void importarPlanilha(); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                void importarPlanilha();
+              }}
             >
               <label className="block text-xs text-muted-foreground">
                 Arquivo Excel ou CSV
@@ -635,18 +767,30 @@ function Painel() {
               </label>
               <label className="block text-xs text-muted-foreground">
                 Link público do Google Sheets
-                <input value={urlPlanilha} onChange={(e) => setUrlPlanilha(e.target.value)} placeholder="https://docs.google.com/spreadsheets/d/..." className={inputCls} />
+                <input
+                  value={urlPlanilha}
+                  onChange={(e) => setUrlPlanilha(e.target.value)}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className={inputCls}
+                />
               </label>
-              <button disabled={importando || (!planilha && !urlPlanilha.trim())} className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+              <button
+                disabled={importando || (!planilha && !urlPlanilha.trim())}
+                className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
                 {importando ? "Importando..." : "Importar dados"}
               </button>
             </form>
             {resultadoImportacao && (
               <div className="mt-4 rounded-md border border-border bg-background p-3 text-sm">
-                <p className="text-foreground">{resultadoImportacao.total} carro(s) importado(s).</p>
+                <p className="text-foreground">
+                  {resultadoImportacao.total} carro(s) importado(s).
+                </p>
                 {resultadoImportacao.erros.length > 0 && (
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-destructive">
-                    {resultadoImportacao.erros.slice(0, 8).map((erro) => <li key={erro}>{erro}</li>)}
+                    {resultadoImportacao.erros.slice(0, 8).map((erro) => (
+                      <li key={erro}>{erro}</li>
+                    ))}
                   </ul>
                 )}
               </div>
@@ -658,10 +802,13 @@ function Painel() {
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Últimas Novidades</h2>
                 <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                  Escolha até seis veículos para a página inicial. A ordem abaixo será a ordem exibida no site.
+                  Escolha até seis veículos para a página inicial. A ordem abaixo será a ordem
+                  exibida no site.
                 </p>
               </div>
-              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{novidadesIds?.length ?? 0}/6 selecionados</span>
+              <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                {novidadesIds?.length ?? 0}/6 selecionados
+              </span>
             </div>
 
             <div className="mt-4 space-y-2">
@@ -669,24 +816,70 @@ function Painel() {
                 const carro = carros.data?.find((item) => item.id === id);
                 if (!carro) return null;
                 return (
-                  <div key={id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{indice + 1}</span>
-                    <span className="min-w-0 flex-1 text-sm font-medium text-foreground">{carro.marca} {carro.modelo} {carro.ano}</span>
-                    <button type="button" aria-label="Mover para cima" disabled={indice === 0} onClick={() => moverNovidade(indice, -1)} className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30">↑</button>
-                    <button type="button" aria-label="Mover para baixo" disabled={indice === (novidadesIds?.length ?? 0) - 1} onClick={() => moverNovidade(indice, 1)} className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30">↓</button>
-                    <button type="button" onClick={() => setNovidadesIds((atuais) => atuais?.filter((item) => item !== id) ?? [])} className="rounded-md border border-destructive/60 px-3 py-1 text-xs text-destructive">Remover</button>
+                  <div
+                    key={id}
+                    className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background px-3 py-2"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {indice + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 text-sm font-medium text-foreground">
+                      {carro.marca} {carro.modelo} {carro.ano}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="Mover para cima"
+                      disabled={indice === 0}
+                      onClick={() => moverNovidade(indice, -1)}
+                      className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Mover para baixo"
+                      disabled={indice === (novidadesIds?.length ?? 0) - 1}
+                      onClick={() => moverNovidade(indice, 1)}
+                      className="rounded-md border border-border px-2.5 py-1 text-sm text-foreground disabled:opacity-30"
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNovidadesIds((atuais) => atuais?.filter((item) => item !== id) ?? [])
+                      }
+                      className="rounded-md border border-destructive/60 px-3 py-1 text-xs text-destructive"
+                    >
+                      Remover
+                    </button>
                   </div>
                 );
               })}
-              {(novidadesIds?.length ?? 0) === 0 && <p className="rounded-lg border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">Nenhum carro selecionado.</p>}
+              {(novidadesIds?.length ?? 0) === 0 && (
+                <p className="rounded-lg border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">
+                  Nenhum carro selecionado.
+                </p>
+              )}
             </div>
 
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <select value={carroParaNovidades} onChange={(e) => setCarroParaNovidades(e.target.value)} className={`${inputCls} flex-1`}>
+              <select
+                value={carroParaNovidades}
+                onChange={(e) => setCarroParaNovidades(e.target.value)}
+                className={`${inputCls} flex-1`}
+              >
                 <option value="">Selecione um carro disponível</option>
                 {(carros.data ?? [])
-                  .filter((carro) => carro.status === "disponivel" && !(novidadesIds ?? []).includes(carro.id))
-                  .map((carro) => <option key={carro.id} value={carro.id}>{carro.marca} {carro.modelo} {carro.ano}</option>)}
+                  .filter(
+                    (carro) =>
+                      carro.status === "disponivel" && !(novidadesIds ?? []).includes(carro.id),
+                  )
+                  .map((carro) => (
+                    <option key={carro.id} value={carro.id}>
+                      {carro.marca} {carro.modelo} {carro.ano}
+                    </option>
+                  ))}
               </select>
               <button
                 type="button"
@@ -701,14 +894,21 @@ function Painel() {
               >
                 Adicionar
               </button>
-              <button type="button" disabled={salvandoNovidades} onClick={() => void salvarConfiguracaoNovidades()} className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+              <button
+                type="button"
+                disabled={salvandoNovidades}
+                onClick={() => void salvarConfiguracaoNovidades()}
+                className="rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
                 {salvandoNovidades ? "Salvando..." : "Salvar seleção"}
               </button>
             </div>
           </section>
 
           <form onSubmit={salvar} className="mt-6 rounded-xl border border-border/70 bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground">{editId ? "Editar carro" : "Novo carro"}</h2>
+            <h2 className="text-lg font-semibold text-foreground">
+              {editId ? "Editar carro" : "Novo carro"}
+            </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
@@ -723,19 +923,45 @@ function Painel() {
               {campo("destaque", "Selo (ex: Único dono)")}
               <label className="block text-xs text-muted-foreground">
                 Combustível
-                <select value={form.combustivel} onChange={(e) => setForm((f) => ({ ...f, combustivel: e.target.value }))} className={inputCls}>
-                  {["Flex", "Gasolina", "Diesel", "Elétrico", "Híbrido"].map((o) => <option key={o}>{o}</option>)}
+                <select
+                  value={form.combustivel}
+                  onChange={(e) => setForm((f) => ({ ...f, combustivel: e.target.value }))}
+                  className={inputCls}
+                >
+                  {["Flex", "Gasolina", "Diesel", "Elétrico", "Híbrido"].map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </label>
               <label className="block text-xs text-muted-foreground">
                 Câmbio
-                <select value={form.cambio} onChange={(e) => setForm((f) => ({ ...f, cambio: e.target.value }))} className={inputCls}>
-                  {["Automático", "Manual"].map((o) => <option key={o}>{o}</option>)}
+                <select
+                  value={form.cambio}
+                  onChange={(e) => setForm((f) => ({ ...f, cambio: e.target.value }))}
+                  className={inputCls}
+                >
+                  {["Automático", "Manual"].map((o) => (
+                    <option key={o}>{o}</option>
+                  ))}
                 </select>
               </label>
               <label className="block text-xs text-muted-foreground">
                 Adicionar fotos
-                <input key={arquivoInputKey} type="file" multiple accept="image/*" onChange={(e) => { const selecionadas = Array.from(e.target.files ?? []); setArquivos((atuais) => [...(fotoEditando ? atuais.slice(1) : atuais), ...selecionadas]); setFotoEditando(null); }} className={inputCls} />
+                <input
+                  key={arquivoInputKey}
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    const selecionadas = Array.from(e.target.files ?? []);
+                    setArquivos((atuais) => [
+                      ...(fotoEditando ? atuais.slice(1) : atuais),
+                      ...selecionadas,
+                    ]);
+                    setFotoEditando(null);
+                  }}
+                  className={inputCls}
+                />
               </label>
             </div>
             {arquivos.length > 0 && (
@@ -743,34 +969,121 @@ function Painel() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-foreground">Editor de capa e fotos</p>
-                    <p className="text-xs text-muted-foreground">{fotoEditando ? "Ajuste a imagem existente e salve para substituí-la." : "O ajuste será aplicado às fotos escolhidas no formato 4:3 usado pelo site."}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {fotoEditando
+                        ? "Ajuste a imagem existente e salve para substituí-la."
+                        : "O ajuste será aplicado às fotos escolhidas no formato 4:3 usado pelo site."}
+                    </p>
                   </div>
-                  <span className="text-xs text-muted-foreground">{arquivos.length} foto(s) selecionada(s)</span>
+                  <span className="text-xs text-muted-foreground">
+                    {arquivos.length} foto(s) selecionada(s)
+                  </span>
                 </div>
                 <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
                   <div className="space-y-3">
                     <div>
-                      <p className="mb-1.5 text-xs font-semibold text-foreground">Foto principal (4:3)</p>
+                      <p className="mb-1.5 text-xs font-semibold text-foreground">
+                        Foto principal (4:3)
+                      </p>
                       <div className="overflow-hidden rounded-lg border border-border bg-black">
-                        <CropPreview src={editorPreviewUrl} crop={crop} ratio={4 / 3} className="mx-auto block w-full max-w-2xl" />
+                        <CropPreview
+                          src={editorPreviewUrl}
+                          crop={crop}
+                          ratio={4 / 3}
+                          className="mx-auto block w-full max-w-2xl"
+                        />
                       </div>
                     </div>
                     <div className="max-w-56">
-                      <p className="mb-1.5 text-xs font-semibold text-foreground">Miniatura inferior (7:5)</p>
+                      <p className="mb-1.5 text-xs font-semibold text-foreground">
+                        Miniatura inferior (7:5)
+                      </p>
                       <div className="overflow-hidden rounded-md border border-border bg-black">
-                        <CropPreview src={editorPreviewUrl} crop={crop} ratio={7 / 5} className="block w-full" />
+                        <CropPreview
+                          src={editorPreviewUrl}
+                          crop={crop}
+                          ratio={7 / 5}
+                          className="block w-full"
+                        />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="block text-xs text-muted-foreground">Zoom: {crop.zoom.toFixed(1)}x<input type="range" min="1" max="3" step="0.1" value={crop.zoom} onChange={(e) => setCrop((value) => ({ ...value, zoom: Number(e.target.value) }))} className="w-full accent-primary" /></label>
-                    <label className="block text-xs text-muted-foreground">Horizontal: {crop.offsetX}<input type="range" min="-100" max="100" step="1" value={crop.offsetX} onChange={(e) => setCrop((value) => ({ ...value, offsetX: Number(e.target.value) }))} className="w-full accent-primary" /><span className="mt-1 flex justify-between text-[10px]"><span>Esquerda</span><span>Direita</span></span></label>
-                    <label className="block text-xs text-muted-foreground">Vertical: {crop.offsetY}<input type="range" min="-100" max="100" step="1" value={crop.offsetY} onChange={(e) => setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))} className="w-full accent-primary" /><span className="mt-1 flex justify-between text-[10px]"><span>Topo</span><span>Base</span></span></label>
-                    <p className="rounded-md border border-border bg-card px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">As extremidades dos controles alcançam todo o espaço disponível da imagem original. A miniatura mostra o pequeno recorte adicional aplicado abaixo da foto principal.</p>
+                    <label className="block text-xs text-muted-foreground">
+                      Zoom: {crop.zoom.toFixed(1)}x
+                      <input
+                        type="range"
+                        min="1"
+                        max="3"
+                        step="0.1"
+                        value={crop.zoom}
+                        onChange={(e) =>
+                          setCrop((value) => ({ ...value, zoom: Number(e.target.value) }))
+                        }
+                        className="w-full accent-primary"
+                      />
+                    </label>
+                    <label className="block text-xs text-muted-foreground">
+                      Horizontal: {crop.offsetX}
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={crop.offsetX}
+                        onChange={(e) =>
+                          setCrop((value) => ({ ...value, offsetX: Number(e.target.value) }))
+                        }
+                        className="w-full accent-primary"
+                      />
+                      <span className="mt-1 flex justify-between text-[10px]">
+                        <span>Esquerda</span>
+                        <span>Direita</span>
+                      </span>
+                    </label>
+                    <label className="block text-xs text-muted-foreground">
+                      Vertical: {crop.offsetY}
+                      <input
+                        type="range"
+                        min="-100"
+                        max="100"
+                        step="1"
+                        value={crop.offsetY}
+                        onChange={(e) =>
+                          setCrop((value) => ({ ...value, offsetY: Number(e.target.value) }))
+                        }
+                        className="w-full accent-primary"
+                      />
+                      <span className="mt-1 flex justify-between text-[10px]">
+                        <span>Topo</span>
+                        <span>Base</span>
+                      </span>
+                    </label>
+                    <p className="rounded-md border border-border bg-card px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+                      As extremidades dos controles alcançam todo o espaço disponível da imagem
+                      original. A miniatura mostra o pequeno recorte adicional aplicado abaixo da
+                      foto principal.
+                    </p>
                     <div className="flex flex-wrap gap-2">
-                      {arquivos.map((arquivo, index) => <button type="button" key={`${arquivo.name}-${index}`} onClick={() => selecionarArquivoParaEditar(index)} className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}>{index + 1}. {arquivo.name.slice(0, 14)}</button>)}
+                      {arquivos.map((arquivo, index) => (
+                        <button
+                          type="button"
+                          key={`${arquivo.name}-${index}`}
+                          onClick={() => selecionarArquivoParaEditar(index)}
+                          className={`rounded-md border px-2 py-1 text-xs ${index === editorIndex ? "border-primary text-primary" : "border-border text-muted-foreground"}`}
+                        >
+                          {index + 1}. {arquivo.name.slice(0, 14)}
+                        </button>
+                      ))}
                     </div>
-                    <button type="button" onClick={() => void processarFotosSelecionadas()} disabled={salvando} className="w-full rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60">{salvando ? "Preparando..." : "Aplicar nesta foto e otimizar"}</button>
+                    <button
+                      type="button"
+                      onClick={() => void processarFotosSelecionadas()}
+                      disabled={salvando}
+                      className="w-full rounded-full border border-primary px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 disabled:opacity-60"
+                    >
+                      {salvando ? "Preparando..." : "Aplicar nesta foto e otimizar"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -779,38 +1092,130 @@ function Painel() {
               <div className="mt-4">
                 <p className="text-xs text-muted-foreground">Fotos atuais e novas</p>
                 <div className="mt-2 flex flex-wrap gap-3">
-                  {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map((foto, indice, fotos) => (
-                    <div key={foto} className="relative h-24 w-32 overflow-hidden rounded-md border border-border">
-                      <ResilientImage src={foto} alt="" className="h-full w-full object-cover" />
-                      <span className="absolute left-1 top-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground">{indice + 1}</span>
-                      <div className="absolute inset-x-1 bottom-1 flex gap-1">
-                        <button type="button" onClick={() => void editarFoto(foto)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
-                        <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void definirCapa(carro, foto); }} className="flex-1 rounded bg-primary px-1 py-1 text-[10px] font-semibold text-primary-foreground">Capa</button>
-                        <button type="button" onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void removerFoto(carro, foto); }} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
-                      </div>
-                      <div className="absolute right-1 top-1 flex gap-1">
-                        <button type="button" aria-label="Mover foto para a esquerda" disabled={indice === 0} onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void moverFoto(carro, indice, -1); }} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8592;</button>
-                        <button type="button" aria-label="Mover foto para a direita" disabled={indice === fotos.length - 1} onClick={() => { const carro = carros.data?.find((item) => item.id === editId); if (carro) void moverFoto(carro, indice, 1); }} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8594;</button>
-                      </div>
-                    </div>
-                  ))}
-                  {!fotoEditando && arquivoPreviewUrls.map((preview, indice) => {
-                    const totalAtuais = carros.data?.find((carro) => carro.id === editId)?.fotos?.length ?? 0;
-                    return (
-                      <div key={`${arquivos[indice]?.name}-${indice}`} className="relative h-24 w-32 overflow-hidden rounded-md border border-primary">
-                        <img src={preview} alt={`Nova foto ${indice + 1}`} className="h-full w-full object-cover" />
-                        <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">Nova {totalAtuais + indice + 1}</span>
+                  {(carros.data?.find((carro) => carro.id === editId)?.fotos ?? []).map(
+                    (foto, indice, fotos) => (
+                      <div
+                        key={foto}
+                        className="relative h-24 w-32 overflow-hidden rounded-md border border-border"
+                      >
+                        <ResilientImage src={foto} alt="" className="h-full w-full object-cover" />
+                        <span className="absolute left-1 top-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-foreground">
+                          {indice + 1}
+                        </span>
                         <div className="absolute inset-x-1 bottom-1 flex gap-1">
-                          <button type="button" onClick={() => selecionarArquivoParaEditar(indice)} className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground">Editar</button>
-                          <button type="button" onClick={() => removerArquivoSelecionado(indice)} className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground">Excluir</button>
+                          <button
+                            type="button"
+                            onClick={() => void editarFoto(foto)}
+                            className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const carro = carros.data?.find((item) => item.id === editId);
+                              if (carro) void definirCapa(carro, foto);
+                            }}
+                            className="flex-1 rounded bg-primary px-1 py-1 text-[10px] font-semibold text-primary-foreground"
+                          >
+                            Capa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const carro = carros.data?.find((item) => item.id === editId);
+                              if (carro) void removerFoto(carro, foto);
+                            }}
+                            className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground"
+                          >
+                            Excluir
+                          </button>
                         </div>
                         <div className="absolute right-1 top-1 flex gap-1">
-                          <button type="button" aria-label="Mover nova foto para a esquerda" disabled={indice === 0} onClick={() => moverArquivoSelecionado(indice, -1)} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8592;</button>
-                          <button type="button" aria-label="Mover nova foto para a direita" disabled={indice === arquivoPreviewUrls.length - 1} onClick={() => moverArquivoSelecionado(indice, 1)} className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30">&#8594;</button>
+                          <button
+                            type="button"
+                            aria-label="Mover foto para a esquerda"
+                            disabled={indice === 0}
+                            onClick={() => {
+                              const carro = carros.data?.find((item) => item.id === editId);
+                              if (carro) void moverFoto(carro, indice, -1);
+                            }}
+                            className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30"
+                          >
+                            &#8592;
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Mover foto para a direita"
+                            disabled={indice === fotos.length - 1}
+                            onClick={() => {
+                              const carro = carros.data?.find((item) => item.id === editId);
+                              if (carro) void moverFoto(carro, indice, 1);
+                            }}
+                            className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30"
+                          >
+                            &#8594;
+                          </button>
                         </div>
                       </div>
-                    );
-                  })}
+                    ),
+                  )}
+                  {!fotoEditando &&
+                    arquivoPreviewUrls.map((preview, indice) => {
+                      const totalAtuais =
+                        carros.data?.find((carro) => carro.id === editId)?.fotos?.length ?? 0;
+                      return (
+                        <div
+                          key={`${arquivos[indice]?.name}-${indice}`}
+                          className="relative h-24 w-32 overflow-hidden rounded-md border border-primary"
+                        >
+                          <img
+                            src={preview}
+                            alt={`Nova foto ${indice + 1}`}
+                            className="h-full w-full object-cover"
+                          />
+                          <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                            Nova {totalAtuais + indice + 1}
+                          </span>
+                          <div className="absolute inset-x-1 bottom-1 flex gap-1">
+                            <button
+                              type="button"
+                              onClick={() => selecionarArquivoParaEditar(indice)}
+                              className="flex-1 rounded bg-background px-1 py-1 text-[10px] font-semibold text-foreground"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removerArquivoSelecionado(indice)}
+                              className="rounded bg-destructive px-1 py-1 text-[10px] text-destructive-foreground"
+                            >
+                              Excluir
+                            </button>
+                          </div>
+                          <div className="absolute right-1 top-1 flex gap-1">
+                            <button
+                              type="button"
+                              aria-label="Mover nova foto para a esquerda"
+                              disabled={indice === 0}
+                              onClick={() => moverArquivoSelecionado(indice, -1)}
+                              className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30"
+                            >
+                              &#8592;
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Mover nova foto para a direita"
+                              disabled={indice === arquivoPreviewUrls.length - 1}
+                              onClick={() => moverArquivoSelecionado(indice, 1)}
+                              className="rounded bg-background/90 px-1.5 py-0.5 text-xs text-foreground disabled:opacity-30"
+                            >
+                              &#8594;
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -825,11 +1230,25 @@ function Painel() {
               />
             </label>
             <div className="mt-4 flex gap-3">
-              <button disabled={salvando} className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+              <button
+                disabled={salvando}
+                className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+              >
                 {salvando ? "Salvando..." : editId ? "Salvar alterações" : "Adicionar carro"}
               </button>
               {editId && (
-                <button type="button" onClick={() => { setEditId(null); setForm({ ...vazio }); setArquivos([]); setFotoEditando(null); setSubstituicoes({}); setArquivoInputKey((key) => key + 1); }} className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditId(null);
+                    setForm({ ...vazio });
+                    setArquivos([]);
+                    setFotoEditando(null);
+                    setSubstituicoes({});
+                    setArquivoInputKey((key) => key + 1);
+                  }}
+                  className="rounded-full border border-border px-6 py-2.5 text-sm text-muted-foreground"
+                >
                   Cancelar
                 </button>
               )}
@@ -838,25 +1257,47 @@ function Painel() {
 
           <div className="mt-8 space-y-3">
             {(carros.data ?? []).map((c) => (
-              <div key={c.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-card p-4">
+              <div
+                key={c.id}
+                className="flex flex-wrap items-center gap-3 rounded-lg border border-border/70 bg-card p-4"
+              >
                 <div>
-                  <span className="font-medium text-foreground">{c.marca} {c.modelo} {c.ano}</span>
+                  <span className="font-medium text-foreground">
+                    {c.marca} {c.modelo} {c.ano}
+                  </span>
                   {c.versao?.trim() ? (
                     <p className="mt-0.5 text-xs text-muted-foreground">{c.versao.trim()}</p>
                   ) : (
-                    <p className="mt-0.5 text-xs font-medium text-destructive">Versão não informada</p>
+                    <p className="mt-0.5 text-xs font-medium text-destructive">
+                      Versão não informada
+                    </p>
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground">{brl(c.preco)}</span>
-                <span className={`rounded-full px-3 py-1 text-xs ${c.status === "vendido" ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground"}`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs ${c.status === "vendido" ? "bg-muted text-muted-foreground" : "bg-primary text-primary-foreground"}`}
+                >
                   {c.status === "vendido" ? "Vendido" : "Disponível"}
                 </span>
                 <div className="ml-auto flex gap-2 text-xs">
-                  <button onClick={() => editar(c)} className="rounded-md border border-border px-3 py-1.5 text-muted-foreground hover:text-primary">Editar</button>
-                  <button onClick={() => alternarStatus(c)} className="rounded-md border border-border px-3 py-1.5 text-muted-foreground hover:text-primary">
+                  <button
+                    onClick={() => editar(c)}
+                    className="rounded-md border border-border px-3 py-1.5 text-muted-foreground hover:text-primary"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => alternarStatus(c)}
+                    className="rounded-md border border-border px-3 py-1.5 text-muted-foreground hover:text-primary"
+                  >
                     {c.status === "vendido" ? "Reativar" : "Marcar vendido"}
                   </button>
-                  <button onClick={() => remover(c)} className="rounded-md border border-destructive/60 px-3 py-1.5 text-destructive">Remover</button>
+                  <button
+                    onClick={() => remover(c)}
+                    className="rounded-md border border-destructive/60 px-3 py-1.5 text-destructive"
+                  >
+                    Remover
+                  </button>
                 </div>
               </div>
             ))}
@@ -867,17 +1308,69 @@ function Painel() {
       ) : analytics.isError ? (
         <div className="mt-8 rounded-xl border border-destructive/50 bg-card p-5">
           <p className="font-medium text-destructive">Não foi possível carregar as métricas.</p>
-          <p className="mt-2 text-sm text-muted-foreground">Confirme que a correção de métricas foi executada no Supabase e tente novamente.</p>
-          <button type="button" onClick={() => void analytics.refetch()} className="mt-4 rounded-full border border-border px-4 py-2 text-sm text-foreground">Tentar novamente</button>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Confirme que a correção de métricas foi executada no Supabase e tente novamente.
+          </p>
+          <button
+            type="button"
+            onClick={() => void analytics.refetch()}
+            className="mt-4 rounded-full border border-border px-4 py-2 text-sm text-foreground"
+          >
+            Tentar novamente
+          </button>
         </div>
-      ) : <AnalyticsPanel eventos={analytics.data} carros={carros.data ?? []} />}
+      ) : (
+        <AnalyticsPanel eventos={analytics.data} carros={carros.data ?? []} />
+      )}
     </div>
   );
 }
 
 function AnalyticsPanel({ eventos, carros }: { eventos: AnalyticsSummaryRow[]; carros: Carro[] }) {
-  const total = (tipo: string, carId?: number) => eventos
-    .filter((evento) => evento.event_type === tipo && (carId === undefined || evento.car_id === carId))
-    .reduce((sum, evento) => sum + evento.total, 0);
-  return <div className="mt-6 space-y-6"><div className="grid gap-4 sm:grid-cols-3">{[["Entradas no site", total("site_visit")], ["Visualizações de carros", total("car_view")], ["Interesses via WhatsApp", total("whatsapp_click")]].map(([titulo, valor]) => <div key={String(titulo)} className="rounded-xl border border-border/70 bg-card p-5"><p className="text-sm text-muted-foreground">{titulo}</p><p className="mt-2 text-3xl font-bold text-primary">{valor}</p></div>)}</div><section className="rounded-xl border border-border/70 bg-card p-5"><h2 className="text-lg font-semibold text-foreground">Desempenho por veículo</h2><div className="mt-4 space-y-3">{carros.map((carro) => <div key={carro.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-sm last:border-0"><span className="font-medium text-foreground">{carro.marca} {carro.modelo} {carro.ano}</span><span className="text-muted-foreground">{total("car_view", carro.id)} visualizações · <strong className="text-primary">{total("whatsapp_click", carro.id)} interesses</strong></span></div>)}{carros.length === 0 && <p className="text-sm text-muted-foreground">Nenhum veículo cadastrado.</p>}</div></section></div>;
+  const total = (tipo: string, carId?: number) =>
+    eventos
+      .filter(
+        (evento) => evento.event_type === tipo && (carId === undefined || evento.car_id === carId),
+      )
+      .reduce((sum, evento) => sum + evento.total, 0);
+  return (
+    <div className="mt-6 space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          ["Entradas no site", total("site_visit")],
+          ["Visualizações de carros", total("car_view")],
+          ["Interesses via WhatsApp", total("whatsapp_click")],
+        ].map(([titulo, valor]) => (
+          <div key={String(titulo)} className="rounded-xl border border-border/70 bg-card p-5">
+            <p className="text-sm text-muted-foreground">{titulo}</p>
+            <p className="mt-2 text-3xl font-bold text-primary">{valor}</p>
+          </div>
+        ))}
+      </div>
+      <section className="rounded-xl border border-border/70 bg-card p-5">
+        <h2 className="text-lg font-semibold text-foreground">Desempenho por veículo</h2>
+        <div className="mt-4 space-y-3">
+          {carros.map((carro) => (
+            <div
+              key={carro.id}
+              className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-sm last:border-0"
+            >
+              <span className="font-medium text-foreground">
+                {carro.marca} {carro.modelo} {carro.ano}
+              </span>
+              <span className="text-muted-foreground">
+                {total("car_view", carro.id)} visualizações ·{" "}
+                <strong className="text-primary">
+                  {total("whatsapp_click", carro.id)} interesses
+                </strong>
+              </span>
+            </div>
+          ))}
+          {carros.length === 0 && (
+            <p className="text-sm text-muted-foreground">Nenhum veículo cadastrado.</p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
 }

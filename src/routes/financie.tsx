@@ -8,29 +8,51 @@ export const Route = createFileRoute("/financie")({
       { title: `Financiamento de Veículos em Uberlândia : ${SITE.name}` },
       {
         name: "description",
-        content: "Financie seu carro na Ouroville Motors em Uberlândia: aprovação rápida, taxas competitivas, entrada facilitada e simulação pelo WhatsApp.",
+        content:
+          "Financie seu carro na Ouroville Motors em Uberlândia: aprovação rápida, taxas competitivas, entrada facilitada e simulação pelo WhatsApp.",
       },
-      { name: "keywords", content: "financiamento de carros uberlandia, simular financiamento automotivo, aprovação de credito carro, financiar seminovo uberlandia" },
+      {
+        name: "keywords",
+        content:
+          "financiamento de carros uberlandia, simular financiamento automotivo, aprovação de credito carro, financiar seminovo uberlandia",
+      },
       { property: "og:title", content: `Financiamento de Veículos : ${SITE.name}` },
-      { property: "og:description", content: "Simule seu financiamento pelo WhatsApp com a equipe Ouroville Motors em Uberlândia." },
+      {
+        property: "og:description",
+        content:
+          "Simule seu financiamento pelo WhatsApp com a equipe Ouroville Motors em Uberlândia.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/financie` },
       { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: `Financiamento de Carros : ${SITE.name}` },
-      { name: "twitter:description", content: "Financiamento facilitado para carros novos e seminovos em Uberlândia." },
+      {
+        name: "twitter:description",
+        content: "Financiamento facilitado para carros novos e seminovos em Uberlândia.",
+      },
     ],
-    links: [
-      { rel: "canonical", href: `${SITE.url}/financie` },
-    ],
+    links: [{ rel: "canonical", href: `${SITE.url}/financie` }],
   }),
   component: Financie,
 });
 
 const passos = [
-  { icon: MessageCircle, t: "1. Fale com a gente", d: "Chame no WhatsApp e diga qual veículo te interessa." },
-  { icon: FileCheck2, t: "2. Envie os documentos", d: "RG/CNH, CPF, comprovante de renda e de residência." },
-  { icon: ShieldCheck, t: "3. Aprovação", d: "Consultamos os principais bancos e buscamos a melhor taxa." },
+  {
+    icon: MessageCircle,
+    t: "1. Fale com a gente",
+    d: "Chame no WhatsApp e diga qual veículo te interessa.",
+  },
+  {
+    icon: FileCheck2,
+    t: "2. Envie os documentos",
+    d: "RG/CNH, CPF, comprovante de renda e de residência.",
+  },
+  {
+    icon: ShieldCheck,
+    t: "3. Aprovação",
+    d: "Consultamos os principais bancos e buscamos a melhor taxa.",
+  },
   { icon: Phone, t: "4. Retirada", d: "Assinatura digital e entrega do carro revisado na loja." },
 ];
 
@@ -38,14 +60,14 @@ function Financie() {
   const financialSchema = {
     "@context": "https://schema.org",
     "@type": "FinancialProduct",
-    "name": "Financiamento de Veículos Ouroville Motors",
-    "description": "Financiamento veicular facilitado com os principais bancos em Uberlândia MG.",
-    "provider": {
+    name: "Financiamento de Veículos Ouroville Motors",
+    description: "Financiamento veicular facilitado com os principais bancos em Uberlândia MG.",
+    provider: {
       "@type": "AutoDealer",
-      "name": SITE.name,
-      "telephone": `+${SITE.phoneDigits}`,
+      name: SITE.name,
+      telephone: `+${SITE.phoneDigits}`,
     },
-    "feesAndCommissionsSpecification": "Simulação gratuita e personalizada via WhatsApp.",
+    feesAndCommissionsSpecification: "Simulação gratuita e personalizada via WhatsApp.",
   };
 
   return (
@@ -54,10 +76,12 @@ function Financie() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(financialSchema) }}
       />
-      <h1 className="text-3xl font-bold text-foreground sm:text-4xl">Financiamento sem complicação</h1>
+      <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+        Financiamento sem complicação
+      </h1>
       <p className="mt-4 max-w-2xl text-muted-foreground">
-        Trabalhamos com os principais bancos do país para encontrar a melhor condição para o seu perfil.
-        Entrada a partir de 10%, parcelas em até 60 meses e resposta no mesmo dia.
+        Trabalhamos com os principais bancos do país para encontrar a melhor condição para o seu
+        perfil. Entrada a partir de 10%, parcelas em até 60 meses e resposta no mesmo dia.
       </p>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2">

@@ -1,17 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  CalendarDays,
-  Cog,
-  Fuel,
-  Gauge,
-  GitBranch,
-  MessageCircle,
-  Zap,
-} from "lucide-react";
+import { CalendarDays, Cog, Fuel, Gauge, GitBranch, MessageCircle, Zap } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { brl, formatCarName, km, SITE, whatsappLink } from "@/lib/site";
-import { carTitle, PLACEHOLDER_CAR, supabase, trackAnalyticsEvent, type Carro } from "@/lib/supabase";
+import {
+  carTitle,
+  PLACEHOLDER_CAR,
+  supabase,
+  trackAnalyticsEvent,
+  type Carro,
+} from "@/lib/supabase";
 import { ResilientImage } from "@/components/site/ResilientImage";
 import { useWhatsAppMessage } from "@/components/site/WhatsAppFloater";
 
@@ -32,7 +30,10 @@ export const Route = createFileRoute("/carros/$marca/$modelo/$ano/$id")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "keywords", content: `${nome.toLowerCase()}, comprar ${params.modelo.replace(/-/g, " ")}, ${params.marca.replace(/-/g, " ")} uberlandia, seminovos uberlandia` },
+        {
+          name: "keywords",
+          content: `${nome.toLowerCase()}, comprar ${params.modelo.replace(/-/g, " ")}, ${params.marca.replace(/-/g, " ")} uberlandia, seminovos uberlandia`,
+        },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "product" },
@@ -41,9 +42,7 @@ export const Route = createFileRoute("/carros/$marca/$modelo/$ano/$id")({
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
       ],
-      links: [
-        { rel: "canonical", href: canonicalUrl },
-      ],
+      links: [{ rel: "canonical", href: canonicalUrl }],
     };
   },
   component: Detalhe,
@@ -90,7 +89,10 @@ function Detalhe() {
 
   function trocarFoto(indice: number) {
     if (indice === ativaRef.current) return;
-    if (indice < inicioMiniaturasRef.current || indice >= inicioMiniaturasRef.current + janelaMiniaturas) {
+    if (
+      indice < inicioMiniaturasRef.current ||
+      indice >= inicioMiniaturasRef.current + janelaMiniaturas
+    ) {
       inicioMiniaturasRef.current = Math.min(
         Math.max(0, indice - 2),
         Math.max(0, fotos.length - janelaMiniaturas),
@@ -129,7 +131,9 @@ function Detalhe() {
   const nomeModelo = carro ? formatCarName(carro.modelo) : "";
   const nomeCarro = carro ? `${nomeMarca} ${nomeModelo} ${carro.ano}` : "";
 
-  const mensagemWhatsApp = carro ? `Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.` : null;
+  const mensagemWhatsApp = carro
+    ? `Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.`
+    : null;
   useWhatsAppMessage(mensagemWhatsApp, carro?.id);
 
   useEffect(() => {
@@ -148,8 +152,13 @@ function Detalhe() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold text-foreground">Veículo indisponível</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Este carro já foi vendido ou não está mais no estoque.</p>
-        <Link to="/estoque" className="mt-6 inline-block rounded-full bg-gold px-6 py-3 text-sm font-semibold text-white">
+        <p className="mt-2 text-sm text-muted-foreground">
+          Este carro já foi vendido ou não está mais no estoque.
+        </p>
+        <Link
+          to="/estoque"
+          className="mt-6 inline-block rounded-full bg-gold px-6 py-3 text-sm font-semibold text-white"
+        >
           Ver estoque
         </Link>
       </div>
@@ -173,47 +182,45 @@ function Detalhe() {
   const carSchema = {
     "@context": "https://schema.org",
     "@type": "Car",
-    "name": nomeCarro,
-    "brand": {
+    name: nomeCarro,
+    brand: {
       "@type": "Brand",
-      "name": nomeMarca,
+      name: nomeMarca,
     },
-    "model": nomeModelo,
-    "vehicleModelDate": String(carro.ano),
-    "fuelType": carro.combustivel || undefined,
-    "vehicleTransmission": carro.cambio || undefined,
-    "color": carro.cor || undefined,
-    "mileageFromOdometer":
+    model: nomeModelo,
+    vehicleModelDate: String(carro.ano),
+    fuelType: carro.combustivel || undefined,
+    vehicleTransmission: carro.cambio || undefined,
+    color: carro.cor || undefined,
+    mileageFromOdometer:
       quilometragem != null
         ? {
             "@type": "QuantitativeValue",
-            "value": quilometragem,
-            "unitCode": "KMT",
+            value: quilometragem,
+            unitCode: "KMT",
           }
         : undefined,
-    "image": fotos,
-    "description":
-      carro.descricao ||
-      `${nomeCarro} disponível na Ouroville Motors em Uberlândia MG.`,
-    "offers": {
+    image: fotos,
+    description: carro.descricao || `${nomeCarro} disponível na Ouroville Motors em Uberlândia MG.`,
+    offers: {
       "@type": "Offer",
-      "priceCurrency": "BRL",
-      "price": carro.preco ?? 0,
-      "availability":
+      priceCurrency: "BRL",
+      price: carro.preco ?? 0,
+      availability:
         carro.status === "disponivel"
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
-      "itemCondition": "https://schema.org/UsedCondition",
-      "seller": {
+      itemCondition: "https://schema.org/UsedCondition",
+      seller: {
         "@type": "AutoDealer",
-        "name": SITE.name,
-        "telephone": `+${SITE.phoneDigits}`,
-        "address": {
+        name: SITE.name,
+        telephone: `+${SITE.phoneDigits}`,
+        address: {
           "@type": "PostalAddress",
-          "streetAddress": SITE.streetAddress,
-          "addressLocality": SITE.city,
-          "addressRegion": SITE.state,
-          "addressCountry": SITE.country,
+          streetAddress: SITE.streetAddress,
+          addressLocality: SITE.city,
+          addressRegion: SITE.state,
+          addressCountry: SITE.country,
         },
       },
     },
@@ -222,23 +229,23 @@ function Detalhe() {
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
+    itemListElement: [
       {
         "@type": "ListItem",
-        "position": 1,
-        "name": "Início",
-        "item": `${SITE.url}/`,
+        position: 1,
+        name: "Início",
+        item: `${SITE.url}/`,
       },
       {
         "@type": "ListItem",
-        "position": 2,
-        "name": "Estoque",
-        "item": `${SITE.url}/estoque`,
+        position: 2,
+        name: "Estoque",
+        item: `${SITE.url}/estoque`,
       },
       {
         "@type": "ListItem",
-        "position": 3,
-        "name": nomeCarro,
+        position: 3,
+        name: nomeCarro,
       },
     ],
   };
@@ -254,7 +261,10 @@ function Detalhe() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <nav className="text-xs text-muted-foreground">
-        <Link to="/estoque" className="transition hover:text-primary">Estoque</Link> / {nomeCarro}
+        <Link to="/estoque" className="transition hover:text-primary">
+          Estoque
+        </Link>{" "}
+        / {nomeCarro}
       </nav>
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
@@ -291,26 +301,32 @@ function Detalhe() {
                 </button>
               )}
               <div className="grid min-w-0 flex-1 grid-cols-5 gap-2">
-              {miniaturas.map((f, localIndex) => {
-                const i = inicioMiniaturas + localIndex;
-                return (
-                <button
-                  key={f + i}
-                  type="button"
-                  onClick={() => {
-                    inicioMiniaturasRef.current = Math.min(
-                      Math.max(0, i - 2),
-                      Math.max(0, fotos.length - janelaMiniaturas),
-                    );
-                    selecionarFoto(i);
-                  }}
-                  aria-label={`Ver foto ${i + 1}`}
-                  className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
-                >
-                  <ResilientImage src={f} alt={`${carTitle(carro)} miniatura ${i + 1}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                </button>
-                );
-              })}
+                {miniaturas.map((f, localIndex) => {
+                  const i = inicioMiniaturas + localIndex;
+                  return (
+                    <button
+                      key={f + i}
+                      type="button"
+                      onClick={() => {
+                        inicioMiniaturasRef.current = Math.min(
+                          Math.max(0, i - 2),
+                          Math.max(0, fotos.length - janelaMiniaturas),
+                        );
+                        selecionarFoto(i);
+                      }}
+                      aria-label={`Ver foto ${i + 1}`}
+                      className={`aspect-[7/5] min-w-0 overflow-hidden rounded-md border ${i === ativa ? "border-primary" : "border-border"}`}
+                    >
+                      <ResilientImage
+                        src={f}
+                        alt={`${carTitle(carro)} miniatura ${i + 1}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  );
+                })}
               </div>
               {fotos.length > 5 && (
                 <button
@@ -340,7 +356,10 @@ function Detalhe() {
 
           <div className="mt-6 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
             {ficha.map(({ label, value, Icon }) => (
-              <div key={label} className="min-w-0 rounded-lg border border-border/70 bg-card px-3 py-3">
+              <div
+                key={label}
+                className="min-w-0 rounded-lg border border-border/70 bg-card px-3 py-3"
+              >
                 <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
                   <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
                   <span className="truncate">{label}</span>
@@ -364,7 +383,9 @@ function Detalhe() {
         {carro.descricao && (
           <section className="lg:col-start-1 lg:row-start-2">
             <h2 className="text-xl font-semibold text-primary">Descrição</h2>
-            <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-white">{carro.descricao}</p>
+            <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-white">
+              {carro.descricao}
+            </p>
           </section>
         )}
       </div>

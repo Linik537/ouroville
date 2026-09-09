@@ -10,9 +10,16 @@ export const Route = createFileRoute("/sobre")({
         name: "description",
         content: `Conheça a história da Ouroville Motors, nossa localização na ${SITE.address}, horários de atendimento e formas de contato direto.`,
       },
-      { name: "keywords", content: "sobre ouroville motors, concessionaria avenida joao pinheiro, contato ouroville motors, endereco ouroville motors uberlandia" },
+      {
+        name: "keywords",
+        content:
+          "sobre ouroville motors, concessionaria avenida joao pinheiro, contato ouroville motors, endereco ouroville motors uberlandia",
+      },
       { property: "og:title", content: `Sobre a ${SITE.name} : Uberlândia MG` },
-      { property: "og:description", content: "História, valores, endereço e contato da Ouroville Motors em Uberlândia MG." },
+      {
+        property: "og:description",
+        content: "História, valores, endereço e contato da Ouroville Motors em Uberlândia MG.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/sobre` },
       { property: "og:image", content: SITE.ogImage },
@@ -20,9 +27,7 @@ export const Route = createFileRoute("/sobre")({
       { name: "twitter:title", content: `Sobre a ${SITE.name}` },
       { name: "twitter:description", content: SITE.description },
     ],
-    links: [
-      { rel: "canonical", href: `${SITE.url}/sobre` },
-    ],
+    links: [{ rel: "canonical", href: `${SITE.url}/sobre` }],
   }),
   component: Sobre,
 });
@@ -38,8 +43,8 @@ function Sobre() {
       <p className="mt-4 max-w-3xl text-muted-foreground">
         Nascemos em Uberlândia com um propósito simples: tornar a compra de um carro uma experiência
         transparente e tranquila. Cada veículo do nosso estoque passa por checagem de procedência e
-        revisão antes de ser anunciado. Valorizamos a honestidade na negociação, o pós-venda próximo e
-        o respeito pelo dinheiro do cliente.
+        revisão antes de ser anunciado. Valorizamos a honestidade na negociação, o pós-venda próximo
+        e o respeito pelo dinheiro do cliente.
       </p>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-3">

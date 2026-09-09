@@ -64,8 +64,20 @@ export async function prepararImagem(file: File, settings: CropSettings) {
   if (!context) throw new Error("Seu navegador não suporta edição de imagens.");
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-  context.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, settings.width, settings.height);
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.86));
+  context.drawImage(
+    image,
+    area.x,
+    area.y,
+    area.width,
+    area.height,
+    0,
+    0,
+    settings.width,
+    settings.height,
+  );
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/webp", 0.86),
+  );
   if (!blob) throw new Error("Não foi possível preparar esta imagem.");
   return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.webp`, { type: "image/webp" });
 }

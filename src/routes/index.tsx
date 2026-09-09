@@ -17,11 +17,19 @@ export const Route = createFileRoute("/")({
         content:
           "Concessionária Ouroville Motors em Uberlândia (MG). Veículos revisados, procedência garantida e financiamento facilitado. Confira o estoque completo.",
       },
-      { name: "keywords", content: "carros uberlandia, seminovos uberlandia, concessionaria uberlandia, comprar carro uberlandia, ouroville motors" },
-      { property: "og:title", content: `${SITE.name} : Veículos Seminovos e Novos em Uberlândia MG` },
+      {
+        name: "keywords",
+        content:
+          "carros uberlandia, seminovos uberlandia, concessionaria uberlandia, comprar carro uberlandia, ouroville motors",
+      },
+      {
+        property: "og:title",
+        content: `${SITE.name} : Veículos Seminovos e Novos em Uberlândia MG`,
+      },
       {
         property: "og:description",
-        content: "Estoque selecionado de carros seminovos e novos com garantia de procedência e financiamento em Uberlândia.",
+        content:
+          "Estoque selecionado de carros seminovos e novos com garantia de procedência e financiamento em Uberlândia.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/` },
@@ -30,9 +38,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:title", content: `${SITE.name} : Veículos em Uberlândia` },
       { name: "twitter:description", content: SITE.description },
     ],
-    links: [
-      { rel: "canonical", href: `${SITE.url}/` },
-    ],
+    links: [{ rel: "canonical", href: `${SITE.url}/` }],
   }),
   component: Home,
 });
@@ -40,11 +46,11 @@ export const Route = createFileRoute("/")({
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": SITE.name,
-  "url": SITE.url,
-  "potentialAction": {
+  name: SITE.name,
+  url: SITE.url,
+  potentialAction: {
     "@type": "SearchAction",
-    "target": `${SITE.url}/estoque?termo={search_term_string}`,
+    target: `${SITE.url}/estoque?termo={search_term_string}`,
     "query-input": "required name=search_term_string",
   },
 };
@@ -86,7 +92,8 @@ function Home() {
             <h1 className="mt-0 flex flex-col gap-2 font-oswald text-[clamp(30px,9vw,60px)] font-bold leading-none tracking-wide text-foreground">
               <span className="whitespace-nowrap">Seu próximo seminovo,</span>
               <span>
-                <span className="text-gold">no padrão de Ouro</span><span className="text-foreground">ville</span>
+                <span className="text-gold">no padrão de Ouro</span>
+                <span className="text-foreground">ville</span>
               </span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-foreground/80">
@@ -135,83 +142,108 @@ function Home() {
       </section>
 
       <div className="relative z-30 bg-background">
-      <section className="mx-auto max-w-7xl px-4 pb-3 pt-12 sm:pt-16">
-        <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card px-5 py-6 shadow-[0_18px_45px_rgba(0,0,0,0.22)] sm:px-8 sm:py-7">
-          <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gold/10 blur-3xl" aria-hidden />
-          <div className="relative flex items-center gap-4 sm:gap-5">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 sm:h-14 sm:w-14">
-              <ShieldCheck className="h-6 w-6 text-primary sm:h-7 sm:w-7" aria-hidden />
-            </span>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Seu próximo carro, com tranquilidade</p>
-              <p className="mt-1 text-base font-medium leading-snug text-foreground sm:text-xl">Veículos revisados, laudo cautelar aprovado e financiamento em minutos.</p>
+        <section className="mx-auto max-w-7xl px-4 pb-3 pt-12 sm:pt-16">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card px-5 py-6 shadow-[0_18px_45px_rgba(0,0,0,0.22)] sm:px-8 sm:py-7">
+            <div
+              className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gold/10 blur-3xl"
+              aria-hidden
+            />
+            <div className="relative flex items-center gap-4 sm:gap-5">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 sm:h-14 sm:w-14">
+                <ShieldCheck className="h-6 w-6 text-primary sm:h-7 sm:w-7" aria-hidden />
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                  Seu próximo carro, com tranquilidade
+                </p>
+                <p className="mt-1 text-base font-medium leading-snug text-foreground sm:text-xl">
+                  Veículos revisados, laudo cautelar aprovado e financiamento em minutos.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 pt-8">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Últimas novidades</h2>
-          <Link to="/estoque" className="shrink-0 rounded-full border border-primary/60 px-4 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10">
-            Ver todo estoque
-          </Link>
-        </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {isLoading
-            ? Array.from({ length: 3 }).map((_, i) => <CarCardSkeleton key={i} />)
-            : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
-        </div>
-        {!isLoading && (data ?? []).length > 0 && (
-          <div className="mt-10 text-center">
+        <section className="mx-auto max-w-7xl px-4 pb-16 pt-8">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Últimas novidades</h2>
             <Link
               to="/estoque"
-              className="gold-glow inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+              className="shrink-0 rounded-full border border-primary/60 px-4 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
             >
-              Ver o estoque completo
+              Ver todo estoque
             </Link>
           </div>
-        )}
-        {!isLoading && (data ?? []).length === 0 && (
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Estoque sendo atualizado. Fale com a gente pelo WhatsApp para conhecer os veículos disponíveis.
-          </p>
-        )}
-      </section>
-
-      <section className="border-y border-border/60 bg-card">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:grid-cols-3">
-          {[
-            { icon: Award, titulo: "Estoque Selecionado", texto: "Carros escolhidos com cuidado para você." },
-            { icon: Users, titulo: "Atendimento personalizado", texto: "Acompanhamento próximo em cada etapa." },
-            { icon: ShieldCheck, titulo: "Parceiros de financiamento", texto: "Principais bancos, aprovação rápida." },
-          ].map((s) => (
-            <div key={s.titulo} className="text-center">
-              <s.icon className="mx-auto h-8 w-8 text-primary" aria-hidden />
-              <h3 className="mt-3 text-lg font-semibold text-foreground">{s.titulo}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{s.texto}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-t border-border/60 bg-card">
-        <div className="mx-auto max-w-7xl px-4 py-16">
-          <h2 className="text-center text-2xl font-bold text-foreground sm:text-3xl">Onde estamos</h2>
-          <p className="mt-3 text-center text-sm text-muted-foreground">
-            {SITE.address} · {SITE.hours}
-          </p>
-          <div className="mt-8 overflow-hidden rounded-xl border border-border/70">
-            <iframe
-              title={`Mapa de localização da ${SITE.name}`}
-              src={SITE.mapEmbed}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="h-96 w-full border-0"
-            />
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, i) => <CarCardSkeleton key={i} />)
+              : (data ?? []).map((c) => <CarCard key={c.id} carro={c} />)}
           </div>
-        </div>
-      </section>
+          {!isLoading && (data ?? []).length > 0 && (
+            <div className="mt-10 text-center">
+              <Link
+                to="/estoque"
+                className="gold-glow inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-semibold text-black shadow-lg transition hover:brightness-110"
+              >
+                Ver o estoque completo
+              </Link>
+            </div>
+          )}
+          {!isLoading && (data ?? []).length === 0 && (
+            <p className="mt-8 text-center text-sm text-muted-foreground">
+              Estoque sendo atualizado. Fale com a gente pelo WhatsApp para conhecer os veículos
+              disponíveis.
+            </p>
+          )}
+        </section>
+
+        <section className="border-y border-border/60 bg-card">
+          <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:grid-cols-3">
+            {[
+              {
+                icon: Award,
+                titulo: "Estoque Selecionado",
+                texto: "Carros escolhidos com cuidado para você.",
+              },
+              {
+                icon: Users,
+                titulo: "Atendimento personalizado",
+                texto: "Acompanhamento próximo em cada etapa.",
+              },
+              {
+                icon: ShieldCheck,
+                titulo: "Parceiros de financiamento",
+                texto: "Principais bancos, aprovação rápida.",
+              },
+            ].map((s) => (
+              <div key={s.titulo} className="text-center">
+                <s.icon className="mx-auto h-8 w-8 text-primary" aria-hidden />
+                <h3 className="mt-3 text-lg font-semibold text-foreground">{s.titulo}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{s.texto}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-t border-border/60 bg-card">
+          <div className="mx-auto max-w-7xl px-4 py-16">
+            <h2 className="text-center text-2xl font-bold text-foreground sm:text-3xl">
+              Onde estamos
+            </h2>
+            <p className="mt-3 text-center text-sm text-muted-foreground">
+              {SITE.address} · {SITE.hours}
+            </p>
+            <div className="mt-8 overflow-hidden rounded-xl border border-border/70">
+              <iframe
+                title={`Mapa de localização da ${SITE.name}`}
+                src={SITE.mapEmbed}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-96 w-full border-0"
+              />
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

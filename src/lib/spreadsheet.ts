@@ -27,7 +27,14 @@ const aliases: Record<keyof ImportacaoCarro, string[]> = {
   marca: ["marca", "fabricante", "brand"],
   modelo: ["modelo", "model", "veiculo", "veículo", "carro"],
   ano: ["ano", "year", "ano fabricacao", "ano fabricação"],
-  versao: ["versao", "versão", "versao modelo", "versão modelo", "versao veiculo", "versão veículo"],
+  versao: [
+    "versao",
+    "versão",
+    "versao modelo",
+    "versão modelo",
+    "versao veiculo",
+    "versão veículo",
+  ],
   ano_modelo: ["ano modelo", "ano do modelo", "model year"],
   preco: ["preco", "preço", "valor", "price"],
   quilometragem: ["quilometragem", "km", "kilometragem", "mileage"],
@@ -60,22 +67,35 @@ function valorNumero(valor: unknown) {
   if (typeof valor === "number") return Number.isFinite(valor) ? valor : undefined;
   const texto = valorTexto(valor).replace(/R\$|\s/g, "");
   if (!texto) return undefined;
-  const normalizado = texto.includes(",") ? texto.replace(/\./g, "").replace(",", ".") : texto.replace(/,/g, "");
+  const normalizado = texto.includes(",")
+    ? texto.replace(/\./g, "").replace(",", ".")
+    : texto.replace(/,/g, "");
   const numero = Number(normalizado);
   return Number.isFinite(numero) ? numero : undefined;
 }
 
 function encontrarCabecalho(linhas: unknown[][]) {
-  let melhor: { linha: number; colunas: Partial<Record<keyof ImportacaoCarro, number>>; pontos: number } | null = null;
+  let melhor: {
+    linha: number;
+    colunas: Partial<Record<keyof ImportacaoCarro, number>>;
+    pontos: number;
+  } | null = null;
   for (let linha = 0; linha < Math.min(linhas.length, 100); linha++) {
     const colunas: Partial<Record<keyof ImportacaoCarro, number>> = {};
     for (const [indice, valor] of linhas[linha].entries()) {
       const nome = normalizar(valor);
-      const campo = fields.find((chave) => aliases[chave].some((alias) => normalizar(alias) === nome));
+      const campo = fields.find((chave) =>
+        aliases[chave].some((alias) => normalizar(alias) === nome),
+      );
       if (campo && colunas[campo] === undefined) colunas[campo] = indice;
     }
     const pontos = Object.keys(colunas).length;
-    if (colunas.marca !== undefined && colunas.modelo !== undefined && colunas.ano !== undefined && (!melhor || pontos > melhor.pontos)) {
+    if (
+      colunas.marca !== undefined &&
+      colunas.modelo !== undefined &&
+      colunas.ano !== undefined &&
+      (!melhor || pontos > melhor.pontos)
+    ) {
       melhor = { linha, colunas, pontos };
     }
   }
@@ -90,14 +110,20 @@ function lerLinhas(workbook: XLSX.WorkBook): unknown[][] {
 export function analisarLinhas(linhas: unknown[][]): ResultadoImportacao {
   const cabecalho = encontrarCabecalho(linhas);
   if (!cabecalho) {
-    return { carros: [], erros: ["Não encontrei uma linha com as colunas Marca, Modelo e Ano."], linhaCabecalho: -1 };
+    return {
+      carros: [],
+      erros: ["Não encontrei uma linha com as colunas Marca, Modelo e Ano."],
+      linhaCabecalho: -1,
+    };
   }
 
   const carros: ImportacaoCarro[] = [];
   const erros: string[] = [];
   for (let indice = cabecalho.linha + 1; indice < linhas.length; indice++) {
     const linha = linhas[indice];
-    const valores = Object.fromEntries(fields.map((campo) => [campo, valorTexto(linha[cabecalho.colunas[campo] ?? -1])])) as Record<keyof ImportacaoCarro, string>;
+    const valores = Object.fromEntries(
+      fields.map((campo) => [campo, valorTexto(linha[cabecalho.colunas[campo] ?? -1])]),
+    ) as Record<keyof ImportacaoCarro, string>;
     if (!Object.values(valores).some(Boolean)) continue;
     const ano = valorNumero(linha[cabecalho.colunas.ano ?? -1]);
     if (!valores.marca || !valores.modelo || !ano) {
@@ -135,6 +161,9 @@ export async function analisarFontePlanilha(arquivo?: File, url?: string) {
   if (arquivo) return analisarArquivo(await arquivo.arrayBuffer());
   if (!url?.trim()) throw new Error("Selecione um arquivo ou informe um link do Google Sheets.");
   const resposta = await fetch(urlExportacaoGoogleSheets(url.trim()));
-  if (!resposta.ok) throw new Error("Não foi possível acessar a planilha. Confira se o Google Sheets está público.");
+  if (!resposta.ok)
+    throw new Error(
+      "Não foi possível acessar a planilha. Confira se o Google Sheets está público.",
+    );
   return analisarArquivo(await resposta.arrayBuffer());
 }

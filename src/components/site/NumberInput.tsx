@@ -26,8 +26,11 @@ export function NumberInput({
   function changeBy(direction: 1 | -1) {
     const current = value === "" ? undefined : Number(value);
     const starting = direction === 1 ? upStart : downStart;
-    const next = current === undefined ? starting ?? 0 : current + direction * step;
-    const bounded = Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, next));
+    const next = current === undefined ? (starting ?? 0) : current + direction * step;
+    const bounded = Math.min(
+      max ?? Number.POSITIVE_INFINITY,
+      Math.max(min ?? Number.NEGATIVE_INFINITY, next),
+    );
     onChange(String(bounded));
   }
 

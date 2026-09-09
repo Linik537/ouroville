@@ -97,7 +97,7 @@ export function HeroHeadlights() {
                 top: `${l.top * 100}%`,
                 width: `${l.width * 100}%`,
                 height: `${l.height * 100}%`,
-                 transform: `rotate(${l.rotate}deg)`,
+                transform: `rotate(${l.rotate}deg)`,
               }}
             />
           ))}
@@ -131,10 +131,7 @@ function CoverBox({ children }: { children: React.ReactNode }) {
   return (
     <div ref={ref} className="absolute inset-0">
       {box && (
-        <div
-          className="absolute"
-          style={{ width: box.w, height: box.h, left: box.x, top: box.y }}
-        >
+        <div className="absolute" style={{ width: box.w, height: box.h, left: box.x, top: box.y }}>
           {children}
         </div>
       )}

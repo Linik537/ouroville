@@ -37,9 +37,14 @@ export type Carro = {
 
 export type AnalyticsEventType = "site_visit" | "car_view" | "whatsapp_click";
 
-export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?: number): Promise<boolean> {
+export async function trackAnalyticsEvent(
+  eventType: AnalyticsEventType,
+  carId?: number,
+): Promise<boolean> {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     const authorizationToken = session?.access_token ?? SUPABASE_PUBLISHABLE_KEY;
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/track_analytics_event`, {
       method: "POST",
@@ -56,7 +61,11 @@ export async function trackAnalyticsEvent(eventType: AnalyticsEventType, carId?:
     });
 
     if (!response.ok) {
-      console.error("Não foi possível registrar a métrica:", response.status, await response.text());
+      console.error(
+        "Não foi possível registrar a métrica:",
+        response.status,
+        await response.text(),
+      );
       return false;
     }
 
@@ -94,8 +103,16 @@ const INVENTORY_CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
 function readInventoryCache(): Carro[] | null {
   if (typeof window === "undefined") return null;
   try {
-    const cached = JSON.parse(window.localStorage.getItem(INVENTORY_CACHE_KEY) ?? "null") as { savedAt?: number; rows?: Carro[] } | null;
-    if (!cached?.savedAt || !Array.isArray(cached.rows) || Date.now() - cached.savedAt > INVENTORY_CACHE_MAX_AGE) return null;
+    const cached = JSON.parse(window.localStorage.getItem(INVENTORY_CACHE_KEY) ?? "null") as {
+      savedAt?: number;
+      rows?: Carro[];
+    } | null;
+    if (
+      !cached?.savedAt ||
+      !Array.isArray(cached.rows) ||
+      Date.now() - cached.savedAt > INVENTORY_CACHE_MAX_AGE
+    )
+      return null;
     return cached.rows;
   } catch {
     return null;
@@ -123,26 +140,40 @@ export async function fetchCarros(filters?: {
 }) {
   let rows: Carro[];
   try {
-    const { data, error } = await supabase.from("carros").select("*").eq("status", "disponivel").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("carros")
+      .select("*")
+      .eq("status", "disponivel")
+      .order("created_at", { ascending: false });
     if (error) throw error;
     rows = (data ?? []) as Carro[];
     writeInventoryCache(rows);
   } catch (err) {
     const cached = readInventoryCache();
     if (!cached) throw err;
-    console.warn("Supabase temporariamente indisponível; exibindo o último estoque carregado.", err);
+    console.warn(
+      "Supabase temporariamente indisponível; exibindo o último estoque carregado.",
+      err,
+    );
     rows = cached;
   }
 
   if (filters?.marca) rows = rows.filter((carro) => carro.marca === filters.marca);
   if (filters?.cambio) rows = rows.filter((carro) => carro.cambio === filters.cambio);
-  if (filters?.combustivel) rows = rows.filter((carro) => carro.combustivel === filters.combustivel);
-  if (filters?.anoMin && Number.isFinite(filters.anoMin)) rows = rows.filter((carro) => carro.ano >= filters.anoMin!);
-  if (filters?.precoMax && Number.isFinite(filters.precoMax)) rows = rows.filter((carro) => carro.preco !== null && carro.preco <= filters.precoMax!);
+  if (filters?.combustivel)
+    rows = rows.filter((carro) => carro.combustivel === filters.combustivel);
+  if (filters?.anoMin && Number.isFinite(filters.anoMin))
+    rows = rows.filter((carro) => carro.ano >= filters.anoMin!);
+  if (filters?.precoMax && Number.isFinite(filters.precoMax))
+    rows = rows.filter((carro) => carro.preco !== null && carro.preco <= filters.precoMax!);
   if (filters?.novidades && rows.some((carro) => typeof carro.mostrar_novidades === "boolean")) {
     rows = rows
       .filter((carro) => carro.mostrar_novidades)
-      .sort((a, b) => (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) - (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER));
+      .sort(
+        (a, b) =>
+          (a.ordem_novidades ?? Number.MAX_SAFE_INTEGER) -
+          (b.ordem_novidades ?? Number.MAX_SAFE_INTEGER),
+      );
   }
   if (filters?.termo?.trim()) rows = fuzzyFilter(rows, filters.termo);
   if (filters?.limit && Number.isFinite(filters.limit)) rows = rows.slice(0, filters.limit);
@@ -155,7 +186,9 @@ export function fuzzyFilter(rows: Carro[], termo: string) {
   if (!tokens.length) return rows;
   const scored = rows
     .map((c) => {
-      const hay = slugify(`${c.marca} ${c.modelo} ${c.versao ?? ""} ${c.ano} ${c.cor ?? ""}`).split("-");
+      const hay = slugify(`${c.marca} ${c.modelo} ${c.versao ?? ""} ${c.ano} ${c.cor ?? ""}`).split(
+        "-",
+      );
       let score = 0;
       for (const t of tokens) {
         let best = 0;
@@ -182,7 +215,11 @@ function levenshtein(a: string, b: string) {
     const cur: number[] = [i];
     for (let j = 1; j <= b.length; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      cur[j] = Math.min((cur[j - 1] as number) + 1, (prev[j] as number) + 1, (prev[j - 1] as number) + cost);
+      cur[j] = Math.min(
+        (cur[j - 1] as number) + 1,
+        (prev[j] as number) + 1,
+        (prev[j - 1] as number) + cost,
+      );
     }
     prev = cur;
   }

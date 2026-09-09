@@ -13,11 +13,12 @@ export function ResilientImage({ src, onError, ...props }: ImgHTMLAttributes<HTM
     };
   }, [originalSrc]);
 
-  const displayedSrc = attempt === 0
-    ? originalSrc
-    : attempt <= 3 && originalSrc && !originalSrc.startsWith("data:")
-      ? `${originalSrc}${originalSrc.includes("?") ? "&" : "?"}retry=${attempt}`
-      : PLACEHOLDER_CAR;
+  const displayedSrc =
+    attempt === 0
+      ? originalSrc
+      : attempt <= 3 && originalSrc && !originalSrc.startsWith("data:")
+        ? `${originalSrc}${originalSrc.includes("?") ? "&" : "?"}retry=${attempt}`
+        : PLACEHOLDER_CAR;
 
   return (
     <img
@@ -26,10 +27,13 @@ export function ResilientImage({ src, onError, ...props }: ImgHTMLAttributes<HTM
       onError={(event) => {
         onError?.(event);
         if (displayedSrc === PLACEHOLDER_CAR || timer.current !== null) return;
-        timer.current = window.setTimeout(() => {
-          timer.current = null;
-          setAttempt((current) => current + 1);
-        }, Math.min(400 * 2 ** attempt, 1_600));
+        timer.current = window.setTimeout(
+          () => {
+            timer.current = null;
+            setAttempt((current) => current + 1);
+          },
+          Math.min(400 * 2 ** attempt, 1_600),
+        );
       }}
     />
   );

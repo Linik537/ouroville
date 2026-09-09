@@ -16,29 +16,24 @@ type EstoqueSearch = {
   precoMax?: number | undefined;
 };
 
-type Ordem =
-  | "recentes"
-  | "antigos"
-  | "preco_asc"
-  | "preco_desc"
-  | "km"
-  | "az";
+type Ordem = "recentes" | "antigos" | "preco_asc" | "preco_desc" | "km" | "az";
 
 export const Route = createFileRoute("/estoque")({
   validateSearch: (s: Record<string, unknown>): EstoqueSearch => {
-    const q = typeof s['q'] === "string" ? s['q'] : undefined;
-    const marca = typeof s['marca'] === "string" ? s['marca'] : undefined;
-    const cambio = typeof s['cambio'] === "string" ? s['cambio'] : undefined;
-    const combustivel = typeof s['combustivel'] === "string" ? s['combustivel'] : undefined;
-    const anoMinRaw = s['anoMin'] ? Number(s['anoMin']) : undefined;
-    const precoMaxRaw = s['precoMax'] ? Number(s['precoMax']) : undefined;
+    const q = typeof s["q"] === "string" ? s["q"] : undefined;
+    const marca = typeof s["marca"] === "string" ? s["marca"] : undefined;
+    const cambio = typeof s["cambio"] === "string" ? s["cambio"] : undefined;
+    const combustivel = typeof s["combustivel"] === "string" ? s["combustivel"] : undefined;
+    const anoMinRaw = s["anoMin"] ? Number(s["anoMin"]) : undefined;
+    const precoMaxRaw = s["precoMax"] ? Number(s["precoMax"]) : undefined;
     return {
       q,
       marca,
       cambio,
       combustivel,
       anoMin: anoMinRaw && Number.isFinite(anoMinRaw) && anoMinRaw > 0 ? anoMinRaw : undefined,
-      precoMax: precoMaxRaw && Number.isFinite(precoMaxRaw) && precoMaxRaw > 0 ? precoMaxRaw : undefined,
+      precoMax:
+        precoMaxRaw && Number.isFinite(precoMaxRaw) && precoMaxRaw > 0 ? precoMaxRaw : undefined,
     };
   },
   head: () => ({
@@ -46,21 +41,31 @@ export const Route = createFileRoute("/estoque")({
       { title: "Estoque de Veículos Seminovos e Novos : Ouroville Motors Uberlândia" },
       {
         name: "description",
-        content: "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço, câmbio e combustível.",
+        content:
+          "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço, câmbio e combustível.",
       },
-      { name: "keywords", content: "estoque de carros uberlandia, carros a venda uberlandia, seminovos uberlandia, filtro de carros" },
+      {
+        name: "keywords",
+        content:
+          "estoque de carros uberlandia, carros a venda uberlandia, seminovos uberlandia, filtro de carros",
+      },
       { property: "og:title", content: "Estoque de Veículos : Ouroville Motors Uberlândia" },
-      { property: "og:description", content: "Catálogo completo de carros seminovos e novos com garantia de procedência em Uberlândia." },
+      {
+        property: "og:description",
+        content:
+          "Catálogo completo de carros seminovos e novos com garantia de procedência em Uberlândia.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${SITE.url}/estoque` },
       { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Estoque de Carros : Ouroville Motors" },
-      { name: "twitter:description", content: "Explore nosso estoque de veículos revisados em Uberlândia." },
+      {
+        name: "twitter:description",
+        content: "Explore nosso estoque de veículos revisados em Uberlândia.",
+      },
     ],
-    links: [
-      { rel: "canonical", href: `${SITE.url}/estoque` },
-    ],
+    links: [{ rel: "canonical", href: `${SITE.url}/estoque` }],
   }),
   component: Estoque,
 });
@@ -116,7 +121,11 @@ function Estoque() {
             aria-label="Pesquisar no estoque"
             className="flex-1 bg-transparent px-5 py-3 text-sm outline-none placeholder:text-muted-foreground"
           />
-          <button type="submit" className="bg-gold px-5 text-primary-foreground" aria-label="Buscar">
+          <button
+            type="submit"
+            className="bg-gold px-5 text-primary-foreground"
+            aria-label="Buscar"
+          >
             <Search className="h-4 w-4" />
           </button>
         </form>
@@ -126,14 +135,26 @@ function Estoque() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">Filtros</h2>
             <label className="block text-xs text-muted-foreground">
               Marca
-              <select className={selectCls} value={search.marca ?? ""} onChange={(e) => setFilter({ marca: e.target.value || undefined })}>
+              <select
+                className={selectCls}
+                value={search.marca ?? ""}
+                onChange={(e) => setFilter({ marca: e.target.value || undefined })}
+              >
                 <option value="">Todas</option>
-                {marcas.map((m) => <option key={m} value={m}>{m}</option>)}
+                {marcas.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="block text-xs text-muted-foreground">
               Câmbio
-              <select className={selectCls} value={search.cambio ?? ""} onChange={(e) => setFilter({ cambio: e.target.value || undefined })}>
+              <select
+                className={selectCls}
+                value={search.cambio ?? ""}
+                onChange={(e) => setFilter({ cambio: e.target.value || undefined })}
+              >
                 <option value="">Todos</option>
                 <option value="Manual">Manual</option>
                 <option value="Automático">Automático</option>
@@ -141,7 +162,11 @@ function Estoque() {
             </label>
             <label className="block text-xs text-muted-foreground">
               Combustível
-              <select className={selectCls} value={search.combustivel ?? ""} onChange={(e) => setFilter({ combustivel: e.target.value || undefined })}>
+              <select
+                className={selectCls}
+                value={search.combustivel ?? ""}
+                onChange={(e) => setFilter({ combustivel: e.target.value || undefined })}
+              >
                 <option value="">Todos</option>
                 <option value="Flex">Flex</option>
                 <option value="Gasolina">Gasolina</option>
@@ -175,7 +200,10 @@ function Estoque() {
             </label>
             <button
               type="button"
-              onClick={() => { setTermo(""); navigate({ search: {} }); }}
+              onClick={() => {
+                setTermo("");
+                navigate({ search: {} });
+              }}
               className="w-full rounded-md border border-border px-3 py-2 text-xs text-muted-foreground hover:text-primary"
             >
               Limpar filtros
@@ -222,10 +250,18 @@ function Estoque() {
   );
 }
 
-function sortCarros<T extends { id: number; marca: string; modelo: string; ano: number | null; ano_modelo: number | null; preco: number | null; quilometragem: number | null; created_at: string }>(
-  rows: T[],
-  ordem: Ordem,
-): T[] {
+function sortCarros<
+  T extends {
+    id: number;
+    marca: string;
+    modelo: string;
+    ano: number | null;
+    ano_modelo: number | null;
+    preco: number | null;
+    quilometragem: number | null;
+    created_at: string;
+  },
+>(rows: T[], ordem: Ordem): T[] {
   const list = [...rows];
   switch (ordem) {
     // "Recente" = ano do modelo (segundo número de "2022/2023"); em empate, ano de fabricação
@@ -250,12 +286,19 @@ function sortCarros<T extends { id: number; marca: string; modelo: string; ano: 
   }
 }
 
-function compareAno(a: { ano: number | null; ano_modelo: number | null }, b: { ano: number | null; ano_modelo: number | null }) {
+function compareAno(
+  a: { ano: number | null; ano_modelo: number | null },
+  b: { ano: number | null; ano_modelo: number | null },
+) {
   // 1º critério: ano do modelo (segundo número de "2022/2023"); 2º: ano de fabricação
   return compareNullable(a.ano_modelo, b.ano_modelo, "asc") || compareNullable(a.ano, b.ano, "asc");
 }
 
-function compareNullable(a: number | null | undefined, b: number | null | undefined, dir: "asc" | "desc") {
+function compareNullable(
+  a: number | null | undefined,
+  b: number | null | undefined,
+  dir: "asc" | "desc",
+) {
   const aNull = a == null;
   const bNull = b == null;
   if (aNull && bNull) return 0;

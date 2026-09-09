@@ -2,7 +2,8 @@ export const SITE = {
   name: "Ouroville Motors",
   url: "https://ourovillemotors.com.br",
   domain: "ourovillemotors.com.br",
-  description: "Concessionária de veículos novos e seminovos de procedência em Uberlândia MG. Confira nosso estoque com ofertas imperdíveis e financiamento facilitado.",
+  description:
+    "Concessionária de veículos novos e seminovos de procedência em Uberlândia MG. Confira nosso estoque com ofertas imperdíveis e financiamento facilitado.",
   phoneDisplay: "(34) 9 9829-0394",
   phoneDigits: "5534998290394",
   address: "Avenida João Pinheiro, 3488 - Uberlândia - MG",
@@ -29,7 +30,11 @@ export function whatsappLink(message?: string) {
 
 export function brl(value: number | null | undefined) {
   if (value == null) return "Consulte";
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  });
 }
 
 export function km(value: number | null | undefined) {
@@ -45,32 +50,31 @@ export function getAutoDealerSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
-    "name": SITE.name,
-    "image": SITE.ogImage,
-    "url": SITE.url,
-    "telephone": `+${SITE.phoneDigits}`,
-    "address": {
+    name: SITE.name,
+    image: SITE.ogImage,
+    url: SITE.url,
+    telephone: `+${SITE.phoneDigits}`,
+    address: {
       "@type": "PostalAddress",
-      "streetAddress": SITE.streetAddress,
-      "addressLocality": SITE.city,
-      "addressRegion": SITE.state,
-      "postalCode": SITE.postalCode,
-      "addressCountry": SITE.country,
+      streetAddress: SITE.streetAddress,
+      addressLocality: SITE.city,
+      addressRegion: SITE.state,
+      postalCode: SITE.postalCode,
+      addressCountry: SITE.country,
     },
-    "geo": {
+    geo: {
       "@type": "GeoCoordinates",
-      "latitude": SITE.geo.latitude,
-      "longitude": SITE.geo.longitude,
+      latitude: SITE.geo.latitude,
+      longitude: SITE.geo.longitude,
     },
-    "openingHoursSpecification": [
+    openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        "opens": "08:00",
-        "closes": "18:00",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        opens: "08:00",
+        closes: "18:00",
       },
     ],
-    "priceRange": "$$$",
+    priceRange: "$$$",
   };
 }
-
