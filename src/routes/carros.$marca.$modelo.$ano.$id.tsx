@@ -449,11 +449,11 @@ function Detalhe() {
             {brl(carro.preco)}
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
-            {ficha.map(({ label, value, Icon }) => (
+          <div className="mt-6 grid grid-cols-1 gap-3 min-[350px]:grid-cols-2">
+            {ficha.map(({ label, value, Icon }, index) => (
               <div
                 key={label}
-                className="min-w-0 rounded-lg border border-border/70 bg-card px-3 py-3"
+                className={`min-w-0 rounded-lg border border-border/70 bg-card px-3 py-3 ${index >= 4 ? "min-[350px]:col-span-2 min-[521px]:col-span-1" : ""}`}
               >
                 <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted-foreground">
                   <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
@@ -473,21 +473,22 @@ function Detalhe() {
           >
             <MessageCircle className="h-5 w-5" /> Tenho interesse
           </a>
-          <a
-            href="tel:34998290394"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-medium text-white transition hover:border-white/60"
-          >
-            <Phone className="h-5 w-5" strokeWidth={1.75} aria-hidden /> Ligar para a concessionária
-          </a>
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-6 text-base font-medium text-white transition hover:border-white/60"
-          >
-            <MapPin className="h-5 w-5" strokeWidth={1.75} aria-hidden /> Onde estamos - Ouroville
-            Motors
-          </a>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <a
+              href="tel:34998290394"
+              className="inline-flex h-12 min-w-0 items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-3 text-sm font-medium text-white transition hover:border-white/60 min-[400px]:text-base"
+            >
+              <Phone className="h-5 w-5 shrink-0" strokeWidth={1.75} aria-hidden /> Ligar
+            </a>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 min-w-0 items-center justify-center gap-2 rounded-full border border-border/70 bg-transparent px-3 text-sm font-medium text-white transition hover:border-white/60 min-[400px]:text-base"
+            >
+              <MapPin className="h-5 w-5 shrink-0" strokeWidth={1.75} aria-hidden /> Onde estamos
+            </a>
+          </div>
         </aside>
 
         {carro.descricao && (
