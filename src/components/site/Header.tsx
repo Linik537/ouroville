@@ -48,7 +48,7 @@ export function Header() {
                 to={n.to}
                 onClick={n.to === "/estoque" ? scrollToPageTop : undefined}
                 className="rounded-md px-3 py-2 text-xl font-display font-semibold uppercase tracking-widest text-white transition hover:text-primary"
-                activeProps={{ className: "text-primary" }}
+                activeProps={{ className: "!text-primary" }}
               >
                 {n.label}
               </Link>
@@ -99,6 +99,7 @@ export function Header() {
                   if (n.to === "/estoque") scrollToPageTop();
                 }}
                 className="block rounded-md px-2 py-3 text-lg font-display font-medium uppercase tracking-wide text-white"
+                activeProps={{ className: "!text-primary" }}
               >
                 {n.label}
               </Link>
