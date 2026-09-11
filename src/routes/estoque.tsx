@@ -10,9 +10,10 @@ import { fetchCarros } from "@/lib/supabase";
 type EstoqueSearch = {
   q?: string | undefined;
   marca?: string | undefined;
-  cambio?: string | undefined;
   combustivel?: string | undefined;
   anoMin?: number | undefined;
+  anoMax?: number | undefined;
+  precoMin?: number | undefined;
   precoMax?: number | undefined;
 };
 
@@ -22,16 +23,19 @@ export const Route = createFileRoute("/estoque")({
   validateSearch: (s: Record<string, unknown>): EstoqueSearch => {
     const q = typeof s["q"] === "string" ? s["q"] : undefined;
     const marca = typeof s["marca"] === "string" ? s["marca"] : undefined;
-    const cambio = typeof s["cambio"] === "string" ? s["cambio"] : undefined;
     const combustivel = typeof s["combustivel"] === "string" ? s["combustivel"] : undefined;
     const anoMinRaw = s["anoMin"] ? Number(s["anoMin"]) : undefined;
+    const anoMaxRaw = s["anoMax"] ? Number(s["anoMax"]) : undefined;
+    const precoMinRaw = s["precoMin"] ? Number(s["precoMin"]) : undefined;
     const precoMaxRaw = s["precoMax"] ? Number(s["precoMax"]) : undefined;
     return {
       q,
       marca,
-      cambio,
       combustivel,
       anoMin: anoMinRaw && Number.isFinite(anoMinRaw) && anoMinRaw > 0 ? anoMinRaw : undefined,
+      anoMax: anoMaxRaw && Number.isFinite(anoMaxRaw) && anoMaxRaw > 0 ? anoMaxRaw : undefined,
+      precoMin:
+        precoMinRaw && Number.isFinite(precoMinRaw) && precoMinRaw > 0 ? precoMinRaw : undefined,
       precoMax:
         precoMaxRaw && Number.isFinite(precoMaxRaw) && precoMaxRaw > 0 ? precoMaxRaw : undefined,
     };
@@ -42,7 +46,7 @@ export const Route = createFileRoute("/estoque")({
       {
         name: "description",
         content:
-          "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço, câmbio e combustível.",
+          "Confira todos os carros disponíveis na Ouroville Motors em Uberlândia MG. Filtre por marca, ano, faixa de preço e combustível.",
       },
       {
         name: "keywords",
@@ -82,9 +86,10 @@ function Estoque() {
       fetchCarros({
         termo: search.q,
         marca: search.marca,
-        cambio: search.cambio,
         combustivel: search.combustivel,
         anoMin: search.anoMin,
+        anoMax: search.anoMax,
+        precoMin: search.precoMin,
         precoMax: search.precoMax,
       }),
   });
@@ -148,18 +153,62 @@ function Estoque() {
                 ))}
               </select>
             </label>
-            <label className="block text-xs text-muted-foreground">
-              Câmbio
-              <select
-                className={selectCls}
-                value={search.cambio ?? ""}
-                onChange={(e) => setFilter({ cambio: e.target.value || undefined })}
-              >
-                <option value="">Todos</option>
-                <option value="Manual">Manual</option>
-                <option value="Automático">Automático</option>
-              </select>
-            </label>
+            <fieldset className="space-y-2">
+              <legend className="text-xs text-muted-foreground">Ano</legend>
+              <label className="block text-[11px] text-muted-foreground">
+                De
+                <NumberInput
+                  className={selectCls}
+                  value={search.anoMin ?? ""}
+                  placeholder="2015"
+                  upStart={2016}
+                  downStart={2015}
+                  ariaLabel="Ano mínimo"
+                  onChange={(value) => setFilter({ anoMin: value ? Number(value) : undefined })}
+                />
+              </label>
+              <label className="block text-[11px] text-muted-foreground">
+                Até
+                <NumberInput
+                  className={selectCls}
+                  value={search.anoMax ?? ""}
+                  placeholder="2027"
+                  upStart={2027}
+                  downStart={2026}
+                  ariaLabel="Ano máximo"
+                  onChange={(value) => setFilter({ anoMax: value ? Number(value) : undefined })}
+                />
+              </label>
+            </fieldset>
+            <fieldset className="space-y-2">
+              <legend className="text-xs text-muted-foreground">Preço (R$)</legend>
+              <label className="block text-[11px] text-muted-foreground">
+                De
+                <NumberInput
+                  className={selectCls}
+                  value={search.precoMin ?? ""}
+                  placeholder="100000"
+                  step={5000}
+                  upStart={100000}
+                  downStart={95000}
+                  ariaLabel="Preço mínimo"
+                  onChange={(value) => setFilter({ precoMin: value ? Number(value) : undefined })}
+                />
+              </label>
+              <label className="block text-[11px] text-muted-foreground">
+                Até
+                <NumberInput
+                  className={selectCls}
+                  value={search.precoMax ?? ""}
+                  placeholder="300000"
+                  step={5000}
+                  upStart={300000}
+                  downStart={295000}
+                  ariaLabel="Preço máximo"
+                  onChange={(value) => setFilter({ precoMax: value ? Number(value) : undefined })}
+                />
+              </label>
+            </fieldset>
             <label className="block text-xs text-muted-foreground">
               Combustível
               <select
@@ -174,29 +223,6 @@ function Estoque() {
                 <option value="Elétrico">Elétrico</option>
                 <option value="Híbrido">Híbrido</option>
               </select>
-            </label>
-            <label className="block text-xs text-muted-foreground">
-              Ano a partir de
-              <NumberInput
-                className={selectCls}
-                value={search.anoMin ?? ""}
-                placeholder="2015"
-                upStart={2016}
-                downStart={2015}
-                onChange={(value) => setFilter({ anoMin: value ? Number(value) : undefined })}
-              />
-            </label>
-            <label className="block text-xs text-muted-foreground">
-              Preço até (R$)
-              <NumberInput
-                className={selectCls}
-                value={search.precoMax ?? ""}
-                placeholder="300000"
-                step={5000}
-                upStart={300000}
-                downStart={280000}
-                onChange={(value) => setFilter({ precoMax: value ? Number(value) : undefined })}
-              />
             </label>
             <button
               type="button"

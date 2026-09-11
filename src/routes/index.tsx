@@ -112,9 +112,16 @@ function Home() {
               <input
                 value={termo}
                 onChange={(e) => setTermo(e.target.value)}
+                placeholder="Digite marca, modelo..."
+                aria-label="Buscar veículo"
+                className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground sm:hidden"
+              />
+              <input
+                value={termo}
+                onChange={(e) => setTermo(e.target.value)}
                 placeholder="Digite marca, modelo ou ano"
                 aria-label="Buscar veículo"
-                className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
+                className="hidden min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground sm:block"
               />
               <button
                 type="submit"

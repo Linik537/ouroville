@@ -131,9 +131,10 @@ function writeInventoryCache(rows: Carro[]) {
 export async function fetchCarros(filters?: {
   termo?: string | undefined;
   marca?: string | undefined;
-  cambio?: string | undefined;
   combustivel?: string | undefined;
   anoMin?: number | undefined;
+  anoMax?: number | undefined;
+  precoMin?: number | undefined;
   precoMax?: number | undefined;
   novidades?: boolean | undefined;
   limit?: number | undefined;
@@ -159,11 +160,14 @@ export async function fetchCarros(filters?: {
   }
 
   if (filters?.marca) rows = rows.filter((carro) => carro.marca === filters.marca);
-  if (filters?.cambio) rows = rows.filter((carro) => carro.cambio === filters.cambio);
   if (filters?.combustivel)
     rows = rows.filter((carro) => carro.combustivel === filters.combustivel);
   if (filters?.anoMin && Number.isFinite(filters.anoMin))
-    rows = rows.filter((carro) => carro.ano >= filters.anoMin!);
+    rows = rows.filter((carro) => (carro.ano_modelo ?? carro.ano) >= filters.anoMin!);
+  if (filters?.anoMax && Number.isFinite(filters.anoMax))
+    rows = rows.filter((carro) => (carro.ano_modelo ?? carro.ano) <= filters.anoMax!);
+  if (filters?.precoMin && Number.isFinite(filters.precoMin))
+    rows = rows.filter((carro) => carro.preco !== null && carro.preco >= filters.precoMin!);
   if (filters?.precoMax && Number.isFinite(filters.precoMax))
     rows = rows.filter((carro) => carro.preco !== null && carro.preco <= filters.precoMax!);
   if (filters?.novidades && rows.some((carro) => typeof carro.mostrar_novidades === "boolean")) {
