@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Award, Search, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
+import autoMotorsLogo from "@/assets/auto-motors.png";
 import heroCar from "@/assets/hero-car.jpg";
 import { CarCard, CarCardSkeleton } from "@/components/site/CarCard";
 import { HeroHeadlights } from "@/components/site/HeroHeadlights";
@@ -89,6 +90,19 @@ function Home() {
         <HeroHeadlights />
         <div className="relative mx-auto max-w-5xl px-4 pb-36 pt-28 text-center sm:pb-40 sm:pt-32">
           <div className="relative -top-1">
+            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/15 bg-black/45 px-4 py-2.5 shadow-[0_12px_35px_rgba(0,0,0,0.32)] backdrop-blur-md sm:gap-4 sm:px-5">
+              <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.16em] text-white/70 sm:text-xs">
+                Em parceria com
+              </span>
+              <span className="h-7 w-px bg-white/15" aria-hidden />
+              <img
+                src={autoMotorsLogo}
+                alt="Auto Motors"
+                width={182}
+                height={87}
+                className="h-auto w-24 drop-shadow-[0_2px_5px_rgba(0,0,0,0.7)] sm:w-28"
+              />
+            </div>
             <h1 className="mt-0 flex flex-col gap-2 font-oswald text-[clamp(30px,9vw,60px)] font-bold leading-none tracking-wide text-foreground">
               <span className="whitespace-nowrap">Seu próximo seminovo,</span>
               <span>
@@ -114,7 +128,7 @@ function Home() {
                 onChange={(e) => setTermo(e.target.value)}
                 placeholder="Digite marca, modelo..."
                 aria-label="Buscar veículo"
-                className="min-w-0 flex-1 rounded-l-full bg-transparent px-6 py-4 text-base text-foreground outline-none placeholder:text-muted-foreground sm:hidden"
+                className="min-w-0 flex-1 rounded-l-full bg-transparent px-4 py-4 text-sm text-foreground outline-none placeholder:text-muted-foreground sm:hidden"
               />
               <input
                 value={termo}
