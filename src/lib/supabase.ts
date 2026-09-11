@@ -88,8 +88,8 @@ export const slugify = (s: string) =>
 export const carUrl = (c: Pick<Carro, "id" | "marca" | "modelo" | "ano">) =>
   `/carros/${slugify(c.marca)}/${slugify(c.modelo)}/${c.ano}/${c.id}`;
 
-export const carTitle = (c: Pick<Carro, "marca" | "modelo" | "ano">) =>
-  `${c.marca} ${c.modelo} ${c.ano}`;
+export const carTitle = (c: Pick<Carro, "marca" | "modelo" | "ano" | "ano_modelo">) =>
+  `${c.marca} ${c.modelo} ${c.ano_modelo ?? c.ano}`;
 
 export const PLACEHOLDER_CAR =
   "data:image/svg+xml;utf8," +

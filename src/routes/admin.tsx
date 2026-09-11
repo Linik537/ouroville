@@ -211,6 +211,7 @@ function Painel() {
   const [novidadesIds, setNovidadesIds] = useState<number[] | null>(null);
   const [carroParaNovidades, setCarroParaNovidades] = useState("");
   const [salvandoNovidades, setSalvandoNovidades] = useState(false);
+  const formularioCarroRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const urls = arquivos.map((arquivo) => URL.createObjectURL(arquivo));
@@ -684,7 +685,9 @@ function Painel() {
     setCrop({ ...DEFAULT_CROP });
     setFotoEditando(null);
     setSubstituicoes({});
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.requestAnimationFrame(() => {
+      formularioCarroRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   function selecionarArquivoParaEditar(indice: number) {
@@ -830,7 +833,7 @@ function Painel() {
                       {indice + 1}
                     </span>
                     <span className="min-w-0 flex-1 text-sm font-medium text-foreground">
-                      {carro.marca} {carro.modelo} {carro.ano}
+                      {carro.marca} {carro.modelo} {carro.ano_modelo ?? carro.ano}
                     </span>
                     <button
                       type="button"
@@ -883,7 +886,7 @@ function Painel() {
                   )
                   .map((carro) => (
                     <option key={carro.id} value={carro.id}>
-                      {carro.marca} {carro.modelo} {carro.ano}
+                      {carro.marca} {carro.modelo} {carro.ano_modelo ?? carro.ano}
                     </option>
                   ))}
               </select>
@@ -911,7 +914,11 @@ function Painel() {
             </div>
           </section>
 
-          <form onSubmit={salvar} className="mt-6 rounded-xl border border-border/70 bg-card p-6">
+          <form
+            ref={formularioCarroRef}
+            onSubmit={salvar}
+            className="mt-6 scroll-mt-24 rounded-xl border border-border/70 bg-card p-6"
+          >
             <h2 className="text-lg font-semibold text-foreground">
               {editId ? "Editar carro" : "Novo carro"}
             </h2>
@@ -919,8 +926,8 @@ function Painel() {
               {campo("marca", "Marca")}
               {campo("modelo", "Modelo")}
               {campo("versao", "Versão")}
-              {campo("ano", "Ano", "number")}
-              {campo("ano_modelo", "Ano / Modelo", "number")}
+              {campo("ano", "Ano de fabricação", "number")}
+              {campo("ano_modelo", "Ano do modelo", "number")}
               {campo("preco", "Preço (R$)", "number")}
               {campo("quilometragem", "Quilometragem", "number")}
               {campo("cor", "Cor")}
@@ -1269,7 +1276,7 @@ function Painel() {
               >
                 <div>
                   <span className="font-medium text-foreground">
-                    {c.marca} {c.modelo} {c.ano}
+                    {c.marca} {c.modelo} {c.ano_modelo ?? c.ano}
                   </span>
                   {c.versao?.trim() ? (
                     <p className="mt-0.5 text-xs text-muted-foreground">{c.versao.trim()}</p>
@@ -1362,7 +1369,7 @@ function AnalyticsPanel({ eventos, carros }: { eventos: AnalyticsSummaryRow[]; c
               className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-sm last:border-0"
             >
               <span className="font-medium text-foreground">
-                {carro.marca} {carro.modelo} {carro.ano}
+                {carro.marca} {carro.modelo} {carro.ano_modelo ?? carro.ano}
               </span>
               <span className="text-muted-foreground">
                 {total("car_view", carro.id)} visualizações ·{" "}

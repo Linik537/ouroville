@@ -223,7 +223,8 @@ function Detalhe() {
   const quilometragem = carro?.quilometragem ?? (carro?.marca.toUpperCase() === "BYD" ? 0 : null);
   const nomeMarca = carro ? formatCarName(carro.marca) : "";
   const nomeModelo = carro ? formatCarName(carro.modelo) : "";
-  const nomeCarro = carro ? `${nomeMarca} ${nomeModelo} ${carro.ano}` : "";
+  const anoModelo = carro?.ano_modelo ?? carro?.ano;
+  const nomeCarro = carro ? `${nomeMarca} ${nomeModelo} ${anoModelo}` : "";
 
   const mensagemWhatsApp = carro
     ? `Olá! Tenho interesse no ${carTitle(carro)} anunciado no site.`
@@ -262,7 +263,7 @@ function Detalhe() {
   const versao = carro.versao?.trim();
   const ficha: FichaItem[] = [
     {
-      label: "Ano / Modelo",
+      label: "Fabricação / Modelo",
       value: `${carro.ano}/${carro.ano_modelo ?? carro.ano}`,
       Icon: CalendarDays,
     },
@@ -282,7 +283,7 @@ function Detalhe() {
       name: nomeMarca,
     },
     model: nomeModelo,
-    vehicleModelDate: String(carro.ano),
+    vehicleModelDate: String(anoModelo),
     fuelType: carro.combustivel || undefined,
     vehicleTransmission: carro.cambio || undefined,
     color: carro.cor || undefined,
@@ -442,7 +443,7 @@ function Detalhe() {
           <h1 className="font-oswald text-[30px] font-semibold leading-tight tracking-wide sm:text-[32px]">
             <span className="text-white">{nomeMarca}</span>{" "}
             <span className="text-gold">{nomeModelo}</span>{" "}
-            <span className="text-white">{carro.ano}</span>
+            <span className="text-white">{anoModelo}</span>
           </h1>
           {versao && <p className="mt-1 text-lg text-white/85">{versao}</p>}
           <p className="text-gold mt-10 inline-block font-inter text-2xl font-bold tracking-wide sm:text-3xl">
